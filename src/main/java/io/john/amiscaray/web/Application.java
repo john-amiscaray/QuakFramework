@@ -10,9 +10,9 @@ import java.util.*;
 
 import static io.john.amiscaray.web.ApplicationProperty.*;
 
-public abstract class Application {
-
+public class Application {
     protected Context context;
+    private ApplicationProperties properties;
 
     public void start() throws LifecycleException {
         var properties = getApplicationProperties();
@@ -36,13 +36,16 @@ public abstract class Application {
     }
 
     public ApplicationProperties getApplicationProperties() {
-        try (var propertiesFileInputStream = Application.class.getResourceAsStream("/application.properties")) {
-            var properties = new Properties();
-            properties.load(propertiesFileInputStream);
-            return parsePropertiesFromFile(properties);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (properties == null) {
+            try (var propertiesFileInputStream = Application.class.getResourceAsStream("/application.properties")) {
+                var propertiesFromFile = new Properties();
+                propertiesFromFile.load(propertiesFileInputStream);
+                properties = parsePropertiesFromFile(propertiesFromFile);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
+        return properties;
     }
 
     private ApplicationProperties parsePropertiesFromFile(Properties properties) {
