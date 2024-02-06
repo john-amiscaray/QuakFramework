@@ -5,15 +5,14 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class PropertyLoadingTest {
+public class ApplicationTest {
 
-    private final Application application = new Application();
+    private Application application = new Application();
 
     @Test
     void testPropertiesAreLoadedFromFile() {
-        
         var properties = application.getApplicationProperties();
-        
+
         assertEquals(properties.serverPort(), 9000);
         assertEquals(properties.serverDirectory(), "myserver");
         assertEquals(properties.serverDocBase(), "based");
@@ -24,7 +23,6 @@ public class PropertyLoadingTest {
         assertEquals(properties.dbUsername(), "root");
         assertEquals(properties.dbPassword(), "password");
         assertEquals(properties.sqlDialect(), "org.hibernate.dialect.MySQLDialect");
-
     }
 
 }

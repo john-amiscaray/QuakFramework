@@ -20,27 +20,28 @@ public class Application {
     protected Context context;
     protected ApplicationProperties properties;
     protected SessionFactory dbSessionFactory;
+    protected Tomcat server;
 
     public void start() throws LifecycleException {
-        var properties = getApplicationProperties();
-        var tomcat = new Tomcat();
-        tomcat.setBaseDir(properties.serverDirectory());
+        properties = getApplicationProperties();
+        server = new Tomcat();
+        server.setBaseDir(properties.serverDirectory());
 
-        var connector1 = tomcat.getConnector();
+        var connector1 = server.getConnector();
         connector1.setPort(properties.serverPort());
 
         var docBase = new File(properties.serverDocBase()).getAbsolutePath();
 
-        context = tomcat.addContext(properties.serverContextPath(), docBase);
+        context = server.addContext(properties.serverContextPath(), docBase);
 
         initDatabases();
 
-        tomcat.start();
-        tomcat.getService().addConnector(connector1);
-        tomcat.getServer().await();
+        server.start();
+        server.getService().addConnector(connector1);
+        server.getServer().await();
     }
 
-    public void initDatabases() {
+    private void initDatabases() {
 
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(Map.of(
@@ -60,10 +61,6 @@ public class Application {
 
         dbSessionFactory = metadata.buildSessionFactory();
 
-    }
-
-    private Context getContext() {
-        return context;
     }
 
     public ApplicationProperties getApplicationProperties() {
