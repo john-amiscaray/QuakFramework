@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTest {
 
-    private Application application = new Application();
+    private Application application = new Application(ApplicationTest.class, new String[0]);
 
     @Test
     void testPropertiesAreLoadedFromFile() {

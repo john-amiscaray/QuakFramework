@@ -21,6 +21,15 @@ public class Application {
     protected ApplicationProperties properties;
     protected SessionFactory dbSessionFactory;
     protected Tomcat server;
+    protected String classScanPackage;
+    protected String[] args;
+
+    public Application(Class<?> main, String[] args) {
+
+        this.args = args;
+        classScanPackage = main.getPackageName();
+
+    }
 
     public void start() throws LifecycleException {
         properties = getApplicationProperties();
