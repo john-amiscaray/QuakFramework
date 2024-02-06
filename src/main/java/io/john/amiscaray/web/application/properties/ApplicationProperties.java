@@ -1,4 +1,4 @@
-package io.john.amiscaray.web;
+package io.john.amiscaray.web.application.properties;
 
 import lombok.Builder;
 

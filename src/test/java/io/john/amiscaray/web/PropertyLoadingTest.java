@@ -1,5 +1,6 @@
 package io.john.amiscaray.web;
 
+import io.john.amiscaray.web.application.Application;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

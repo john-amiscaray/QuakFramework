@@ -1,6 +1,6 @@
 package io.john.amiscaray;
 
-import io.john.amiscaray.web.Application;
+import io.john.amiscaray.web.application.Application;
 import org.apache.catalina.LifecycleException;
 
 public class Main extends Application {

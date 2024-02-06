@@ -1,10 +1,9 @@
-package io.john.amiscaray.web;
+package io.john.amiscaray.web.application;
 
-import io.john.amiscaray.orm.Employee;
+import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -15,11 +14,12 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-import static io.john.amiscaray.web.ApplicationProperty.*;
+import static io.john.amiscaray.web.application.properties.ApplicationProperty.*;
 
 public class Application {
     protected Context context;
-    private ApplicationProperties properties;
+    protected ApplicationProperties properties;
+    protected SessionFactory dbSessionFactory;
 
     public void start() throws LifecycleException {
         var properties = getApplicationProperties();
@@ -54,19 +54,11 @@ public class Application {
                 .build();
 
         Metadata metadata = new MetadataSources(serviceRegistry)
-                .addAnnotatedClass(Employee.class)
+                //.addAnnotatedClass(Employee.class)
                 // other domain classes
                 .buildMetadata();
 
-        try (SessionFactory factory = metadata.buildSessionFactory(); Session session = factory.openSession()) {
-
-            var transaction = session.beginTransaction();
-
-            session.persist(new Employee("Jimmy"));
-
-            transaction.commit();
-
-        }
+        dbSessionFactory = metadata.buildSessionFactory();
 
     }
 

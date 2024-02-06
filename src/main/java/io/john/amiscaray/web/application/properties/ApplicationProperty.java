@@ -1,4 +1,4 @@
-package io.john.amiscaray.web;
+package io.john.amiscaray.web.application.properties;
 
 import java.util.Optional;
 import java.util.Properties;
