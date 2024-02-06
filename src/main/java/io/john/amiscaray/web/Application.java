@@ -1,8 +1,15 @@
 package io.john.amiscaray.web;
 
+import io.john.amiscaray.orm.Employee;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.service.ServiceRegistry;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +33,41 @@ public class Application {
 
         context = tomcat.addContext(properties.serverContextPath(), docBase);
 
+        initDatabases();
+
         tomcat.start();
         tomcat.getService().addConnector(connector1);
         tomcat.getServer().await();
+    }
+
+    public void initDatabases() {
+
+        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
+                .applySettings(Map.of(
+                        SQL_DIALECT.getName(), properties.sqlDialect(),
+                        DB_DRIVER_CLASS.getName(), properties.dbConnectionDriver(),
+                        DB_CONNECTION_URL.getName(), properties.dbConnectionURL(),
+                        DB_CONNECTION_USERNAME.getName(), properties.dbUsername(),
+                        DB_CONNECTION_PASSWORD.getName(), properties.dbPassword(),
+                        HBM2DDL.getName(), properties.hbm2ddl()
+                ))
+                .build();
+
+        Metadata metadata = new MetadataSources(serviceRegistry)
+                .addAnnotatedClass(Employee.class)
+                // other domain classes
+                .buildMetadata();
+
+        try (SessionFactory factory = metadata.buildSessionFactory(); Session session = factory.openSession()) {
+
+            var transaction = session.beginTransaction();
+
+            session.persist(new Employee("Jimmy"));
+
+            transaction.commit();
+
+        }
+
     }
 
     private Context getContext() {
@@ -49,15 +88,17 @@ public class Application {
     }
 
     private ApplicationProperties parsePropertiesFromFile(Properties properties) {
-        var port = Optional.of(properties.getProperty(PORT.getName())).orElse("8080");
-        var serverDirectory = Optional.of(properties.getProperty(SERVER_DIRECTORY.getName())).orElse("server");
-        var serverContextPath = Optional.of(properties.getProperty(CONTEXT_PATH.getName())).orElse("");
-        var serverDocBase = Optional.of(properties.getProperty(DOCUMENT_BASE.getName())).orElse(".");
         return ApplicationProperties.builder()
-                .serverPort(Integer.parseInt(port))
-                .serverDirectory(serverDirectory)
-                .serverContextPath(serverContextPath)
-                .serverDocBase(serverDocBase)
+                .serverPort(Integer.parseInt(PORT.getOrElseDefault(properties)))
+                .serverDirectory(SERVER_DIRECTORY.getOrElseDefault(properties))
+                .serverContextPath(CONTEXT_PATH.getOrElseDefault(properties))
+                .serverDocBase(DOCUMENT_BASE.getOrElseDefault(properties))
+                .dbUsername(DB_CONNECTION_USERNAME.getOrElseDefault(properties))
+                .dbPassword(DB_CONNECTION_PASSWORD.getOrElseDefault(properties))
+                .dbConnectionURL(DB_CONNECTION_URL.getOrElseDefault(properties))
+                .sqlDialect(SQL_DIALECT.getOrElseDefault(properties))
+                .dbConnectionDriver(DB_DRIVER_CLASS.getOrElseDefault(properties))
+                .hbm2ddl(HBM2DDL.getOrElseDefault(properties))
                 .build();
     }
 

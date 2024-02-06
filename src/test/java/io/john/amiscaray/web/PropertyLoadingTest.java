@@ -10,11 +10,19 @@ public class PropertyLoadingTest {
 
     @Test
     void testPropertiesAreLoadedFromFile() {
-
-        assertEquals(application.getApplicationProperties().serverPort(), 9000);
-        assertEquals(application.getApplicationProperties().serverDirectory(), "myserver");
-        assertEquals(application.getApplicationProperties().serverDocBase(), "based");
-        assertEquals(application.getApplicationProperties().serverContextPath(), "/test");
+        
+        var properties = application.getApplicationProperties();
+        
+        assertEquals(properties.serverPort(), 9000);
+        assertEquals(properties.serverDirectory(), "myserver");
+        assertEquals(properties.serverDocBase(), "based");
+        assertEquals(properties.serverContextPath(), "/test");
+        assertEquals(properties.dbConnectionURL(), "jdbc:mysql://localhost:3306/test");
+        assertEquals(properties.dbConnectionDriver(), "com.mysql.cj.jdbc.Driver");
+        assertEquals(properties.hbm2ddl(), "update");
+        assertEquals(properties.dbUsername(), "root");
+        assertEquals(properties.dbPassword(), "password");
+        assertEquals(properties.sqlDialect(), "org.hibernate.dialect.MySQLDialect");
 
     }
 
