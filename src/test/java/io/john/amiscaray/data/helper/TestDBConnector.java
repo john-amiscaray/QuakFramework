@@ -1,6 +1,5 @@
 package io.john.amiscaray.data.helper;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import org.h2.tools.RunScript;
 
