@@ -1,6 +1,8 @@
 package io.john.amiscaray.web.application;
 
+import io.john.amiscaray.data.DatabaseProxy;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
+import jakarta.persistence.Entity;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
@@ -9,6 +11,8 @@ import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.service.ServiceRegistry;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,13 +26,12 @@ public class Application {
     protected SessionFactory dbSessionFactory;
     protected Tomcat server;
     protected String classScanPackage;
+    protected DatabaseProxy databaseProxy;
     protected String[] args;
 
     public Application(Class<?> main, String[] args) {
-
         this.args = args;
         classScanPackage = main.getPackageName();
-
     }
 
     public void start() throws LifecycleException {
@@ -43,33 +46,11 @@ public class Application {
 
         context = server.addContext(properties.serverContextPath(), docBase);
 
-        initDatabases();
+        databaseProxy = new DatabaseProxy(properties, classScanPackage);
 
         server.start();
         server.getService().addConnector(connector1);
         server.getServer().await();
-    }
-
-    private void initDatabases() {
-
-        ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
-                .applySettings(Map.of(
-                        SQL_DIALECT.getName(), properties.sqlDialect(),
-                        DB_DRIVER_CLASS.getName(), properties.dbConnectionDriver(),
-                        DB_CONNECTION_URL.getName(), properties.dbConnectionURL(),
-                        DB_CONNECTION_USERNAME.getName(), properties.dbUsername(),
-                        DB_CONNECTION_PASSWORD.getName(), properties.dbPassword(),
-                        HBM2DDL.getName(), properties.hbm2ddl()
-                ))
-                .build();
-
-        Metadata metadata = new MetadataSources(serviceRegistry)
-                //.addAnnotatedClass(Employee.class)
-                // other domain classes
-                .buildMetadata();
-
-        dbSessionFactory = metadata.buildSessionFactory();
-
     }
 
     public ApplicationProperties getApplicationProperties() {

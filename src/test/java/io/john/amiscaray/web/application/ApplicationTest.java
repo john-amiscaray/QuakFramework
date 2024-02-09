@@ -1,13 +1,12 @@
-package io.john.amiscaray.web;
+package io.john.amiscaray.web.application;
 
-import io.john.amiscaray.web.application.Application;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTest {
 
-    private Application application = new Application(ApplicationTest.class, new String[0]);
+    private final Application application = new Application(ApplicationTest.class, new String[0]);
 
     @Test
     void testPropertiesAreLoadedFromFile() {
@@ -15,10 +14,10 @@ public class ApplicationTest {
 
         assertEquals(properties.serverPort(), 9000);
         assertEquals(properties.serverDirectory(), "myserver");
-        assertEquals(properties.serverDocBase(), "based");
+        assertEquals(properties.serverDocBase(), ".");
         assertEquals(properties.serverContextPath(), "/test");
-        assertEquals(properties.dbConnectionURL(), "jdbc:mysql://localhost:3306/test");
-        assertEquals(properties.dbConnectionDriver(), "com.mysql.cj.jdbc.Driver");
+        assertEquals(properties.dbConnectionURL(), "jdbc:h2:mem:test");
+        assertEquals(properties.dbConnectionDriver(), "org.h2.Driver");
         assertEquals(properties.hbm2ddl(), "update");
         assertEquals(properties.dbUsername(), "root");
         assertEquals(properties.dbPassword(), "password");
