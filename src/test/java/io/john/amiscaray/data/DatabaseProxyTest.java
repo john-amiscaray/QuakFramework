@@ -26,7 +26,7 @@ public class DatabaseProxyTest {
             .sqlDialect("org.hibernate.dialect.H2Dialect")
             .build();
     private static final String hibernatePackage = "io.john.amiscaray.data.stub";
-    private static final TestDBConnector<Employee> testDBConnector = new EmployeeTestDBConnector(testApplicationProperties);
+    private static final EmployeeTestDBConnector testDBConnector = new EmployeeTestDBConnector(testApplicationProperties);
     private final static DatabaseProxy dbProxy = new DatabaseProxy(testApplicationProperties, hibernatePackage);
 
     @BeforeEach
@@ -57,13 +57,22 @@ public class DatabaseProxyTest {
 
     @Test
     void testEmployeeCanBeDeleted() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/data.sql");
+        testDBConnector.runQueryFromFile("/sql/sample/single_employee.sql");
 
-        var employeeToDelete = dbProxy.fetchById(1L, Employee.class);
+        var employeeToDelete = testDBConnector.queryById(1L);
         dbProxy.delete(employeeToDelete.getId(), Employee.class);
         List<Employee> resultingTable = testDBConnector.queryEntries("SELECT * FROM Employee");
 
         assertTrue(resultingTable.isEmpty());
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedById() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/single_employee.sql");
+
+        var fetchedEmployee = dbProxy.fetchById(1L, Employee.class);
+
+        assertEquals(new Employee(1L, "Billy", "Tech"), fetchedEmployee);
     }
 
 }

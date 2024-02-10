@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @AllArgsConstructor
-public class EmployeeTestDBConnector implements TestDBConnector<Employee> {
+public class EmployeeTestDBConnector implements TestDBConnector<Employee, Long> {
 
     private ApplicationProperties properties;
 
