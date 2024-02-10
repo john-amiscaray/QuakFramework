@@ -1,7 +1,6 @@
 package io.john.amiscaray.data;
 
 import io.john.amiscaray.data.helper.EmployeeTestDBConnector;
-import io.john.amiscaray.data.helper.TestDBConnector;
 import io.john.amiscaray.data.stub.Employee;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import org.junit.jupiter.api.AfterAll;
@@ -75,4 +74,16 @@ public class DatabaseProxyTest {
         assertEquals(new Employee(1L, "Billy", "Tech"), fetchedEmployee);
     }
 
+    @Test
+    void testEmployeeCanBeQueriedByDepartment() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+//        CriteriaBuilder cb = dbProxy.criteriaBuilder();
+//        CriteriaQuery<Employee> cr = cb.createQuery(Employee.class);
+//        Root<Employee> root = cr.from(Employee.class);
+//        cr.select(root);
+//
+//        .where(root.get("department").in("Tech"));
+//        query.getOrderList();
+    }
 }

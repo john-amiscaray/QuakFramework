@@ -2,11 +2,13 @@ package io.john.amiscaray.data;
 
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.criteria.HibernateCriteriaBuilder;
 import org.hibernate.service.ServiceRegistry;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -54,12 +56,14 @@ public class DatabaseProxy {
     }
 
     public void persist(Object entity) {
+        checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         currentSession.persist(entity);
         transaction.commit();
     }
 
     public <T> T fetchById(Object entityId, Class<T> entityType) {
+        checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         var entity = currentSession.byId(entityType).getReference(entityId);
         transaction.commit();
@@ -67,9 +71,22 @@ public class DatabaseProxy {
     }
 
     public void delete(Object entityId, Class<?> entityType) {
+        checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         var entity = currentSession.byId(entityType).getReference(entityId);
         currentSession.remove(entity);
         transaction.commit();
     }
+
+    public CriteriaBuilder criteriaBuilder() {
+        checkSessionStarted();
+        return currentSession.getCriteriaBuilder();
+    }
+
+    private void checkSessionStarted() {
+        if (currentSession == null) {
+            throw new IllegalStateException("Attempted to access database without an active session");
+        }
+    }
+
 }

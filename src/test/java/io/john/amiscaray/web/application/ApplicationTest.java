@@ -19,9 +19,9 @@ public class ApplicationTest {
         assertEquals(properties.dbConnectionURL(), "jdbc:h2:mem:test");
         assertEquals(properties.dbConnectionDriver(), "org.h2.Driver");
         assertEquals(properties.hbm2ddl(), "update");
-        assertEquals(properties.dbUsername(), "root");
-        assertEquals(properties.dbPassword(), "password");
-        assertEquals(properties.sqlDialect(), "org.hibernate.dialect.MySQLDialect");
+        assertEquals(properties.dbUsername(), "sa");
+        assertEquals(properties.dbPassword(), "");
+        assertEquals(properties.sqlDialect(), "org.hibernate.dialect.H2Dialect");
     }
 
 }
