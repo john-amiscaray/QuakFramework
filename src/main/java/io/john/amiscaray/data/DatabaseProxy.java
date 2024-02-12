@@ -1,22 +1,28 @@
 package io.john.amiscaray.data;
 
+import io.john.amiscaray.data.query.QueryCriteria;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Root;
+import lombok.Singular;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.query.criteria.HibernateCriteriaBuilder;
+import org.hibernate.query.Query;
 import org.hibernate.service.ServiceRegistry;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import static io.john.amiscaray.web.application.properties.ApplicationProperty.*;
-import static io.john.amiscaray.web.application.properties.ApplicationProperty.HBM2DDL;
 
 public class DatabaseProxy {
 
@@ -78,14 +84,83 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-    public CriteriaBuilder criteriaBuilder() {
+    public static DatabaseQuery.DatabaseQueryBuilder queryBuilder() {
+        return DatabaseQuery.builder();
+    }
+
+    public <T> List<T> runQuery(DatabaseQuery databaseQuery, Class<T> entityType) {
         checkSessionStarted();
-        return currentSession.getCriteriaBuilder();
+        CriteriaBuilder cb = currentSession.getCriteriaBuilder();
+        CriteriaQuery<T> cr = cb.createQuery(entityType);
+        Root<T> root = cr.from(entityType);
+        var selection = cr.select(root);
+
+        for (QueryCriteria criteria : databaseQuery.criteria) {
+            selection.where(criteria.getTestPredicate(root, cb));
+        }
+
+        Query<T> query = currentSession.createQuery(cr);
+        return query.getResultList();
     }
 
     private void checkSessionStarted() {
         if (currentSession == null) {
             throw new IllegalStateException("Attempted to access database without an active session");
+        }
+    }
+
+    private record DatabaseQuery(@Singular("criteria") List<QueryCriteria> criteria) {
+
+        public static DatabaseQueryBuilder builder() {
+            return new DatabaseQueryBuilder();
+        }
+
+        public static class DatabaseQueryBuilder {
+            private ArrayList<QueryCriteria> criteria;
+
+            DatabaseQueryBuilder() {
+            }
+
+            public DatabaseQueryBuilder withCriteria(QueryCriteria criteria) {
+                if (this.criteria == null) this.criteria = new ArrayList<>();
+                this.criteria.add(criteria);
+                return this;
+            }
+
+            public DatabaseQueryBuilder withCriteria(Collection<? extends QueryCriteria> criteria) {
+                if (criteria == null) {
+                    throw new NullPointerException("criteria cannot be null");
+                }
+                if (this.criteria == null) this.criteria = new ArrayList<>();
+                this.criteria.addAll(criteria);
+                return this;
+            }
+
+            public DatabaseQueryBuilder clearCriteria() {
+                if (this.criteria != null)
+                    this.criteria.clear();
+                return this;
+            }
+
+            public DatabaseQuery build() {
+                List<QueryCriteria> criteria;
+                switch (this.criteria == null ? 0 : this.criteria.size()) {
+                    case 0:
+                        criteria = java.util.Collections.emptyList();
+                        break;
+                    case 1:
+                        criteria = java.util.Collections.singletonList(this.criteria.get(0));
+                        break;
+                    default:
+                        criteria = java.util.Collections.unmodifiableList(new ArrayList<>(this.criteria));
+                }
+
+                return new DatabaseQuery(criteria);
+            }
+
+            public String toString() {
+                return "DatabaseProxy.DatabaseQuery.DatabaseQueryBuilder(criteria=" + this.criteria + ")";
+            }
         }
     }
 

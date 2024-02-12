@@ -1,6 +1,7 @@
 package io.john.amiscaray.data;
 
 import io.john.amiscaray.data.helper.EmployeeTestDBConnector;
+import io.john.amiscaray.data.query.numeric.ValueBetween;
 import io.john.amiscaray.data.stub.Employee;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import org.junit.jupiter.api.AfterAll;
@@ -75,15 +76,18 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByDepartment() throws SQLException, FileNotFoundException {
+    void testEmployeeCanBeQueriedByIdsBetween() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-//        CriteriaBuilder cb = dbProxy.criteriaBuilder();
-//        CriteriaQuery<Employee> cr = cb.createQuery(Employee.class);
-//        Root<Employee> root = cr.from(Employee.class);
-//        cr.select(root);
-//
-//        .where(root.get("department").in("Tech"));
-//        query.getOrderList();
+        var fetchedEmployees = dbProxy.runQuery(DatabaseProxy
+                .queryBuilder()
+                .withCriteria(new ValueBetween("id", 2, 4))
+                .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
     }
 }
