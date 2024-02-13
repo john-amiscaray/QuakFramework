@@ -87,7 +87,7 @@ public class DatabaseProxyTest {
     void testEmployeeCanBeQueriedByIdsBetween() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueBetween("id", 2, 4))
                 .build(), Employee.class);
@@ -103,7 +103,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeByIdLessThan4() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueLessThan("id", 4))
                 .build(), Employee.class);
@@ -119,7 +119,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeByIdGreaterThan4() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueGreaterThan("id", 4))
                 .build(), Employee.class);
@@ -133,7 +133,7 @@ public class DatabaseProxyTest {
     void testEmployeeQueryNameIsJohn() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(
+        var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("name", "John"))
                         .build(), Employee.class);
@@ -145,7 +145,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeWhereNameIsOneOfJohnOrElli() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(
+        var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIsOneOf("name", "John", "Elli"))
                         .build(), Employee.class);
@@ -160,7 +160,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeNameStartsWithJo() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(
+        var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueStartsWith("name", "Jo"))
                         .build(), Employee.class);
@@ -172,7 +172,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeNameEndsWithHN() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(
+        var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueEndsWith("name", "hn"))
                         .build(), Employee.class);
@@ -184,7 +184,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeNameContainsLL() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(
+        var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueContaining("name", "ll"))
                         .build(), Employee.class);
@@ -199,7 +199,7 @@ public class DatabaseProxyTest {
     void testQueryEmployeeNameLike() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        var fetchedEmployees = dbProxy.runQuery(
+        var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueLike("name", "J_ff"))
                         .build(), Employee.class);
@@ -207,5 +207,20 @@ public class DatabaseProxyTest {
         assertEquals(List.of(
                 new Employee(5L, "Jeff", "Corporate")
         ), fetchedEmployees);
+    }
+
+    @Test
+    void testDeleteEmployeeWithDepartmentCorporate() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.delete(DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueIs("department", "Corporate"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech"),
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }

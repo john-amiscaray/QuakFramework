@@ -4,6 +4,7 @@ import io.john.amiscaray.data.query.QueryCriteria;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import lombok.Singular;
@@ -88,8 +89,9 @@ public class DatabaseProxy {
         return DatabaseQuery.builder();
     }
 
-    public <T> List<T> runQuery(DatabaseQuery databaseQuery, Class<T> entityType) {
+    public <T> List<T> queryAll(DatabaseQuery databaseQuery, Class<T> entityType) {
         checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
         CriteriaBuilder cb = currentSession.getCriteriaBuilder();
         CriteriaQuery<T> cr = cb.createQuery(entityType);
         Root<T> root = cr.from(entityType);
@@ -100,7 +102,24 @@ public class DatabaseProxy {
         }
 
         Query<T> query = currentSession.createQuery(cr);
-        return query.getResultList();
+        var result = query.getResultList();
+        transaction.commit();
+        return result;
+    }
+
+    public <T> void delete(DatabaseQuery deletionCriteria, Class<T> entityType) {
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        CriteriaBuilder cb = currentSession.getCriteriaBuilder();
+        CriteriaDelete<T> delete = cb.createCriteriaDelete(entityType);
+        Root<T> root = delete.from(entityType);
+
+        for (QueryCriteria criteria : deletionCriteria.criteria) {
+            delete.where(criteria.getTestPredicate(root, cb));
+        }
+
+        currentSession.createMutationQuery(delete).executeUpdate();
+        transaction.commit();
     }
 
     private void checkSessionStarted() {

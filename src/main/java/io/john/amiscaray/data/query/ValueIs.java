@@ -12,6 +12,6 @@ public class ValueIs extends BaseQueryCriteria{
     }
     @Override
     public Expression<Boolean> getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder) {
-        return queryRoot.get("name").in(value);
+        return queryRoot.get(fieldName).in(value);
     }
 }
