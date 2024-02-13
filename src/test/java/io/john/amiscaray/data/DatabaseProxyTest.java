@@ -1,7 +1,15 @@
 package io.john.amiscaray.data;
 
 import io.john.amiscaray.data.helper.EmployeeTestDBConnector;
+import io.john.amiscaray.data.query.ValueIs;
+import io.john.amiscaray.data.query.ValueIsOneOf;
 import io.john.amiscaray.data.query.numeric.ValueBetween;
+import io.john.amiscaray.data.query.numeric.ValueGreaterThan;
+import io.john.amiscaray.data.query.numeric.ValueLessThan;
+import io.john.amiscaray.data.query.string.ValueContaining;
+import io.john.amiscaray.data.query.string.ValueEndsWith;
+import io.john.amiscaray.data.query.string.ValueLike;
+import io.john.amiscaray.data.query.string.ValueStartsWith;
 import io.john.amiscaray.data.stub.Employee;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import org.junit.jupiter.api.AfterAll;
@@ -88,6 +96,116 @@ public class DatabaseProxyTest {
                 new Employee(2L, "Elli", "Tech"),
                 new Employee(3L, "John", "Tech"),
                 new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeByIdLessThan4() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(DatabaseProxy
+                .queryBuilder()
+                .withCriteria(new ValueLessThan("id", 4))
+                .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech"),
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeByIdGreaterThan4() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(DatabaseProxy
+                .queryBuilder()
+                .withCriteria(new ValueGreaterThan("id", 4))
+                .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(5L, "Jeff", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeQueryNameIsJohn() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueIs("name", "John"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(new Employee(3L, "John", "Tech")), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeWhereNameIsOneOfJohnOrElli() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueIsOneOf("name", "John", "Elli"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeNameStartsWithJo() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueStartsWith("name", "Jo"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(new Employee(3L, "John", "Tech")), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeNameEndsWithHN() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueEndsWith("name", "hn"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(new Employee(3L, "John", "Tech")), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeNameContainsLL() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueContaining("name", "ll"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech"),
+                new Employee(2L, "Elli", "Tech")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeNameLike() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.runQuery(
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueLike("name", "J_ff"))
+                        .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(5L, "Jeff", "Corporate")
         ), fetchedEmployees);
     }
 }
