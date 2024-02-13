@@ -3,10 +3,7 @@ package io.john.amiscaray.data;
 import io.john.amiscaray.data.query.QueryCriteria;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaDelete;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.Singular;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -69,6 +66,13 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    public void update(Object entity) {
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        currentSession.merge(entity);
+        transaction.commit();
+    }
+
     public <T> T fetchById(Object entityId, Class<T> entityType) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -107,7 +111,7 @@ public class DatabaseProxy {
         return result;
     }
 
-    public <T> void delete(DatabaseQuery deletionCriteria, Class<T> entityType) {
+    public <T> void deleteAll(DatabaseQuery deletionCriteria, Class<T> entityType) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         CriteriaBuilder cb = currentSession.getCriteriaBuilder();
@@ -119,6 +123,23 @@ public class DatabaseProxy {
         }
 
         currentSession.createMutationQuery(delete).executeUpdate();
+        transaction.commit();
+    }
+
+    public <T> void updateAll(DatabaseQuery updateCriteria, String fieldToUpdate, Object newValue, Class<T> entityType) {
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        CriteriaBuilder cb = currentSession.getCriteriaBuilder();
+        CriteriaUpdate<T> update = cb.createCriteriaUpdate(entityType);
+        Root<T> root = update.from(entityType);
+
+        update.set(fieldToUpdate, newValue);
+
+        for (QueryCriteria criteria : updateCriteria.criteria) {
+            update.where(criteria.getTestPredicate(root, cb));
+        }
+
+        currentSession.createMutationQuery(update).executeUpdate();
         transaction.commit();
     }
 

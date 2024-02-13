@@ -12,10 +12,7 @@ import io.john.amiscaray.data.query.string.ValueLike;
 import io.john.amiscaray.data.query.string.ValueStartsWith;
 import io.john.amiscaray.data.stub.Employee;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
@@ -35,20 +32,17 @@ public class DatabaseProxyTest {
             .build();
     private static final String hibernatePackage = "io.john.amiscaray.data.stub";
     private static final EmployeeTestDBConnector testDBConnector = new EmployeeTestDBConnector(testApplicationProperties);
-    private final static DatabaseProxy dbProxy = new DatabaseProxy(testApplicationProperties, hibernatePackage);
+    private static DatabaseProxy dbProxy;
 
     @BeforeEach
     void cleanDB() {
+        dbProxy = new DatabaseProxy(testApplicationProperties, hibernatePackage);
         testDBConnector.clearTable();
-    }
-
-    @BeforeAll
-    static void startUp() {
         dbProxy.beginSession();
     }
 
-    @AfterAll
-    static void cleanUp() {
+    @AfterEach
+    void endSession() {
         dbProxy.endSession();
     }
 
@@ -213,7 +207,7 @@ public class DatabaseProxyTest {
     void testDeleteEmployeeWithDepartmentCorporate() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        dbProxy.delete(DatabaseProxy.queryBuilder()
+        dbProxy.deleteAll(DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department", "Corporate"))
                         .build(), Employee.class);
 
@@ -221,6 +215,38 @@ public class DatabaseProxyTest {
                 new Employee(1L, "Billy", "Tech"),
                 new Employee(2L, "Elli", "Tech"),
                 new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.updateAll(DatabaseProxy.queryBuilder()
+                .withCriteria(new ValueIs("department", "Tech"))
+                .build(), "department", "Technology", Employee.class);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Technology"),
+                new Employee(2L, "Elli", "Technology"),
+                new Employee(3L, "John", "Technology"),
+                new Employee(4L, "Annie", "Corporate"),
+                new Employee(5L, "Jeff", "Corporate")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeeNamedJohnToJohnnyUsingUpdateMethod() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.update(new Employee(3L, "Johnny", "Tech"));
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech"),
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "Johnny", "Tech"),
+                new Employee(4L, "Annie", "Corporate"),
+                new Employee(5L, "Jeff", "Corporate")
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }
