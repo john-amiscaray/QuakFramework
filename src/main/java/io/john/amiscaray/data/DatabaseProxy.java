@@ -1,10 +1,12 @@
 package io.john.amiscaray.data;
 
 import io.john.amiscaray.data.query.QueryCriteria;
+import io.john.amiscaray.data.update.CompoundNumericFieldUpdate;
+import io.john.amiscaray.data.update.FieldUpdate;
+import io.john.amiscaray.data.update.numeric.SimpleNumericFieldUpdate;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.criteria.*;
-import lombok.Singular;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -93,6 +95,10 @@ public class DatabaseProxy {
         return DatabaseQuery.builder();
     }
 
+    public <T> List<T> queryAll(Class<T> entityType) {
+        return queryAll(DatabaseQuery.builder().build(), entityType);
+    }
+
     public <T> List<T> queryAll(DatabaseQuery databaseQuery, Class<T> entityType) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -126,14 +132,14 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-    public <T> void updateAll(DatabaseQuery updateCriteria, String fieldToUpdate, Object newValue, Class<T> entityType) {
+    public final <T, F> void updateAll(Class<T> entityType, DatabaseQuery updateCriteria, FieldUpdate<F> fieldUpdate) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         CriteriaBuilder cb = currentSession.getCriteriaBuilder();
         CriteriaUpdate<T> update = cb.createCriteriaUpdate(entityType);
         Root<T> root = update.from(entityType);
 
-        update.set(fieldToUpdate, newValue);
+        update.set(fieldUpdate.fieldName(), fieldUpdate.updateExpression().createExpression(root, cb));
 
         for (QueryCriteria criteria : updateCriteria.criteria) {
             update.where(criteria.getTestPredicate(root, cb));
@@ -143,13 +149,39 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+//    public final <T, N extends Number> void updateAll(Class<T> entityType, , DatabaseQuery updateCriteria, CompoundNumericFieldUpdate<N> compoundFieldUpdate) {
+//        checkSessionStarted();
+//        var transaction = currentSession.beginTransaction();
+//        CriteriaBuilder cb = currentSession.getCriteriaBuilder();
+//        CriteriaUpdate<T> update = cb.createCriteriaUpdate(entityType);
+//        Root<T> root = update.from(entityType);
+//
+//        Expression<N> currentExpression = root.get(compoundFieldUpdate.fieldName());
+//
+//        for (var operation : compoundFieldUpdate.operations()) {
+//            currentExpression = operation.operation().apply(currentExpression, cb.literal(operation.operand()));
+//        }
+//
+//        update.set(compoundFieldUpdate.fieldName(), currentExpression);
+//
+//        for (QueryCriteria criteria : updateCriteria.criteria) {
+//            update.where(criteria.getTestPredicate(root, cb));
+//        }
+//
+//        transaction.commit();
+//    }
+
+    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
+        updateAll(entityType, updateCriteria, FieldUpdate.setFieldToValue(fieldToUpdate, newValue));
+    }
+
     private void checkSessionStarted() {
         if (currentSession == null) {
             throw new IllegalStateException("Attempted to access database without an active session");
         }
     }
 
-    private record DatabaseQuery(@Singular("criteria") List<QueryCriteria> criteria) {
+    private record DatabaseQuery(List<QueryCriteria> criteria) {
 
         public static DatabaseQueryBuilder builder() {
             return new DatabaseQueryBuilder();

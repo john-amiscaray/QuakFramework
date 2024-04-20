@@ -21,7 +21,7 @@ public class EmployeeTestDBConnector implements TestDBConnector<Employee, Long> 
 
     @Override
     public Employee parseFromResultSet(ResultSet rs) throws SQLException {
-        return new Employee(rs.getLong("id"), rs.getString("name"), rs.getString("department"));
+        return new Employee(rs.getLong("id"), rs.getString("name"), rs.getString("department"), rs.getLong("salary"));
     }
 
     @Override

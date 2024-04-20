@@ -18,9 +18,20 @@ public class Employee {
     private Long id;
     private String name;
     private String department;
+    private Long salary;
 
-    public Employee(String name, String department) {
+    public Employee(Long id, String name, String department) {
+        this(name, department, 40000L);
+        this.id = id;
+    }
+
+    public Employee(String name, String department, Long salary) {
         this.name = name;
         this.department = department;
+        this.salary = salary;
+    }
+
+    public Employee(String name, String department) {
+        this(name, department, 40000L);
     }
 }

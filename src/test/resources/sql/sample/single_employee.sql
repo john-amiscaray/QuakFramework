@@ -1,1 +1,1 @@
-INSERT INTO Employee VALUES (1, 'Tech', 'Billy');
+INSERT INTO Employee VALUES (1, 'Tech', 'Billy', 40000);

@@ -11,6 +11,10 @@ import io.john.amiscaray.data.query.string.ValueEndsWith;
 import io.john.amiscaray.data.query.string.ValueLike;
 import io.john.amiscaray.data.query.string.ValueStartsWith;
 import io.john.amiscaray.data.stub.Employee;
+import io.john.amiscaray.data.update.CompoundNumericFieldUpdate;
+import io.john.amiscaray.data.update.UpdateExpression;
+import io.john.amiscaray.data.update.numeric.ProductFieldUpdate;
+import io.john.amiscaray.data.update.numeric.QuotientFieldUpdate;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import org.junit.jupiter.api.*;
 
@@ -222,9 +226,9 @@ public class DatabaseProxyTest {
     void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        dbProxy.updateAll(DatabaseProxy.queryBuilder()
+        dbProxy.updateAll(Employee.class, "department", DatabaseProxy.queryBuilder()
                 .withCriteria(new ValueIs("department", "Tech"))
-                .build(), "department", "Technology", Employee.class);
+                .build(), "Technology");
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Technology"),
@@ -248,5 +252,64 @@ public class DatabaseProxyTest {
                 new Employee(4L, "Annie", "Corporate"),
                 new Employee(5L, "Jeff", "Corporate")
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeesInCorporateDepartmentToDoubleSalary() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.updateAll(Employee.class,
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueIs("department","Corporate"))
+                        .build(),
+                new ProductFieldUpdate<>("salary", UpdateExpression.literal(2L)));
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 80000L),
+                new Employee(5L, "Jeff", "Corporate", 80000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeesInTechDepartmentToHalveSalary() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.updateAll(Employee.class,
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueIs("department","Tech"))
+                        .build(),
+                new QuotientFieldUpdate("salary", UpdateExpression.literal(2L)));
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 20000L),
+                new Employee(2L, "Elli", "Tech", 20000L),
+                new Employee(3L, "John", "Tech", 20000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    @Disabled
+    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException, FileNotFoundException {
+//        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+//
+//        dbProxy.updateAll(Employee.class,
+//                DatabaseProxy.queryBuilder()
+//                        .build(),
+//                new CompoundNumericFieldUpdate<>("salary", List.of(
+//                        new SimpleNumericFieldOperation<Number>()
+//                )));
+//
+//        assertEquals(List.of(
+//                new Employee(1L, "Billy", "Tech", 20000L),
+//                new Employee(2L, "Elli", "Tech", 20000L),
+//                new Employee(3L, "John", "Tech", 20000L),
+//                new Employee(4L, "Annie", "Corporate", 40000L),
+//                new Employee(5L, "Jeff", "Corporate", 40000L)
+//        ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }
