@@ -38,10 +38,11 @@ public class DatabaseProxyTest {
     private static DatabaseProxy dbProxy;
 
     @BeforeEach
-    void cleanDB() {
+    void cleanDB() throws SQLException, FileNotFoundException {
         dbProxy = new DatabaseProxy(testApplicationProperties, hibernatePackage);
         testDBConnector.clearTable();
         dbProxy.beginSession();
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
     }
 
     @AfterEach
@@ -51,39 +52,40 @@ public class DatabaseProxyTest {
 
     @Test
     void testEmployeeCanBeSaved() throws SQLException {
-        var employee = new Employee("Billy", "Tech");
+        var employee = new Employee("Dale", "Tech");
+        testDBConnector.clearTable();
 
         dbProxy.persist(employee);
         var result = testDBConnector.queryEntries("SELECT * FROM Employee");
 
-        assertEquals(result.size(), 1);
-        assertEquals(result.get(0), employee);
+        assertEquals(List.of(
+                employee
+        ), result);
     }
 
     @Test
-    void testEmployeeCanBeDeleted() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/single_employee.sql");
-
+    void testEmployeeCanBeDeleted() throws SQLException{
         var employeeToDelete = testDBConnector.queryById(1L);
         dbProxy.delete(employeeToDelete.getId(), Employee.class);
         List<Employee> resultingTable = testDBConnector.queryEntries("SELECT * FROM Employee");
 
-        assertTrue(resultingTable.isEmpty());
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate"),
+                new Employee(5L, "Jeff", "Corporate")
+        ), resultingTable);
     }
 
     @Test
-    void testEmployeeCanBeQueriedById() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/single_employee.sql");
-
+    void testEmployeeCanBeQueriedById() {
         var fetchedEmployee = dbProxy.fetchById(1L, Employee.class);
 
         assertEquals(new Employee(1L, "Billy", "Tech"), fetchedEmployee);
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIdsBetween2And4() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testEmployeeCanBeQueriedByIdsBetween2And4() {
         var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueBetween("id", 2, 4))
@@ -97,9 +99,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4() {
         var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueGreaterThanOrEqualTo("id", 2)
@@ -114,9 +114,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeByIdLessThan4() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeByIdLessThan4() {
         var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueLessThan("id", 4))
@@ -130,9 +128,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeByIdGreaterThan4() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeByIdGreaterThan4() {
         var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueGreaterThan("id", 4))
@@ -144,9 +140,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeQueryNameIsJohn() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testEmployeeQueryNameIsJohn() {
         var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("name", "John"))
@@ -156,9 +150,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeWhereNameIsOneOfJohnOrElli() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeWhereNameIsOneOfJohnOrElli() {
         var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIsOneOf("name", "John", "Elli"))
@@ -171,9 +163,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeNameStartsWithJo() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeNameStartsWithJo() {
         var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueStartsWith("name", "Jo"))
@@ -183,9 +173,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeNameEndsWithHN() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeNameEndsWithHN() {
         var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueEndsWith("name", "hn"))
@@ -195,9 +183,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeNameContainsLL() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeNameContainsLL() {
         var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueContaining("name", "ll"))
@@ -210,9 +196,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testQueryEmployeeNameLike() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testQueryEmployeeNameLike() {
         var fetchedEmployees = dbProxy.queryAll(
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueLike("name", "J_ff"))
@@ -224,9 +208,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testDeleteEmployeeWithDepartmentCorporate() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testDeleteEmployeeWithDepartmentCorporate() throws SQLException {
         dbProxy.deleteAll(DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department", "Corporate"))
                         .build(), Employee.class);
@@ -239,9 +221,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException {
         dbProxy.deleteAll(DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueLessThan("id", 2)
                                 .or(new ValueGreaterThan("id", 3)))
@@ -254,9 +234,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException {
         dbProxy.updateAll(Employee.class, "department", String.class, DatabaseProxy.queryBuilder()
                 .withCriteria(new ValueIs("department", "Tech"))
                 .build(), "Technology");
@@ -271,9 +249,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeeNamedJohnToJohnnyUsingUpdateMethod() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testUpdateEmployeeNamedJohnToJohnnyUsingUpdateMethod() throws SQLException {
         dbProxy.update(new Employee(3L, "Johnny", "Tech"));
 
         assertEquals(List.of(
@@ -286,9 +262,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeesInCorporateDepartmentToDoubleSalary() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testUpdateEmployeesInCorporateDepartmentToDoubleSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department","Corporate"))
@@ -305,14 +279,12 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeesInTechDepartmentToHalveSalary() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testUpdateEmployeesInTechDepartmentToHalveSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department","Tech"))
                         .build(),
-                new QuotientFieldUpdate("salary", Long.class, UpdateExpression.<Number>literal(2)));
+                new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2)));
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 20000L),
@@ -324,9 +296,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 DatabaseProxy.queryBuilder()
                         .build(),
@@ -349,9 +319,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException, FileNotFoundException {
-        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-
+    void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 DatabaseProxy.queryBuilder()
                         .build(),

@@ -18,13 +18,18 @@ public interface TestDBConnector <T, TID> {
 
     Class<T> getEntityType();
 
+    default String getTableName() {
+        var entityType = getEntityType();
+        return entityType.isAnnotationPresent(Table.class) ? entityType.getAnnotation(Table.class).name() : entityType.getSimpleName();
+    }
+
     default T queryById(TID id) throws SQLException {
         try (Statement statement = getDBConnection().createStatement()) {
             Field idField = Arrays.stream(getEntityType().getDeclaredFields())
                     .filter(field -> field.isAnnotationPresent(Id.class))
                     .findFirst().orElseThrow();
             assert idField.getType().equals(id.getClass());
-            var resultSet = statement.executeQuery("SELECT * FROM employee WHERE " + idField.getName() + " = " + id);
+            var resultSet = statement.executeQuery("SELECT * FROM " + getTableName() +" WHERE " + idField.getName() + " = " + id);
             if (resultSet.next()) {
                 return parseFromResultSet(resultSet);
             }
@@ -49,9 +54,7 @@ public interface TestDBConnector <T, TID> {
 
     default void clearTable() {
         try {
-            var entityType = getEntityType();
-            String tableName = entityType.isAnnotationPresent(Table.class) ? entityType.getAnnotation(Table.class).name() : entityType.getSimpleName();
-            try (var deleteStatement = getDBConnection().prepareCall("DELETE FROM " + tableName + " WHERE true")) {
+            try (var deleteStatement = getDBConnection().prepareCall("DELETE FROM " + getTableName() + " WHERE true")) {
                 deleteStatement.execute();
             }
         } catch (SQLException e) {
