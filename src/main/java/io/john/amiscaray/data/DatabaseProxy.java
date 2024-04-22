@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static io.john.amiscaray.web.application.properties.ApplicationProperty.*;
 
@@ -95,10 +94,10 @@ public class DatabaseProxy {
     }
 
     public <T> List<T> queryAll(Class<T> entityType) {
-        return queryAll(DatabaseQuery.builder().build(), entityType);
+        return queryAll(entityType, DatabaseQuery.builder().build());
     }
 
-    public <T> List<T> queryAll(DatabaseQuery databaseQuery, Class<T> entityType) {
+    public <T> List<T> queryAll(Class<T> entityType, DatabaseQuery databaseQuery) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         CriteriaBuilder cb = currentSession.getCriteriaBuilder();
@@ -123,9 +122,6 @@ public class DatabaseProxy {
         CriteriaDelete<T> delete = cb.createCriteriaDelete(entityType);
         Root<T> root = delete.from(entityType);
 
-//        for (QueryCriteria criteria : deletionCriteria.criteria) {
-//            delete.where(criteria.getTestPredicate(root, cb));
-//        }
         delete.where(deletionCriteria.criteria.stream()
                 .map(criteria -> criteria.getTestPredicate(root, cb))
                 .toArray(Predicate[]::new));
@@ -151,8 +147,16 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    public final <T, F> void updateAll(Class<T> entityType, FieldUpdate<F> fieldUpdate) {
+        updateAll(entityType, DatabaseQuery.builder().build(), fieldUpdate);
+    }
+
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, Class<V> fieldType, DatabaseQuery updateCriteria, V newValue) {
         updateAll(entityType, updateCriteria, FieldUpdate.setFieldToValue(fieldToUpdate, newValue, fieldType));
+    }
+
+    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, Class<V> fieldType, V newValue) {
+        updateAll(entityType, fieldToUpdate, fieldType, DatabaseQuery.builder().build(), newValue);
     }
 
     private void checkSessionStarted() {

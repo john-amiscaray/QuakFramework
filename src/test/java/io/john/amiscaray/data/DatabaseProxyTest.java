@@ -86,10 +86,10 @@ public class DatabaseProxyTest {
 
     @Test
     void testEmployeeCanBeQueriedByIdsBetween2And4() {
-        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueBetween("id", 2, 4))
-                .build(), Employee.class);
+                .build());
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -100,11 +100,11 @@ public class DatabaseProxyTest {
 
     @Test
     void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4() {
-        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueGreaterThanOrEqualTo("id", 2)
                         .and(new ValueLessThanOrEqualTo("id", 4)))
-                .build(), Employee.class);
+                .build());
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -115,10 +115,10 @@ public class DatabaseProxyTest {
 
     @Test
     void testQueryEmployeeByIdLessThan4() {
-        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueLessThan("id", 4))
-                .build(), Employee.class);
+                .build());
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech"),
@@ -129,10 +129,10 @@ public class DatabaseProxyTest {
 
     @Test
     void testQueryEmployeeByIdGreaterThan4() {
-        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueGreaterThan("id", 4))
-                .build(), Employee.class);
+                .build());
 
         assertEquals(List.of(
                 new Employee(5L, "Jeff", "Corporate")
@@ -142,9 +142,9 @@ public class DatabaseProxyTest {
     @Test
     void testEmployeeQueryNameIsJohn() {
         var fetchedEmployees = dbProxy.queryAll(
-                DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("name", "John"))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(new Employee(3L, "John", "Tech")), fetchedEmployees);
     }
@@ -152,9 +152,9 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeWhereNameIsOneOfJohnOrElli() {
         var fetchedEmployees = dbProxy.queryAll(
-                DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIsOneOf("name", "John", "Elli"))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -165,9 +165,9 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameStartsWithJo() {
         var fetchedEmployees = dbProxy.queryAll(
-                DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueStartsWith("name", "Jo"))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(new Employee(3L, "John", "Tech")), fetchedEmployees);
     }
@@ -175,9 +175,9 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameEndsWithHN() {
         var fetchedEmployees = dbProxy.queryAll(
-                DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueEndsWith("name", "hn"))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(new Employee(3L, "John", "Tech")), fetchedEmployees);
     }
@@ -185,9 +185,9 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameContainsLL() {
         var fetchedEmployees = dbProxy.queryAll(
-                DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueContaining("name", "ll"))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech"),
@@ -196,11 +196,24 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    public void testQueryEmployeeNameContainsLLAndStartsWithEAsTwoSeparateCriteria() {
+        var fetchedEmployees = dbProxy.queryAll(
+                Employee.class, DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueContaining("name", "ll"))
+                        .withCriteria(new ValueStartsWith("name", "E"))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech")
+        ), fetchedEmployees);
+    }
+
+    @Test
     void testQueryEmployeeNameLike() {
         var fetchedEmployees = dbProxy.queryAll(
-                DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueLike("name", "J_ff"))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(
                 new Employee(5L, "Jeff", "Corporate")
@@ -296,10 +309,8 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException {
+    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000AsCompoundUpdate() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                DatabaseProxy.queryBuilder()
-                        .build(),
                 CompoundNumericFieldUpdate
                         .<Long>builder()
                         .fieldName("salary")
@@ -321,8 +332,6 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                DatabaseProxy.queryBuilder()
-                        .build(),
                 new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(9))
         );
 
@@ -332,6 +341,51 @@ public class DatabaseProxyTest {
                 new Employee(3L, "John", "Tech", 4444L),
                 new Employee(4L, "Annie", "Corporate", 4444L),
                 new Employee(5L, "Jeff", "Corporate", 4444L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testQueryEmployeeByIDGreaterThan2AndDepartmentIsCorporateAsConjunction() {
+        var resultSet = dbProxy.queryAll(Employee.class, DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueGreaterThan("id", 2).and(new ValueIs("department", "Corporate")))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), resultSet);
+    }
+
+    @Test
+    public void testQueryEmployeeByIDGreaterThan2AndDepartmentIsCorporateAsSeparateCriteria() {
+        var resultSet = dbProxy.queryAll(Employee.class, DatabaseProxy.queryBuilder()
+                .withCriteria(new ValueGreaterThan("id", 2))
+                .withCriteria(new ValueIs("department", "Corporate"))
+                .build());
+
+        assertEquals(List.of(
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), resultSet);
+    }
+
+    @Test
+    public void testUpdateEmployeeWithIdGreaterThan2AndDepartmentIsCorporateToHaveDepartmentAsExecutive() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                "department",
+                String.class,
+                DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueGreaterThan("department", 2))
+                        .withCriteria(new ValueIs("department", "Corporate"))
+                        .build(),
+                "Executive");
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Executive", 40000L),
+                new Employee(5L, "Jeff", "Executive", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }
