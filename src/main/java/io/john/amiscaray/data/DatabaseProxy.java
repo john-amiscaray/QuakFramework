@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.john.amiscaray.web.application.properties.ApplicationProperty.*;
 
@@ -122,9 +123,12 @@ public class DatabaseProxy {
         CriteriaDelete<T> delete = cb.createCriteriaDelete(entityType);
         Root<T> root = delete.from(entityType);
 
-        for (QueryCriteria criteria : deletionCriteria.criteria) {
-            delete.where(criteria.getTestPredicate(root, cb));
-        }
+//        for (QueryCriteria criteria : deletionCriteria.criteria) {
+//            delete.where(criteria.getTestPredicate(root, cb));
+//        }
+        delete.where(deletionCriteria.criteria.stream()
+                .map(criteria -> criteria.getTestPredicate(root, cb))
+                .toArray(Predicate[]::new));
 
         currentSession.createMutationQuery(delete).executeUpdate();
         transaction.commit();

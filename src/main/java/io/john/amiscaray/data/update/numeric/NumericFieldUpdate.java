@@ -9,12 +9,12 @@ import java.util.function.BinaryOperator;
 
 public abstract class NumericFieldUpdate<N extends Number> extends BaseFieldUpdate<N> {
 
-    protected final UpdateExpression<N>[] operands;
+    protected final UpdateExpression<Number>[] operands;
 
     protected final Class<N> fieldType;
 
     @SafeVarargs
-    public NumericFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<N>... operands) {
+    public NumericFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<Number>... operands) {
         super(fieldName);
         this.operands = operands;
         this.fieldType = fieldType;

@@ -4,7 +4,7 @@ import io.john.amiscaray.data.update.UpdateExpression;
 
 public class QuotientFieldUpdate<N extends Number> extends NumericFieldUpdate<N> {
     @SafeVarargs
-    public QuotientFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<N>... operands) {
+    public QuotientFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<Number>... operands) {
         super(fieldName, fieldType, operands);
     }
 

@@ -5,7 +5,7 @@ import io.john.amiscaray.data.update.UpdateExpression;
 public class DifferenceFieldUpdate<N extends Number> extends NumericFieldUpdate<N> {
 
     @SafeVarargs
-    public DifferenceFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<N>... operands) {
+    public DifferenceFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<Number>... operands) {
         super(fieldName, fieldType, operands);
     }
 

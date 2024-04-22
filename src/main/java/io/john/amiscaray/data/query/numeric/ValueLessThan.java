@@ -1,7 +1,7 @@
 package io.john.amiscaray.data.query.numeric;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 public class ValueLessThan extends NumericQueryCriteria{
@@ -11,7 +11,7 @@ public class ValueLessThan extends NumericQueryCriteria{
     }
 
     @Override
-    public Expression<Boolean> getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder) {
+    public Predicate getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder) {
         return criteriaBuilder.lt(queryRoot.get(fieldName), values[0]);
     }
 }

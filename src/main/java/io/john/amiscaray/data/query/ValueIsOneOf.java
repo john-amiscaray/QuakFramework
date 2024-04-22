@@ -1,7 +1,7 @@
 package io.john.amiscaray.data.query;
 
 import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.Expression;
+import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 public class ValueIsOneOf extends BaseQueryCriteria{
@@ -13,7 +13,7 @@ public class ValueIsOneOf extends BaseQueryCriteria{
     }
 
     @Override
-    public Expression<Boolean> getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder) {
+    public Predicate getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder) {
         return queryRoot.get("name").in(values);
     }
 }

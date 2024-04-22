@@ -4,7 +4,7 @@ import io.john.amiscaray.data.update.UpdateExpression;
 
 public class ProductFieldUpdate<N extends Number> extends NumericFieldUpdate<N> {
     @SafeVarargs
-    public ProductFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<N>... operands) {
+    public ProductFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<Number>... operands) {
         super(fieldName, fieldType, operands);
     }
 

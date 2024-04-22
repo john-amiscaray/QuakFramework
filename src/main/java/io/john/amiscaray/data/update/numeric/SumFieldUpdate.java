@@ -5,7 +5,7 @@ import io.john.amiscaray.data.update.UpdateExpression;
 public class SumFieldUpdate<N extends Number> extends NumericFieldUpdate<N> {
 
     @SafeVarargs
-    public SumFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<N>... operands) {
+    public SumFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<Number>... operands) {
         super(fieldName, fieldType, operands);
     }
 

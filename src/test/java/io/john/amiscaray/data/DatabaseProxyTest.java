@@ -83,7 +83,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIdsBetween() throws SQLException, FileNotFoundException {
+    void testEmployeeCanBeQueriedByIdsBetween2And4() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
         var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
@@ -224,6 +224,21 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.deleteAll(DatabaseProxy.queryBuilder()
+                        .withCriteria(new ValueLessThan("id", 2)
+                                .or(new ValueGreaterThan("id", 3)))
+                .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
     void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
@@ -263,7 +278,7 @@ public class DatabaseProxyTest {
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department","Corporate"))
                         .build(),
-                new ProductFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2L)));
+                new ProductFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2)));
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 40000L),
@@ -282,7 +297,7 @@ public class DatabaseProxyTest {
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department","Tech"))
                         .build(),
-                new QuotientFieldUpdate("salary", Long.class, UpdateExpression.literal(2L)));
+                new QuotientFieldUpdate("salary", Long.class, UpdateExpression.<Number>literal(2)));
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 20000L),
@@ -325,7 +340,7 @@ public class DatabaseProxyTest {
         dbProxy.updateAll(Employee.class,
                 DatabaseProxy.queryBuilder()
                         .build(),
-                new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(9L))
+                new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(9))
         );
 
         assertEquals(List.of(
