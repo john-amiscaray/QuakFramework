@@ -3,9 +3,7 @@ package io.john.amiscaray.data;
 import io.john.amiscaray.data.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.data.query.ValueIs;
 import io.john.amiscaray.data.query.ValueIsOneOf;
-import io.john.amiscaray.data.query.numeric.ValueBetween;
-import io.john.amiscaray.data.query.numeric.ValueGreaterThan;
-import io.john.amiscaray.data.query.numeric.ValueLessThan;
+import io.john.amiscaray.data.query.numeric.*;
 import io.john.amiscaray.data.query.string.ValueContaining;
 import io.john.amiscaray.data.query.string.ValueEndsWith;
 import io.john.amiscaray.data.query.string.ValueLike;
@@ -89,6 +87,23 @@ public class DatabaseProxyTest {
         var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
                 .queryBuilder()
                 .withCriteria(new ValueBetween("id", 2, 4))
+                .build(), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        var fetchedEmployees = dbProxy.queryAll(DatabaseProxy
+                .queryBuilder()
+                .withCriteria(new ValueGreaterThanOrEqualTo("id", 2)
+                        .and(new ValueLessThanOrEqualTo("id", 4)))
                 .build(), Employee.class);
 
         assertEquals(List.of(
