@@ -1,9 +1,7 @@
 package io.john.amiscaray.data;
 
 import io.john.amiscaray.data.query.QueryCriteria;
-import io.john.amiscaray.data.update.CompoundNumericFieldUpdate;
 import io.john.amiscaray.data.update.FieldUpdate;
-import io.john.amiscaray.data.update.numeric.SimpleNumericFieldUpdate;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.criteria.*;
@@ -149,30 +147,8 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-//    public final <T, N extends Number> void updateAll(Class<T> entityType, , DatabaseQuery updateCriteria, CompoundNumericFieldUpdate<N> compoundFieldUpdate) {
-//        checkSessionStarted();
-//        var transaction = currentSession.beginTransaction();
-//        CriteriaBuilder cb = currentSession.getCriteriaBuilder();
-//        CriteriaUpdate<T> update = cb.createCriteriaUpdate(entityType);
-//        Root<T> root = update.from(entityType);
-//
-//        Expression<N> currentExpression = root.get(compoundFieldUpdate.fieldName());
-//
-//        for (var operation : compoundFieldUpdate.operations()) {
-//            currentExpression = operation.operation().apply(currentExpression, cb.literal(operation.operand()));
-//        }
-//
-//        update.set(compoundFieldUpdate.fieldName(), currentExpression);
-//
-//        for (QueryCriteria criteria : updateCriteria.criteria) {
-//            update.where(criteria.getTestPredicate(root, cb));
-//        }
-//
-//        transaction.commit();
-//    }
-
-    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
-        updateAll(entityType, updateCriteria, FieldUpdate.setFieldToValue(fieldToUpdate, newValue));
+    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, Class<V> fieldType, DatabaseQuery updateCriteria, V newValue) {
+        updateAll(entityType, updateCriteria, FieldUpdate.setFieldToValue(fieldToUpdate, newValue, fieldType));
     }
 
     private void checkSessionStarted() {

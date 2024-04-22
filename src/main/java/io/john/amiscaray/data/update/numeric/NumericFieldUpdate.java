@@ -7,20 +7,23 @@ import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 import java.util.function.BinaryOperator;
 
-public abstract class SimpleNumericFieldUpdate<N extends Number> extends BaseFieldUpdate<N> {
+public abstract class NumericFieldUpdate<N extends Number> extends BaseFieldUpdate<N> {
 
     protected final UpdateExpression<N>[] operands;
 
+    protected final Class<N> fieldType;
+
     @SafeVarargs
-    public SimpleNumericFieldUpdate(String fieldName, UpdateExpression<N>... operands) {
+    public NumericFieldUpdate(String fieldName, Class<N> fieldType, UpdateExpression<N>... operands) {
         super(fieldName);
         this.operands = operands;
+        this.fieldType = fieldType;
     }
 
-    protected Expression<N> reduceOperandsUsing(BinaryOperator<Expression<N>> accumulator, Root<?> queryRoot, CriteriaBuilder cb) {
+    protected Expression<N> reduceOperandsUsing(BinaryOperator<Expression<? extends Number>> accumulator, Root<?> queryRoot, CriteriaBuilder cb) {
         Expression<N> currentExpression = queryRoot.get(fieldName);
         for (var operand : operands) {
-            currentExpression = accumulator.apply(currentExpression, operand.createExpression(queryRoot, cb));
+            currentExpression = accumulator.apply(currentExpression, operand.createExpression(queryRoot, cb)).as(fieldType);
         }
         return currentExpression;
     }

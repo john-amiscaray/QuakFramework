@@ -11,8 +11,8 @@ import io.john.amiscaray.data.query.string.ValueEndsWith;
 import io.john.amiscaray.data.query.string.ValueLike;
 import io.john.amiscaray.data.query.string.ValueStartsWith;
 import io.john.amiscaray.data.stub.Employee;
-import io.john.amiscaray.data.update.CompoundNumericFieldUpdate;
 import io.john.amiscaray.data.update.UpdateExpression;
+import io.john.amiscaray.data.update.numeric.CompoundNumericFieldUpdate;
 import io.john.amiscaray.data.update.numeric.ProductFieldUpdate;
 import io.john.amiscaray.data.update.numeric.QuotientFieldUpdate;
 import io.john.amiscaray.web.application.properties.ApplicationProperties;
@@ -23,6 +23,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static io.john.amiscaray.data.update.numeric.CompoundNumericFieldUpdate.*;
 
 public class DatabaseProxyTest {
 
@@ -226,7 +227,7 @@ public class DatabaseProxyTest {
     void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException, FileNotFoundException {
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
 
-        dbProxy.updateAll(Employee.class, "department", DatabaseProxy.queryBuilder()
+        dbProxy.updateAll(Employee.class, "department", String.class, DatabaseProxy.queryBuilder()
                 .withCriteria(new ValueIs("department", "Tech"))
                 .build(), "Technology");
 
@@ -262,7 +263,7 @@ public class DatabaseProxyTest {
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department","Corporate"))
                         .build(),
-                new ProductFieldUpdate<>("salary", UpdateExpression.literal(2L)));
+                new ProductFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2L)));
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 40000L),
@@ -281,7 +282,7 @@ public class DatabaseProxyTest {
                 DatabaseProxy.queryBuilder()
                         .withCriteria(new ValueIs("department","Tech"))
                         .build(),
-                new QuotientFieldUpdate("salary", UpdateExpression.literal(2L)));
+                new QuotientFieldUpdate("salary", Long.class, UpdateExpression.literal(2L)));
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 20000L),
@@ -293,23 +294,46 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    @Disabled
     void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException, FileNotFoundException {
-//        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
-//
-//        dbProxy.updateAll(Employee.class,
-//                DatabaseProxy.queryBuilder()
-//                        .build(),
-//                new CompoundNumericFieldUpdate<>("salary", List.of(
-//                        new SimpleNumericFieldOperation<Number>()
-//                )));
-//
-//        assertEquals(List.of(
-//                new Employee(1L, "Billy", "Tech", 20000L),
-//                new Employee(2L, "Elli", "Tech", 20000L),
-//                new Employee(3L, "John", "Tech", 20000L),
-//                new Employee(4L, "Annie", "Corporate", 40000L),
-//                new Employee(5L, "Jeff", "Corporate", 40000L)
-//        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.updateAll(Employee.class,
+                DatabaseProxy.queryBuilder()
+                        .build(),
+                CompoundNumericFieldUpdate
+                        .<Long>builder()
+                        .fieldName("salary")
+                        .fieldType(Long.class)
+                        .apply(new SubOperation<>(SubOperationType.PROD, 1.5))
+                        .apply(new SubOperation<>(SubOperationType.SUM, 2000))
+                        .build()
+                );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 62000L),
+                new Employee(2L, "Elli", "Tech", 62000L),
+                new Employee(3L, "John", "Tech", 62000L),
+                new Employee(4L, "Annie", "Corporate", 62000L),
+                new Employee(5L, "Jeff", "Corporate", 62000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException, FileNotFoundException {
+        testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");
+
+        dbProxy.updateAll(Employee.class,
+                DatabaseProxy.queryBuilder()
+                        .build(),
+                new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(9L))
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 4444L),
+                new Employee(2L, "Elli", "Tech", 4444L),
+                new Employee(3L, "John", "Tech", 4444L),
+                new Employee(4L, "Annie", "Corporate", 4444L),
+                new Employee(5L, "Jeff", "Corporate", 4444L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }
