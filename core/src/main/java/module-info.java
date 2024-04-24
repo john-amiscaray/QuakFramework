@@ -1,4 +1,4 @@
-module io.john.amiscaray.backend.framework.core {
+module backend.framework.core {
     exports io.john.amiscaray.backend.framework.core.properties;
     requires lombok;
     requires org.reflections;
