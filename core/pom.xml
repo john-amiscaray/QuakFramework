@@ -20,18 +20,7 @@
         <tomcat.version>10.1.16</tomcat.version>
         <junit-version>5.8.2</junit-version>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-core</artifactId>
-            <version>${tomcat.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.tomcat.embed</groupId>
-            <artifactId>tomcat-embed-jasper</artifactId>
-            <version>${tomcat.version}</version>
-        </dependency>
-    </dependencies>
+
     <build>
         <plugins>
             <plugin>
