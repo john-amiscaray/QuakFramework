@@ -1,14 +1,20 @@
 package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
+import io.john.amiscaray.backend.framework.web.controller.HttpController;
 import io.john.amiscaray.backend.framework.web.handler.PathController;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
+import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
+import org.javatuples.Pair;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class WebApplication extends Application {
     protected Tomcat server;
@@ -37,9 +43,33 @@ public class WebApplication extends Application {
 
         context = server.addContext(properties.serverContextPath(), docBase);
 
+        registerServlets();
+
         server.start();
         server.getService().addConnector(connector1);
         server.getServer().await();
+    }
+
+    private void registerServlets() {
+        var urlToControllersMapping = new HashMap<String, List<Pair<RequestMethod, PathController<?, ?>>>>();
+        for (var entry : pathControllers.entrySet()) {
+            Pair<RequestMethod, PathController<?, ?>> methodToControllerMapping = Pair.with(entry.getKey().method(), entry.getValue());
+            if (urlToControllersMapping.containsKey(entry.getKey().url())) {
+                urlToControllersMapping.get(entry.getKey().url()).add(methodToControllerMapping);
+            } else {
+                urlToControllersMapping.put(entry.getKey().url(), new ArrayList<>(List.of(methodToControllerMapping)));
+            }
+        }
+        for (var entry : urlToControllersMapping.entrySet()) {
+            var url = entry.getKey();
+            var controller = new HttpController(entry.getValue()
+                    .stream()
+                    .collect(Collectors.toMap(
+                            Pair::getValue0,
+                            Pair::getValue1
+                    )));
+            server.addServlet(properties.serverContextPath(), url.replace("/", ""), controller);
+        }
     }
 
     public static class WebApplicationBuilder {

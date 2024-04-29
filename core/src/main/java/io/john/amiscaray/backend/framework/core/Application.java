@@ -11,9 +11,11 @@ public class Application {
     protected ApplicationProperties properties;
     protected String classScanPackage;
     protected String[] args;
+    protected Class<?> main;
 
     public Application(Class<?> main, String[] args) {
         this.args = args;
+        this.main = main;
         classScanPackage = main.getPackageName();
     }
 
@@ -23,7 +25,7 @@ public class Application {
 
     public ApplicationProperties getApplicationProperties() {
         if (properties == null) {
-            try (var propertiesFileInputStream = Application.class.getResourceAsStream("/application.properties")) {
+            try (var propertiesFileInputStream = main.getResourceAsStream("/application.properties")) {
                 var propertiesFromFile = new Properties();
                 propertiesFromFile.load(propertiesFileInputStream);
                 properties = parsePropertiesFromFile(propertiesFromFile);

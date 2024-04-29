@@ -2,7 +2,6 @@ package io.john.amiscaray.backend.framework.web.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.handler.PathController;
-import io.john.amiscaray.backend.framework.web.handler.RequestHandler;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import jakarta.servlet.http.HttpServlet;
