@@ -11,7 +11,7 @@
 
     <groupId>org.example</groupId>
     <artifactId>backend.framework.web</artifactId>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>20</maven.compiler.source>
