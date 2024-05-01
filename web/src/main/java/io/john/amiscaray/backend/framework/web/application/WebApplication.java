@@ -47,7 +47,7 @@ public class WebApplication extends Application {
 
         server.start();
         server.getService().addConnector(connector1);
-        server.getServer().await();
+        Thread.startVirtualThread(() -> server.getServer().await());
     }
 
     private void registerServlets() {
@@ -68,7 +68,8 @@ public class WebApplication extends Application {
                             Pair::getValue0,
                             Pair::getValue1
                     )));
-            server.addServlet(properties.serverContextPath(), url.replace("/", ""), controller);
+            server.addServlet(properties.serverContextPath(), controller.toString(), controller);
+            context.addServletMappingDecoded(url, controller.toString());
         }
     }
 

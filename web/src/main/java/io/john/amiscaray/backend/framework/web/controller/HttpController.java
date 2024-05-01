@@ -30,15 +30,29 @@ public class HttpController extends HttpServlet {
             return;
         }
 
-        var headers = extractHeaders(servletRequest);
-        var request = new Request<>(headers, method, MAPPER.readValue(readJSON(servletRequest), controller.requestBodyType()));
+        var requestHeaders = extractHeaders(servletRequest);
+        var bodyRaw = readBody(servletRequest);
+        Request<?> request;
+        if (controller.requestBodyType().equals(String.class)) {
+            request = new Request<>(requestHeaders, method, bodyRaw);
+        } else if (controller.requestBodyType().equals(Void.class)) {
+            request = new Request<>(requestHeaders, method, null);
+        } else {
+            request = new Request<>(requestHeaders,
+                    method,
+                    MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw));
+        }
+
+        var responseHeaders = new HashMap<String, String>();
         var response = controller.requestHandler().handleRequest((Request) request);
-
-        var objectWriter = MAPPER.writerFor(controller.responseBodyType());
-
         servletResponse.setStatus(response.status());
-        writeResponseHeaders(headers, servletResponse);
-        objectWriter.writeValue(servletResponse.getWriter(), controller.responseBodyType().cast(response.body()));
+        writeResponseHeaders(responseHeaders, servletResponse);
+
+        if (controller.responseBodyType().equals(String.class)) {
+            servletResponse.getWriter().print(response.body());
+        } else if (!controller.responseBodyType().equals(Void.class)) {
+            MAPPER.writerFor(controller.responseBodyType()).writeValue(servletResponse.getWriter(), controller.responseBodyType().cast(response.body()));
+        }
     }
 
     private Map<String, String> extractHeaders(HttpServletRequest req) {
@@ -63,7 +77,7 @@ public class HttpController extends HttpServlet {
         }
     }
 
-    private String readJSON(HttpServletRequest req) throws IOException {
+    private String readBody(HttpServletRequest req) throws IOException {
         StringBuilder sb = new StringBuilder();
         try (BufferedReader reader = req.getReader()) {
             String line;
