@@ -2,7 +2,8 @@ package io.john.amiscaray.backend.framework.web.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.john.amiscaray.backend.framework.web.handler.PathController;
+import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
+import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
@@ -16,6 +17,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -33,18 +35,29 @@ public class WebApplicationTest {
                 .args(new String[]{})
                 .pathMapping(
                         new RequestMapping(RequestMethod.GET, "/"),
-                        new PathController<>(
+                        new SimplePathController<>(
                                 Void.class,
                                 String.class,
-                                request -> new Response<>(new HashMap<>(), HttpServletResponse.SC_OK, "Hello World")
+                                _request -> new Response<>(new HashMap<>(), HttpServletResponse.SC_OK, "Hello World")
                         )
                 )
                 .pathMapping(
                         new RequestMapping(RequestMethod.POST, "/"),
-                        new PathController<>(
+                        new SimplePathController<>(
                                 MockUserInfo.class,
                                 String.class,
                                 _request -> new Response<>(new HashMap<>(), HttpServletResponse.SC_CREATED, "/user/1")
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.DELETE, "/{id}"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                Void.class,
+                                request -> new Response<>(Map.of("thing",
+                                        request.pathVariables().get("id")),
+                                        HttpServletResponse.SC_NO_CONTENT,
+                                        null)
                         )
                 )
                 .build();

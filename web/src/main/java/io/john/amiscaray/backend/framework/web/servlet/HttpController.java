@@ -1,8 +1,10 @@
-package io.john.amiscaray.backend.framework.web.controller;
+package io.john.amiscaray.backend.framework.web.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.john.amiscaray.backend.framework.web.handler.PathController;
+import io.john.amiscaray.backend.framework.web.controller.PathController;
+import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
+import io.john.amiscaray.backend.framework.web.handler.request.SimpleRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,11 +36,11 @@ public class HttpController extends HttpServlet {
         var bodyRaw = readBody(servletRequest);
         Request<?> request;
         if (controller.requestBodyType().equals(String.class)) {
-            request = new Request<>(requestHeaders, method, bodyRaw);
+            request = new SimpleRequest<>(requestHeaders, method, bodyRaw);
         } else if (controller.requestBodyType().equals(Void.class)) {
-            request = new Request<>(requestHeaders, method, null);
+            request = new SimpleRequest<>(requestHeaders, method, null);
         } else {
-            request = new Request<>(requestHeaders,
+            request = new SimpleRequest<>(requestHeaders,
                     method,
                     MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw));
         }

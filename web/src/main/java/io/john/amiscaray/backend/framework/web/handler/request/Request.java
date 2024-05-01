@@ -2,5 +2,12 @@ package io.john.amiscaray.backend.framework.web.handler.request;
 
 import java.util.Map;
 
-public record Request<T>(Map<String, String> headers, RequestMethod method, T body) {
+public sealed interface Request<T> permits SimpleRequest, DynamicPathRequest{
+
+    T body();
+
+    RequestMethod method();
+
+    Map<String, String> headers();
+
 }
