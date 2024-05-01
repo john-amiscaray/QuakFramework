@@ -24,6 +24,7 @@ public class WebApplicationTest {
 
     private static final int REQUEST_TIMEOUT_SECONDS = 10;
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final String ROOT_URL = "http://localhost:9000";
 
     @BeforeAll
     static void startWebApplication() throws Exception {
@@ -55,7 +56,7 @@ public class WebApplicationTest {
     public void testGetRequestToRootYieldsHelloWorld() {
         var httpClient = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:9000/test/"))
+                .uri(URI.create(ROOT_URL + "/test/"))
                 .build();
 
         httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -69,7 +70,7 @@ public class WebApplicationTest {
     public void testPostRequestToRootYields201Created() throws JsonProcessingException {
         var httpClient = HttpClient.newHttpClient();
         var request = HttpRequest.newBuilder()
-                .uri(URI.create("http://localhost:9000/test/"))
+                .uri(URI.create(ROOT_URL + "/test/"))
                 .POST(HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(new MockUserInfo("John", 21, "1234 Some Street"))))
                 .build();
 
