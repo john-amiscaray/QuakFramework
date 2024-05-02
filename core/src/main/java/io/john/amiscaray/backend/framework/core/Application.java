@@ -23,6 +23,16 @@ public class Application {
         properties = getApplicationProperties();
     }
 
+    public void startAsync() {
+        Thread.startVirtualThread(() -> {
+            try {
+                start();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
     public ApplicationProperties getApplicationProperties() {
         if (properties == null) {
             try (var propertiesFileInputStream = main.getResourceAsStream("/application.properties")) {

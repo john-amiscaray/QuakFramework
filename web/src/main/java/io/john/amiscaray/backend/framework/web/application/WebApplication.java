@@ -47,7 +47,7 @@ public class WebApplication extends Application {
 
         server.start();
         server.getService().addConnector(connector1);
-        Thread.startVirtualThread(() -> server.getServer().await());
+        server.getServer().await();
     }
 
     private void registerServlets() {
