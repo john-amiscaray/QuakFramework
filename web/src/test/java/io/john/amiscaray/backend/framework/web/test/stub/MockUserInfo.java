@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.web.stub;
+package io.john.amiscaray.backend.framework.web.test.stub;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

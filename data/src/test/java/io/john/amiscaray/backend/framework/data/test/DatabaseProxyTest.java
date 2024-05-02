@@ -1,14 +1,15 @@
-package io.john.amiscaray.backend.framework.data;
+package io.john.amiscaray.backend.framework.data.test;
 
+import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 import io.john.amiscaray.backend.framework.data.query.numeric.*;
 import io.john.amiscaray.backend.framework.data.query.string.ValueContaining;
 import io.john.amiscaray.backend.framework.data.query.string.ValueEndsWith;
 import io.john.amiscaray.backend.framework.data.query.string.ValueLike;
 import io.john.amiscaray.backend.framework.data.query.string.ValueStartsWith;
-import io.john.amiscaray.backend.framework.data.helper.EmployeeTestDBConnector;
+import io.john.amiscaray.backend.framework.data.test.stub.Employee;
+import io.john.amiscaray.backend.framework.data.test.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.backend.framework.data.query.ValueIs;
 import io.john.amiscaray.backend.framework.data.query.ValueIsOneOf;
-import io.john.amiscaray.backend.framework.data.stub.Employee;
 import io.john.amiscaray.backend.framework.data.update.UpdateExpression;
 import io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate;
 import io.john.amiscaray.backend.framework.data.update.numeric.ProductFieldUpdate;
@@ -33,7 +34,7 @@ public class DatabaseProxyTest {
             .dbPassword("")
             .sqlDialect("org.hibernate.dialect.H2Dialect")
             .build();
-    private static final String hibernatePackage = "io.john.amiscaray.backend.framework.data.stub";
+    private static final String hibernatePackage = "io.john.amiscaray.backend.framework.data.test.stub";
     private static final EmployeeTestDBConnector testDBConnector = new EmployeeTestDBConnector(testApplicationProperties);
     private static DatabaseProxy dbProxy;
 

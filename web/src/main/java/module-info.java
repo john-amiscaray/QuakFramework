@@ -10,4 +10,5 @@ module backend.framework.web {
     exports io.john.amiscaray.backend.framework.web.handler;
     exports io.john.amiscaray.backend.framework.web.handler.request;
     exports io.john.amiscaray.backend.framework.web.handler.response;
+    exports io.john.amiscaray.backend.framework.web.controller;
 }

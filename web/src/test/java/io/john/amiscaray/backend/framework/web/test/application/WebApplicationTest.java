@@ -1,13 +1,14 @@
-package io.john.amiscaray.backend.framework.web.application;
+package io.john.amiscaray.backend.framework.web.test.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
-import io.john.amiscaray.backend.framework.web.stub.MockUserInfo;
+import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;

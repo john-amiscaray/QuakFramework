@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.data.stub;
+package io.john.amiscaray.backend.framework.data.test.stub;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
