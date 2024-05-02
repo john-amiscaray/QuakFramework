@@ -34,7 +34,7 @@ public class WebApplicationTest {
     private static final int MAX_CONNECTION_RETRIES = 20;
 
     @BeforeAll
-    static void startWebApplication() throws InterruptedException {
+    static void startWebApplication() {
         WebApplication webApplication = WebApplication.builder()
                 .main(WebApplicationTest.class)
                 .args(new String[]{})
