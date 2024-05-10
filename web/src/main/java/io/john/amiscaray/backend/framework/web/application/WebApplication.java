@@ -2,21 +2,19 @@ package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
-import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.servlet.HttpController;
+import io.john.amiscaray.backend.framework.web.servlet.HttpControllerGroup;
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.commons.lang3.StringUtils;
 import org.javatuples.Pair;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class WebApplication extends Application {
@@ -51,26 +49,68 @@ public class WebApplication extends Application {
     }
 
     private void registerServlets() {
-        var urlToControllersMapping = new HashMap<String, List<Pair<RequestMethod, PathController<?, ?>>>>();
+        var urlToPathControllersMapping = new HashMap<String, List<Pair<RequestMethod, PathController<?, ?>>>>();
         for (var entry : pathControllers.entrySet()) {
             Pair<RequestMethod, PathController<?, ?>> methodToControllerMapping = Pair.with(entry.getKey().method(), entry.getValue());
-            if (urlToControllersMapping.containsKey(entry.getKey().url())) {
-                urlToControllersMapping.get(entry.getKey().url()).add(methodToControllerMapping);
+            if (urlToPathControllersMapping.containsKey(entry.getKey().url())) {
+                urlToPathControllersMapping.get(entry.getKey().url()).add(methodToControllerMapping);
             } else {
-                urlToControllersMapping.put(entry.getKey().url(), new ArrayList<>(List.of(methodToControllerMapping)));
+                urlToPathControllersMapping.put(entry.getKey().url(), new ArrayList<>(List.of(methodToControllerMapping)));
             }
         }
-        for (var entry : urlToControllersMapping.entrySet()) {
+        var urlToHttpControllerMapping = new HashMap<String, HttpController>();
+        for (var entry : urlToPathControllersMapping.entrySet()) {
             var url = entry.getKey();
-            var controller = new HttpController(entry.getValue()
+            var controller = new HttpController(
+                    url,
+                    entry.getValue()
                     .stream()
                     .collect(Collectors.toMap(
                             Pair::getValue0,
                             Pair::getValue1
                     )));
-            server.addServlet(properties.serverContextPath(), controller.toString(), controller);
-            context.addServletMappingDecoded(url, controller.toString());
+            urlToHttpControllerMapping.put(url, controller);
         }
+        var controllersToAdd = new ArrayList<>(urlToHttpControllerMapping.entrySet());
+        while (!controllersToAdd.isEmpty()) {
+            var nextControllerMapping = controllersToAdd.get(0);
+            var commonPrefixes = new HashSet<String>();
+            for (var controllerMapping : controllersToAdd) {
+                if (controllerMapping.equals(nextControllerMapping)) {
+                    continue;
+                }
+                var urlPattern = controllerMapping.getKey();
+                var commonPrefix = StringUtils.getCommonPrefix(nextControllerMapping.getKey(), urlPattern);
+                if (!commonPrefix.isEmpty() && !commonPrefix.equals("/")) {
+                    commonPrefixes.add(commonPrefix);
+                }
+            }
+            if (commonPrefixes.isEmpty()) {
+                var controller = nextControllerMapping.getValue();
+                var url = cleanURLPath(nextControllerMapping.getKey());
+                server.addServlet(properties.serverContextPath(), controller.toString(), controller);
+                context.addServletMappingDecoded(url, controller.toString());
+            } else {
+                for(var prefix : commonPrefixes) {
+                    var controllerMappingsWithPrefix = controllersToAdd.stream()
+                            .filter(mapping -> mapping.getKey().startsWith(prefix))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                    var httpController = new HttpControllerGroup(controllerMappingsWithPrefix);
+                    server.addServlet(properties.serverContextPath(), httpController.toString(), httpController);
+                    context.addServletMappingDecoded(cleanURLPath(prefix) + "/*", httpController.toString());
+                    controllersToAdd.removeAll(controllerMappingsWithPrefix.entrySet());
+                }
+            }
+            controllersToAdd.remove(nextControllerMapping);
+        }
+    }
+
+    private String cleanURLPath(String urlPath) {
+        var cleaned = urlPath.replaceAll("\\{.+}", "*");
+        if (cleaned.equals("/")) {
+            return "";
+        }
+        return cleaned;
     }
 
 }

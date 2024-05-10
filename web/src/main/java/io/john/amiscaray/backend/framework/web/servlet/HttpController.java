@@ -2,25 +2,38 @@ package io.john.amiscaray.backend.framework.web.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
-import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
+import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
-import io.john.amiscaray.backend.framework.web.handler.request.SimpleRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
+import io.john.amiscaray.backend.framework.web.handler.request.SimpleRequest;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
-@AllArgsConstructor
 public class HttpController extends HttpServlet {
 
+    private Map<String, String> pathParameters = new HashMap<>();
+    private final String urlPattern;
     private final Map<RequestMethod, PathController<?, ?>> pathControllers;
-    private final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
+    public HttpController(String urlPattern, Map<RequestMethod, PathController<?, ?>> pathControllers) {
+        this.urlPattern = urlPattern;
+        this.pathControllers = pathControllers;
+    }
+
+    protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Map<String, String> pathParameters) throws IOException {
+        this.pathParameters = pathParameters;
+        service(servletRequest, servletResponse);
+    }
 
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
@@ -28,7 +41,7 @@ public class HttpController extends HttpServlet {
         var controller = pathControllers.get(method);
 
         if (controller == null || controller.requestHandler() == null) {
-            servletResponse.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, "This path does not support HTTP method " + method.name());
+            servletResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "This path does not support HTTP method " + method.name());
             return;
         }
 
@@ -36,19 +49,24 @@ public class HttpController extends HttpServlet {
         var bodyRaw = readBody(servletRequest);
         Request<?> request;
         if (controller.requestBodyType().equals(String.class)) {
-            request = new SimpleRequest<>(requestHeaders, method, bodyRaw);
+            request = new DynamicPathRequest<>(requestHeaders, method,
+                    pathParameters,
+                    bodyRaw);
         } else if (controller.requestBodyType().equals(Void.class)) {
-            request = new SimpleRequest<>(requestHeaders, method, null);
-        } else {
-            request = new SimpleRequest<>(requestHeaders,
+            request = new DynamicPathRequest<>(requestHeaders,
                     method,
+                    pathParameters,
+                    null);
+        } else {
+            request = new DynamicPathRequest<>(requestHeaders,
+                    method,
+                    pathParameters,
                     MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw));
         }
 
-        var responseHeaders = new HashMap<String, String>();
         var response = controller.requestHandler().handleRequest((Request) request);
         servletResponse.setStatus(response.status());
-        writeResponseHeaders(responseHeaders, servletResponse);
+        writeResponseHeaders(response.headers(), servletResponse);
 
         if (controller.responseBodyType().equals(String.class)) {
             servletResponse.getWriter().print(response.body());
@@ -65,7 +83,7 @@ public class HttpController extends HttpServlet {
             return result;
         }
 
-        while(headerNames.hasMoreElements()) {
+        while (headerNames.hasMoreElements()) {
             var headerName = headerNames.nextElement();
             result.put(headerName, req.getHeader(headerName));
         }

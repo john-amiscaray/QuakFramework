@@ -5,6 +5,8 @@ module backend.framework.web {
     requires javatuples;
     requires lombok;
     requires org.apache.tomcat.embed.core;
+    requires org.eclipse.jdt.core.compiler.batch;
+    requires org.apache.commons.lang3;
 
     exports io.john.amiscaray.backend.framework.web.application;
     exports io.john.amiscaray.backend.framework.web.handler;

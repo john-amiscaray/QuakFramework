@@ -30,7 +30,7 @@ public class WebApplicationTest {
 
     private static final int REQUEST_TIMEOUT_SECONDS = 10;
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final String ROOT_URL = "http://localhost:9000";
+    private static final String ROOT_URL = "http://localhost:9000/test";
     private static final int MAX_CONNECTION_RETRIES = 20;
 
     @BeforeAll
@@ -47,15 +47,15 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.POST, "/"),
-                        new SimplePathController<>(
+                        new RequestMapping(RequestMethod.POST, "/user"),
+                        new DynamicPathController<>(
                                 MockUserInfo.class,
                                 String.class,
                                 _request -> new Response<>(new HashMap<>(), HttpServletResponse.SC_CREATED, "/user/1")
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.DELETE, "/{id}"),
+                        new RequestMapping(RequestMethod.DELETE, "/user/{id}"),
                         new DynamicPathController<>(
                                 Void.class,
                                 String.class,
@@ -108,7 +108,7 @@ public class WebApplicationTest {
     @Test
     public void testGetRequestToRootYieldsHelloWorld() {
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(ROOT_URL + "/test/"))
+                .uri(URI.create(ROOT_URL + "/"))
                 .build();
 
         attemptConnectionAndAssert(request,
@@ -122,15 +122,32 @@ public class WebApplicationTest {
     @Test
     public void testPostRequestToRootYields201Created() throws JsonProcessingException {
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(ROOT_URL + "/test/"))
+                .uri(URI.create(ROOT_URL + "/user"))
                 .POST(HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(new MockUserInfo("John", 21, "1234 Some Street"))))
                 .build();
         attemptConnectionAndAssert(
                 request,
                 HttpResponse.BodyHandlers.ofString(),
                 httpResponse -> {
-                    assertEquals(201, httpResponse.statusCode());
+                    assertEquals(HttpServletResponse.SC_CREATED, httpResponse.statusCode());
                     assertEquals("/user/1", httpResponse.body());
+                }
+        );
+    }
+
+    @Test
+    public void testDeleteRequestYields204WithCustomHeaderWithDeletedID() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "/user/1"))
+                .DELETE()
+                .build();
+        attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var thingHeader = httpResponse.headers().firstValue("thing");
+                    assertTrue(thingHeader.isPresent());
+                    assertEquals(Integer.parseInt(thingHeader.get()), 1);
                 }
         );
     }
