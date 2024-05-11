@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Minor">
-      <change afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpControllerGroup.java" afterDir="false" />
+    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Make path variables work">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/module-info.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -59,6 +54,7 @@
     "JUnit.WebApplicationTest (1).executor": "Run",
     "JUnit.WebApplicationTest.executor": "Run",
     "JUnit.WebApplicationTest.testDeleteRequestYields204WithCustomHeaderWithDeletedID.executor": "Debug",
+    "JUnit.WebApplicationTest.testGetRequestForUserInfoYields200AndHasUserIDStringInBody.executor": "Run",
     "JUnit.WebApplicationTest.testGetRequestToRootYieldsHelloWorld.executor": "Run",
     "JUnit.WebApplicationTest.testPostRequestToRootYields201Created.executor": "Debug",
     "JUnit.java in backend.framework.data.executor": "Run",
@@ -123,7 +119,7 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="WebApplicationTest.testGetRequestToRootYieldsHelloWorld" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="WebApplicationTest.testGetRequestForUserInfoYields200AndHasUserIDStringInBody" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
       <extension name="coverage">
         <pattern>
@@ -133,7 +129,23 @@
       </extension>
       <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
       <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebApplicationTest" />
-      <option name="METHOD_NAME" value="testGetRequestToRootYieldsHelloWorld" />
+      <option name="METHOD_NAME" value="testGetRequestForUserInfoYields200AndHasUserIDStringInBody" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.web" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
+      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebApplicationTest" />
+      <option name="METHOD_NAME" value="testGetRequestForUserWithIDYieldsMockUser" />
       <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -156,21 +168,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="java in backend.framework.web" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/web/src/test/java" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.WebApplicationTest" />
+        <item itemvalue="JUnit.WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser" />
+        <item itemvalue="JUnit.WebApplicationTest.testGetRequestForUserInfoYields200AndHasUserIDStringInBody" />
         <item itemvalue="JUnit.WebApplicationTest.testDeleteRequestYields204WithCustomHeaderWithDeletedID" />
         <item itemvalue="JUnit.WebApplicationTest.testPostRequestToRootYields201Created" />
-        <item itemvalue="JUnit.WebApplicationTest.testGetRequestToRootYieldsHelloWorld" />
-        <item itemvalue="JUnit.java in backend.framework.web" />
       </list>
     </recent_temporary>
   </component>
@@ -196,7 +200,8 @@
       <workItem from="1714649659651" duration="2955000" />
       <workItem from="1714652634641" duration="10319000" />
       <workItem from="1715285447529" duration="6755000" />
-      <workItem from="1715364513479" duration="2065000" />
+      <workItem from="1715364513479" duration="2185000" />
+      <workItem from="1715459085783" duration="1125000" />
     </task>
     <task id="LOCAL-00001" summary="Fix build issues with IntelliJ">
       <option name="closed" value="true" />
@@ -262,7 +267,15 @@
       <option name="project" value="LOCAL" />
       <updated>1714663737068</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Make path variables work">
+      <option name="closed" value="true" />
+      <created>1715366639168</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1715366639168</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -277,16 +290,12 @@
     <MESSAGE value="Fix build" />
     <MESSAGE value="Refactor" />
     <MESSAGE value="Minor" />
-    <option name="LAST_COMMIT_MESSAGE" value="Minor" />
+    <MESSAGE value="Make path variables work" />
+    <option name="LAST_COMMIT_MESSAGE" value="Make path variables work" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint type="java-line">
-          <url>file://$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java</url>
-          <line>148</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
         <line-breakpoint type="java-line">
           <url>file://$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java</url>
           <line>98</line>

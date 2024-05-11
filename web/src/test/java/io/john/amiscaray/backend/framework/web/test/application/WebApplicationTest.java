@@ -32,6 +32,7 @@ public class WebApplicationTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final String ROOT_URL = "http://localhost:9000/test";
     private static final int MAX_CONNECTION_RETRIES = 20;
+    private static final MockUserInfo MOCK_USER = new MockUserInfo("John", 21, "831 Some Street");
 
     @BeforeAll
     static void startWebApplication() {
@@ -55,6 +56,18 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                MockUserInfo.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        MOCK_USER
+                                )
+                        )
+                )
+                .pathMapping(
                         new RequestMapping(RequestMethod.DELETE, "/user/{id}"),
                         new DynamicPathController<>(
                                 Void.class,
@@ -65,8 +78,18 @@ public class WebApplicationTest {
                                         null)
                         )
                 )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}/info"),
+                        new DynamicPathController<>(
+                                String.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "User " + request.pathVariables().get("id"))
+                        )
+                )
                 .build();
-
         webApplication.startAsync();
     }
 
@@ -148,6 +171,47 @@ public class WebApplicationTest {
                     var thingHeader = httpResponse.headers().firstValue("thing");
                     assertTrue(thingHeader.isPresent());
                     assertEquals(Integer.parseInt(thingHeader.get()), 1);
+                }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserInfoYields200AndHasUserIDStringInBody() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "/user/1/info"))
+                .GET()
+                .build();
+        attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var body = httpResponse.body();
+                    var status = httpResponse.statusCode();
+                    assertEquals("User 1", body);
+                    assertEquals(status, 200);
+                }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserWithIDYieldsMockUser() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "/user/1"))
+                .GET()
+                .build();
+        attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    MockUserInfo body;
+                    try {
+                        body = MAPPER.readerFor(MockUserInfo.class).readValue((String) httpResponse.body());
+                        var status = httpResponse.statusCode();
+                        assertEquals(MOCK_USER, body);
+                        assertEquals(status, 200);
+                    } catch (JsonProcessingException e) {
+                        throw new AssertionError("Could not parse body as mock user: ", e);
+                    }
                 }
         );
     }
