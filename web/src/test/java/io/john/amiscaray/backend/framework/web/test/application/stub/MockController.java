@@ -11,6 +11,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
 
+import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUser;
+
 @Controller
 public class MockController {
 
@@ -32,7 +34,7 @@ public class MockController {
     public Response<List<MockUserInfo>> getUsersWithAge(DynamicPathRequest<Void> request) {
 
         var age = Integer.parseInt(request.pathVariables().get("age"));
-        var body = List.of(new MockUserInfo("John", age, "123 Some Street"));
+        var body = List.of(dummyUser(age));
 
         return new Response<>(HttpServletResponse.SC_OK, body);
 

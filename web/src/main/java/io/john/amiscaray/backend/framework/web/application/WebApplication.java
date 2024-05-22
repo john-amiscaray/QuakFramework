@@ -96,12 +96,16 @@ public class WebApplication extends Application {
                 }
                 var urlPattern = controllerMapping.getKey();
                 var commonPrefix = StringUtils.getCommonPrefix(nextControllerMapping.getKey(), urlPattern);
-                if (!commonPrefix.isEmpty() && !commonPrefix.equals("/")) {
-                    commonPrefixes.add(commonPrefix);
+                if (commonPrefixIsValid(commonPrefix)) {
+                    var smallerPrefixesExist = !commonPrefixes.isEmpty() &&
+                            commonPrefixes.stream().noneMatch(commonPrefix::startsWith);
+                    if (!smallerPrefixesExist) {
+                        commonPrefixes.add(commonPrefix);
+                    }
                 }
             }
             if (commonPrefixes.isEmpty()) {
-                var controller = nextControllerMapping.getValue();
+                var controller = new HttpControllerGroup(Map.ofEntries(nextControllerMapping));
                 var url = cleanURLPath(nextControllerMapping.getKey());
                 server.addServlet(properties.serverContextPath(), controller.toString(), controller);
                 context.addServletMappingDecoded(url, controller.toString());
@@ -118,6 +122,10 @@ public class WebApplication extends Application {
             }
             controllersToAdd.remove(nextControllerMapping);
         }
+    }
+
+    private boolean commonPrefixIsValid(String prefix) {
+        return !prefix.isEmpty() && !prefix.equals("/");
     }
 
     private String cleanURLPath(String urlPath) {

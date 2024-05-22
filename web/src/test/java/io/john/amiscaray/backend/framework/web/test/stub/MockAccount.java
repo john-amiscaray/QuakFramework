@@ -14,4 +14,12 @@ public class MockAccount {
     private long userBalance;
     private String name;
 
+    public static MockAccount dummyAccount() {
+        return new MockAccount(1, 1, 10000, "savings");
+    }
+
+    public static MockAccount dummyAccount(int accountID) {
+        return new MockAccount(accountID, 1, 10000, "savings");
+    }
+
 }

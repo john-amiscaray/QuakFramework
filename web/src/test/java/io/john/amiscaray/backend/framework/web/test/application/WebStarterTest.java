@@ -7,8 +7,8 @@ import io.john.amiscaray.backend.framework.web.application.WebStarter;
 import io.john.amiscaray.backend.framework.web.test.stub.MockAccount;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.mapper.Mapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,8 +17,10 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.List;
 
+import static io.john.amiscaray.backend.framework.web.test.stub.MockAccount.dummyAccount;
+import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUser;
+import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUsers;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -54,7 +56,7 @@ public class WebStarterTest {
                 httpResponse -> {
                     var body = httpResponse.body();
                     var status = httpResponse.statusCode();
-                    assertEquals(200, status);
+                    assertEquals(HttpServletResponse.SC_OK, status);
                     assertEquals("Hello World", body);
                 });
 
@@ -64,11 +66,7 @@ public class WebStarterTest {
     public void testPostRequestToSaveMockUser() throws JsonProcessingException {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(ROOT_URL + "user"))
-                .POST(HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(new MockUserInfo(
-                            "John",
-                            21,
-                        "123 Some Street"
-                ))))
+                .POST(HttpRequest.BodyPublishers.ofString(MAPPER.writeValueAsString(dummyUser())))
                 .build();
 
         connectionUtil.attemptConnectionAndAssert(request,
@@ -76,7 +74,7 @@ public class WebStarterTest {
                 httpResponse -> {
                     var body = httpResponse.body();
                     var status = httpResponse.statusCode();
-                    assertEquals(201, status);
+                    assertEquals(HttpServletResponse.SC_CREATED, status);
                     assertEquals("", body);
                 });
     }
@@ -93,14 +91,10 @@ public class WebStarterTest {
                 httpResponse -> {
                     var body = httpResponse.body();
                     var status = httpResponse.statusCode();
-                    assertEquals(200, status);
+                    assertEquals(HttpServletResponse.SC_OK, status);
                     try {
                         assertEquals(
-                                MAPPER.writeValueAsString(
-                                        List.of(
-                                                new MockUserInfo("John", 21, "123 Some Street")
-                                        )
-                                ), body);
+                                MAPPER.writeValueAsString(dummyUsers()), body);
                     } catch (JsonProcessingException e) {
                         Assertions.fail(e);
                     }
@@ -120,15 +114,30 @@ public class WebStarterTest {
                 httpResponse -> {
                     var body = httpResponse.body();
                     var status = httpResponse.statusCode();
-                    assertEquals(200, status);
+                    assertEquals(HttpServletResponse.SC_OK, status);
                     try {
-                        assertEquals(MAPPER.writeValueAsString(
-                                new MockAccount(1, 1, 10000, "savings")
-                        ), body);
+                        assertEquals(MAPPER.writeValueAsString(dummyAccount(12)), body);
                     } catch (JsonProcessingException e) {
                         Assertions.fail(e);
                     }
                 });
+    }
+
+    @Test
+    public void testPostRequestToRootGivesHTTP405() {
+
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, status);
+                });
+
     }
 
 }
