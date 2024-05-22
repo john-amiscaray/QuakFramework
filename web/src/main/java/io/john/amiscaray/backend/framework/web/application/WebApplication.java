@@ -34,6 +34,9 @@ public class WebApplication extends Application {
 
     @Override
     public void start() throws Exception {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("START APPLICATION");
+        }
         super.start();
         server = new Tomcat();
         server.setBaseDir(properties.serverDirectory());
@@ -58,6 +61,9 @@ public class WebApplication extends Application {
     }
 
     private void registerServlets() {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("REGISTERING SERVLETS");
+        }
         var urlToPathControllersMapping = new HashMap<String, List<Pair<RequestMethod, PathController<?, ?>>>>();
         for (var entry : pathControllers.entrySet()) {
             Pair<RequestMethod, PathController<?, ?>> methodToControllerMapping = Pair.with(entry.getKey().method(), entry.getValue());

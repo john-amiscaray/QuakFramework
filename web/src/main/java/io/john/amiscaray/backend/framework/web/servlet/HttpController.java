@@ -5,18 +5,16 @@ import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
-import io.john.amiscaray.backend.framework.web.handler.request.SimpleRequest;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class HttpController extends HttpServlet {
 
@@ -24,6 +22,7 @@ public class HttpController extends HttpServlet {
     private final String urlPattern;
     private final Map<RequestMethod, PathController<?, ?>> pathControllers;
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final Logger LOG = LoggerFactory.getLogger(HttpController.class);
 
     public HttpController(String urlPattern, Map<RequestMethod, PathController<?, ?>> pathControllers) {
         this.urlPattern = urlPattern;
@@ -37,6 +36,9 @@ public class HttpController extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest servletRequest, HttpServletResponse servletResponse) throws IOException {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Servicing Request: {} {}", servletRequest.getMethod(), servletRequest.getRequestURI());
+        }
         var method = RequestMethod.valueOf(servletRequest.getMethod());
         var controller = pathControllers.get(method);
 

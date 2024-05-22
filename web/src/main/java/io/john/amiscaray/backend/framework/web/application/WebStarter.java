@@ -8,12 +8,16 @@ import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 
 public class WebStarter {
+
+    private static final Logger LOG = LoggerFactory.getLogger(WebStarter.class);
 
     public static WebApplication beginWebApplication(Class<?> main, String[] args) {
         var reflections = new Reflections(main.getPackageName(), Scanners.TypesAnnotated);
@@ -33,6 +37,7 @@ public class WebStarter {
                         .filter(method -> method.getParameterCount() == 1)
                         .filter(method -> method.getParameters()[0].getType().isAssignableFrom(Request.class))
                         .toList();
+                var contextPath = controller.getAnnotation(Controller.class).contextPath();
 
                 for (var handlerMethod : handlerMethods) {
                     var handlerInfo = handlerMethod.getAnnotation(Handle.class);
@@ -45,7 +50,7 @@ public class WebStarter {
                     var responseBodyType = Class.forName(responseReturnType.getActualTypeArguments()[0].getTypeName());
 
                     applicationBuilder.pathMapping(
-                            new RequestMapping(handlerInfo.method(), handlerInfo.path()),
+                            new RequestMapping(handlerInfo.method(), contextPath + handlerInfo.path()),
                             new DynamicPathController<>(
                                     requestBodyType,
                                     responseBodyType,
