@@ -7,5 +7,6 @@ module backend.framework.web.test {
     requires java.net.http;
 
     opens io.john.amiscaray.backend.framework.web.test.application to org.junit.platform.commons;
+    opens io.john.amiscaray.backend.framework.web.test.application.stub;
     opens io.john.amiscaray.backend.framework.web.test.stub;
 }

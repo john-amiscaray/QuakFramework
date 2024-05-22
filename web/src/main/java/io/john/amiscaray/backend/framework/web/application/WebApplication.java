@@ -9,9 +9,12 @@ import io.john.amiscaray.backend.framework.web.servlet.HttpControllerGroup;
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.lang3.StringUtils;
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
@@ -21,6 +24,7 @@ public class WebApplication extends Application {
     protected Tomcat server;
     protected Context context;
     private final Map<RequestMapping, PathController<?, ?>> pathControllers;
+    private static final Logger LOG = LoggerFactory.getLogger(WebApplication.class);
 
     @Builder
     private WebApplication(Class<?> main, @Singular("pathMapping") Map<RequestMapping, PathController<?, ?>> pathControllers, String[] args) {
@@ -46,6 +50,11 @@ public class WebApplication extends Application {
         server.start();
         server.getService().addConnector(connector1);
         server.getServer().await();
+    }
+
+    public void stop() throws LifecycleException {
+        server.stop();
+        server.destroy();
     }
 
     private void registerServlets() {
