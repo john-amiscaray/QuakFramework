@@ -4,9 +4,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
+import io.john.amiscaray.backend.framework.web.test.stub.MockAccount;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.mapper.Mapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -77,7 +79,6 @@ public class WebStarterTest {
                     assertEquals(201, status);
                     assertEquals("", body);
                 });
-
     }
 
     @Test
@@ -105,6 +106,29 @@ public class WebStarterTest {
                     }
                 });
 
+    }
+
+    @Test
+    public void testGetRequestForAccountByID() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "accounts/account/12"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var body = httpResponse.body();
+                    var status = httpResponse.statusCode();
+                    assertEquals(200, status);
+                    try {
+                        assertEquals(MAPPER.writeValueAsString(
+                                new MockAccount(1, 1, 10000, "savings")
+                        ), body);
+                    } catch (JsonProcessingException e) {
+                        Assertions.fail(e);
+                    }
+                });
     }
 
 }
