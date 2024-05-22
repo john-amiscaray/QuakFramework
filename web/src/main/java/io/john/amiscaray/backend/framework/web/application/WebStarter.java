@@ -13,11 +13,19 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 
 public class WebStarter {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebStarter.class);
+
+    private static String getRawTypeName(Type type) {
+        if (type instanceof ParameterizedType parameterizedType) {
+            return parameterizedType.getRawType().getTypeName();
+        }
+        return type.getTypeName();
+    }
 
     public static WebApplication beginWebApplication(Class<?> main, String[] args) {
         var reflections = new Reflections(main.getPackageName(), Scanners.TypesAnnotated);
@@ -35,7 +43,7 @@ public class WebStarter {
                         .filter(method -> method.isAnnotationPresent(Handle.class))
                         .filter(method -> method.getReturnType().equals(Response.class))
                         .filter(method -> method.getParameterCount() == 1)
-                        .filter(method -> method.getParameters()[0].getType().isAssignableFrom(Request.class))
+                        .filter(method -> Request.class.isAssignableFrom(method.getParameters()[0].getType()))
                         .toList();
                 var contextPath = controller.getAnnotation(Controller.class).contextPath();
 
@@ -44,10 +52,12 @@ public class WebStarter {
                     var requestArgument = handlerMethod.getParameters()[0];
                     var responseReturnType = (ParameterizedType) handlerMethod.getGenericReturnType();
 
-                    var requestBodyType = Class.forName(((ParameterizedType) requestArgument.getParameterizedType())
-                            .getActualTypeArguments()[0].getTypeName());
+                    var requestBodyTypeName = getRawTypeName(((ParameterizedType) requestArgument.getParameterizedType())
+                            .getActualTypeArguments()[0]);
+                    var requestBodyType = Class.forName(requestBodyTypeName);
 
-                    var responseBodyType = Class.forName(responseReturnType.getActualTypeArguments()[0].getTypeName());
+                    var responseBodyTypeName = getRawTypeName(responseReturnType.getActualTypeArguments()[0]);
+                    var responseBodyType = Class.forName(responseBodyTypeName);
 
                     applicationBuilder.pathMapping(
                             new RequestMapping(handlerInfo.method(), contextPath + handlerInfo.path()),

@@ -2,11 +2,14 @@ package io.john.amiscaray.backend.framework.web.test.application.stub;
 
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
+import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.List;
 
 @Controller
 public class MockController {
@@ -22,6 +25,16 @@ public class MockController {
     public Response<Void> saveUser(Request<MockUserInfo> request) {
 
         return new Response<>(HttpServletResponse.SC_CREATED, null);
+
+    }
+
+    @Handle(path="/user/age/{age}", method=RequestMethod.GET)
+    public Response<List<MockUserInfo>> getUsersWithAge(DynamicPathRequest<Void> request) {
+
+        var age = Integer.parseInt(request.pathVariables().get("age"));
+        var body = List.of(new MockUserInfo("John", age, "123 Some Street"));
+
+        return new Response<>(HttpServletResponse.SC_OK, body);
 
     }
 

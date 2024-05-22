@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Add Web Starter framework">
+    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Add Logging">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/log4j.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebStarter.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebStarter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/response/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/response/Response.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebStarterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebStarterTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/stub/MockController.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/stub/MockController.java" afterDir="false" />
     </list>
@@ -68,6 +63,8 @@
     "JUnit.WebApplicationTest.testPostRequestToRootYields201Created.executor": "Debug",
     "JUnit.WebStarterTest.executor": "Run",
     "JUnit.WebStarterTest.testGetRequestAtRootUsingControllerClass.executor": "Debug",
+    "JUnit.WebStarterTest.testGetRequestForUsersWithAge.executor": "Run",
+    "JUnit.WebStarterTest.testPostRequestToSaveMockUser.executor": "Debug",
     "JUnit.java in backend.framework.data.executor": "Run",
     "JUnit.java in backend.framework.web.executor": "Run",
     "Maven.backend.framework [clean].executor": "Run",
@@ -102,40 +99,7 @@
       <recent name="C:\Projects\MyBackendFramework\web\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.java in backend.framework.web">
-    <configuration name="WebApplicationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebApplicationTest" />
-      <option name="METHOD_NAME" value="testPostRequestToRootYields201Created" />
-      <option name="TEST_OBJECT" value="class" />
-      <dir value="$PROJECT_DIR$/web/src/test/java" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebApplicationTest" />
-      <option name="METHOD_NAME" value="testGetRequestForUserWithIDYieldsMockUser" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.WebStarterTest">
     <configuration name="WebStarterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
       <extension name="coverage">
@@ -168,6 +132,38 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="WebStarterTest.testGetRequestForUsersWithAge" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.web" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
+      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
+      <option name="METHOD_NAME" value="testGetRequestForUsersWithAge" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebStarterTest.testPostRequestToSaveMockUser" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.web" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
+      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
+      <option name="METHOD_NAME" value="testPostRequestToSaveMockUser" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="java in backend.framework.web" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
       <option name="TEST_OBJECT" value="directory" />
@@ -178,11 +174,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.java in backend.framework.web" />
         <item itemvalue="JUnit.WebStarterTest" />
+        <item itemvalue="JUnit.WebStarterTest.testGetRequestForUsersWithAge" />
+        <item itemvalue="JUnit.WebStarterTest.testPostRequestToSaveMockUser" />
+        <item itemvalue="JUnit.java in backend.framework.web" />
         <item itemvalue="JUnit.WebStarterTest.testGetRequestAtRootUsingControllerClass" />
-        <item itemvalue="JUnit.WebApplicationTest" />
-        <item itemvalue="JUnit.WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser" />
       </list>
     </recent_temporary>
   </component>
@@ -211,7 +207,7 @@
       <workItem from="1715364513479" duration="2185000" />
       <workItem from="1715459085783" duration="5672000" />
       <workItem from="1716146602169" duration="2320000" />
-      <workItem from="1716389018604" duration="7966000" />
+      <workItem from="1716389018604" duration="10308000" />
     </task>
     <task id="LOCAL-00001" summary="Fix build issues with IntelliJ">
       <option name="closed" value="true" />
@@ -301,7 +297,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716392373819</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Add Logging">
+      <option name="closed" value="true" />
+      <created>1716397127139</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1716397127139</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -319,9 +323,24 @@
     <MESSAGE value="Make path variables work" />
     <MESSAGE value="Expand testing" />
     <MESSAGE value="Add Web Starter framework" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Web Starter framework" />
+    <MESSAGE value="Add Logging" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Logging" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java</url>
+          <line>67</line>
+          <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebStarter.java</url>
+          <line>80</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="io.john.amiscaray.backend.framework.web.servlet.HttpController" memberName="pathControllers" />
