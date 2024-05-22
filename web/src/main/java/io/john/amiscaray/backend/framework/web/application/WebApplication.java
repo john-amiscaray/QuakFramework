@@ -89,7 +89,7 @@ public class WebApplication extends Application {
         var controllersToAdd = new ArrayList<>(urlToHttpControllerMapping.entrySet());
         while (!controllersToAdd.isEmpty()) {
             var nextControllerMapping = controllersToAdd.get(0);
-            var commonPrefixes = new HashSet<String>();
+            String smallestCommonPrefix = null;
             for (var controllerMapping : controllersToAdd) {
                 if (controllerMapping.equals(nextControllerMapping)) {
                     continue;
@@ -97,28 +97,27 @@ public class WebApplication extends Application {
                 var urlPattern = controllerMapping.getKey();
                 var commonPrefix = StringUtils.getCommonPrefix(nextControllerMapping.getKey(), urlPattern);
                 if (commonPrefixIsValid(commonPrefix)) {
-                    var smallerPrefixesExist = !commonPrefixes.isEmpty() &&
-                            commonPrefixes.stream().noneMatch(commonPrefix::startsWith);
-                    if (!smallerPrefixesExist) {
-                        commonPrefixes.add(commonPrefix);
+                    if (smallestCommonPrefix == null ||
+                            ((commonPrefix.length() < smallestCommonPrefix.length())
+                                    && smallestCommonPrefix.startsWith(commonPrefix))) {
+                        smallestCommonPrefix = commonPrefix;
                     }
                 }
             }
-            if (commonPrefixes.isEmpty()) {
+            if (smallestCommonPrefix == null || smallestCommonPrefix.isEmpty()) {
                 var controller = new HttpControllerGroup(Map.ofEntries(nextControllerMapping));
                 var url = cleanURLPath(nextControllerMapping.getKey());
                 server.addServlet(properties.serverContextPath(), controller.toString(), controller);
                 context.addServletMappingDecoded(url, controller.toString());
             } else {
-                for(var prefix : commonPrefixes) {
-                    var controllerMappingsWithPrefix = controllersToAdd.stream()
-                            .filter(mapping -> mapping.getKey().startsWith(prefix))
-                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                    var httpController = new HttpControllerGroup(controllerMappingsWithPrefix);
-                    server.addServlet(properties.serverContextPath(), httpController.toString(), httpController);
-                    context.addServletMappingDecoded(cleanURLPath(prefix) + "/*", httpController.toString());
-                    controllersToAdd.removeAll(controllerMappingsWithPrefix.entrySet());
-                }
+                String finalSmallestCommonPrefix = smallestCommonPrefix;
+                var controllerMappingsWithPrefix = controllersToAdd.stream()
+                        .filter(mapping -> mapping.getKey().startsWith(finalSmallestCommonPrefix))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                var httpController = new HttpControllerGroup(controllerMappingsWithPrefix);
+                server.addServlet(properties.serverContextPath(), httpController.toString(), httpController);
+                context.addServletMappingDecoded(cleanURLPath(smallestCommonPrefix) + "/*", httpController.toString());
+                controllersToAdd.removeAll(controllerMappingsWithPrefix.entrySet());
             }
             controllersToAdd.remove(nextControllerMapping);
         }
