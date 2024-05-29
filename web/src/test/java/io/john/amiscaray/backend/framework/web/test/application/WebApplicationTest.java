@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUsersWithName;
+import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.*;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,7 +55,16 @@ public class WebApplicationTest {
                                 List.class,
                                 request -> {
                                     var name = request.queryParams().get("name");
-                                    return Response.of(dummyUsersWithName(name));
+                                    var age = request.queryParams().get("age");
+                                    if (name != null && age != null) {
+                                        return Response.of(dummyUsersWithAgeAndName(Integer.parseInt(age), name));
+                                    } else if (name != null) {
+                                        return Response.of(dummyUsersWithName(name));
+                                    } else if (age != null) {
+                                        return Response.of(dummyUsersWithAge(Integer.parseInt(age)));
+                                    } else {
+                                        return Response.of(List.of());
+                                    }
                                 }
                         )
                 )
@@ -216,6 +225,29 @@ public class WebApplicationTest {
                         var status = httpResponse.statusCode();
                         assertEquals(status, 200);
                         assertEquals(dummyUsersWithName("John"), Arrays.stream(body).toList());
+                    } catch (JsonProcessingException e) {
+                        throw new AssertionError("Could not parse body: ", e);
+                    }
+                }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserWithQueryParamsForNameAndAge() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "users?name=John&age=21"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    MockUserInfo[] body;
+                    try {
+                        body = MAPPER.readerFor(MockUserInfo[].class).readValue((String) httpResponse.body());
+                        var status = httpResponse.statusCode();
+                        assertEquals(status, 200);
+                        assertEquals(dummyUsersWithAgeAndName(21, "John"), Arrays.stream(body).toList());
                     } catch (JsonProcessingException e) {
                         throw new AssertionError("Could not parse body: ", e);
                     }

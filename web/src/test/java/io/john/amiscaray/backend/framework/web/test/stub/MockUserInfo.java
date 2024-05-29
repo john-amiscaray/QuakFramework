@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @EqualsAndHashCode
+@ToString
 public class MockUserInfo {
 
     private String username;
@@ -37,6 +38,14 @@ public class MockUserInfo {
 
     public static List<MockUserInfo> dummyUsersWithName(String name) {
         return List.of(dummyUser(20, name), dummyUser(21, name), dummyUser(22, name));
+    }
+
+    public static List<MockUserInfo> dummyUsersWithAge(int age) {
+        return List.of(dummyUser(age, "John"), dummyUser(age, "Elli"), dummyUser(age, "Arshia"));
+    }
+
+    public static List<MockUserInfo> dummyUsersWithAgeAndName(int age, String name) {
+        return List.of(dummyUser(age, name), dummyUser(age, name));
     }
 
 }
