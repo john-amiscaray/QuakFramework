@@ -88,40 +88,44 @@ public class WebApplication extends Application {
         }
         // TODO rewrite this algorithm. First sort the entries by the shortest url patterns based on number of URL parts there are. Then, look for paths starting with the current path, group them in controller groups and pop them.
         var controllersToAdd = new ArrayList<>(urlToHttpControllerMapping.entrySet());
+        controllersToAdd.sort(Comparator.comparingInt(entry -> getNumPaths(entry.getKey())));
         while (!controllersToAdd.isEmpty()) {
-            var nextControllerMapping = controllersToAdd.get(0);
-            String smallestCommonPrefix = null;
-            for (var controllerMapping : controllersToAdd) {
-                if (controllerMapping.equals(nextControllerMapping)) {
-                    continue;
-                }
-                var urlPattern = controllerMapping.getKey();
-                var commonPrefix = StringUtils.getCommonPrefix(nextControllerMapping.getKey(), urlPattern);
-                if (commonPrefixIsValid(commonPrefix)) {
-                    if (smallestCommonPrefix == null ||
-                            ((commonPrefix.length() < smallestCommonPrefix.length())
-                                    && smallestCommonPrefix.startsWith(commonPrefix))) {
-                        smallestCommonPrefix = commonPrefix;
+            var currentControllerMapping = controllersToAdd.get(0);
+            var controllersToGroup = new HashMap<String, HttpController>();
+            if (!currentControllerMapping.getKey().equals("/")) { // root URL should be handled on its own
+                for (var controllerMapping : controllersToAdd) {
+                    if (controllerMapping.equals(currentControllerMapping)) {
+                        continue;
+                    }
+                    if (controllerMapping.getKey().startsWith(currentControllerMapping.getKey())) {
+                        controllersToGroup.put(controllerMapping.getKey(), controllerMapping.getValue());
                     }
                 }
             }
-            if (smallestCommonPrefix == null || smallestCommonPrefix.isEmpty()) {
-                var controller = new HttpControllerGroup(Map.ofEntries(nextControllerMapping));
-                var url = cleanURLPath(nextControllerMapping.getKey());
+            if (controllersToGroup.isEmpty()) {
+                var controller = new HttpControllerGroup(Map.ofEntries(currentControllerMapping));
+                var url = cleanURLPath(currentControllerMapping.getKey());
                 server.addServlet(properties.serverContextPath(), controller.toString(), controller);
                 context.addServletMappingDecoded(url, controller.toString());
+                controllersToAdd.remove(currentControllerMapping);
             } else {
-                String finalSmallestCommonPrefix = smallestCommonPrefix;
-                var controllerMappingsWithPrefix = controllersToAdd.stream()
-                        .filter(mapping -> mapping.getKey().equals(finalSmallestCommonPrefix) || mapping.getKey().matches(finalSmallestCommonPrefix + "/.+"))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                var httpController = new HttpControllerGroup(controllerMappingsWithPrefix);
+                controllersToGroup.put(currentControllerMapping.getKey(), currentControllerMapping.getValue());
+                var httpController = new HttpControllerGroup(controllersToGroup);
                 server.addServlet(properties.serverContextPath(), httpController.toString(), httpController);
-                context.addServletMappingDecoded(cleanURLPath(smallestCommonPrefix) + "/*", httpController.toString());
-                controllersToAdd.removeAll(controllerMappingsWithPrefix.entrySet());
+                context.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
+                controllersToAdd.removeAll(controllersToGroup.entrySet());
             }
-            controllersToAdd.remove(nextControllerMapping);
         }
+    }
+
+    private int getNumPaths(String url) {
+        if (url.startsWith("/")) {
+            url = url.substring(1);
+        }
+        if (url.endsWith("/")) {
+            url = url.substring(0, url.length() - 1);
+        }
+        return url.split("/").length;
     }
 
     private boolean commonPrefixIsValid(String prefix) {

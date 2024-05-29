@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,7 +171,7 @@ public class WebApplicationTest {
                 httpResponse -> {
                     var body = httpResponse.body();
                     var status = httpResponse.statusCode();
-                    assertEquals(status, 200);
+                    assertEquals(200, status);
                     assertEquals("User 1", body);
                 }
         );
@@ -209,12 +210,12 @@ public class WebApplicationTest {
                 request,
                 HttpResponse.BodyHandlers.ofString(),
                 httpResponse -> {
-                    List<MockUserInfo> body;
+                    MockUserInfo[] body;
                     try {
-                        body = MAPPER.readerFor(List.class).readValue((String) httpResponse.body());
+                        body = MAPPER.readerFor(MockUserInfo[].class).readValue((String) httpResponse.body());
                         var status = httpResponse.statusCode();
                         assertEquals(status, 200);
-                        assertEquals(dummyUsersWithName("John"), body);
+                        assertEquals(dummyUsersWithName("John"), Arrays.stream(body).toList());
                     } catch (JsonProcessingException e) {
                         throw new AssertionError("Could not parse body: ", e);
                     }
