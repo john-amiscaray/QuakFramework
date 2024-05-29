@@ -1,6 +1,6 @@
-package io.john.amiscaray.backend.framework.data.helper;
+package io.john.amiscaray.backend.framework.data.test.helper;
 
-import io.john.amiscaray.backend.framework.data.stub.Employee;
+import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import lombok.AllArgsConstructor;
 

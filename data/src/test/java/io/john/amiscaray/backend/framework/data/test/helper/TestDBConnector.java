@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.data.helper;
+package io.john.amiscaray.backend.framework.data.test.helper;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
