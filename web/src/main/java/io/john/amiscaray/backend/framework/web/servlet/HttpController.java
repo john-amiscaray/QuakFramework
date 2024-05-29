@@ -8,6 +8,7 @@ import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,9 +16,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class HttpController extends HttpServlet {
 
+    @Setter
     private Map<String, String> pathParameters = new HashMap<>();
     private final String urlPattern;
     private final Map<RequestMethod, PathController<?, ?>> pathControllers;
@@ -41,6 +44,12 @@ public class HttpController extends HttpServlet {
         }
         var method = RequestMethod.valueOf(servletRequest.getMethod());
         var controller = pathControllers.get(method);
+        var queryParams = servletRequest.getParameterMap()
+                .entrySet()
+                .stream()
+                .filter(paramEntry -> paramEntry.getValue().length > 0)
+                .map(paramEntry -> Map.entry(paramEntry.getKey(), paramEntry.getValue()[0]))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (controller == null || controller.requestHandler() == null) {
             servletResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "This path does not support HTTP method " + method.name());
@@ -51,16 +60,23 @@ public class HttpController extends HttpServlet {
         var bodyRaw = readBody(servletRequest);
         Request<?> request;
         if (controller.requestBodyType().equals(String.class)) {
-            request = new DynamicPathRequest<>(requestHeaders, method,
+            request = new DynamicPathRequest<>(
+                    requestHeaders,
+                    queryParams,
+                    method,
                     pathParameters,
                     bodyRaw);
         } else if (controller.requestBodyType().equals(Void.class)) {
-            request = new DynamicPathRequest<>(requestHeaders,
+            request = new DynamicPathRequest<>(
+                    requestHeaders,
+                    queryParams,
                     method,
                     pathParameters,
                     null);
         } else {
-            request = new DynamicPathRequest<>(requestHeaders,
+            request = new DynamicPathRequest<>(
+                    requestHeaders,
+                    queryParams,
                     method,
                     pathParameters,
                     MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw));

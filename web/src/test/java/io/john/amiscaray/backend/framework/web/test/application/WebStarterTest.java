@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
-import io.john.amiscaray.backend.framework.web.test.stub.MockAccount;
-import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
@@ -18,7 +16,7 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-import static io.john.amiscaray.backend.framework.web.test.stub.MockAccount.dummyAccount;
+import static io.john.amiscaray.backend.framework.web.test.stub.MockAccount.*;
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUser;
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUsers;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
@@ -124,8 +122,49 @@ public class WebStarterTest {
     }
 
     @Test
-    public void testPostRequestToRootGivesHTTP405() {
+    public void testGetRequestToAccountWithQueryParamForAccountName() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "accounts/account?name=savings"))
+                .GET()
+                .build();
 
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var body = httpResponse.body();
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    try {
+                        assertEquals(MAPPER.writeValueAsString(dummyAccountsWithName("savings")), body);
+                    } catch (JsonProcessingException e) {
+                        Assertions.fail(e);
+                    }
+                });
+    }
+
+    @Test
+    public void testGetRequestToAccountWithQueryParamForAccountNameAndBalance() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "accounts/account?name=savings&balance=10000"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var body = httpResponse.body();
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    try {
+                        assertEquals(MAPPER.writeValueAsString(dummyAccountsWithNameAndUserBalance("savings", 10000)), body);
+                    } catch (JsonProcessingException e) {
+                        Assertions.fail(e);
+                    }
+                });
+    }
+
+    @Test
+    public void testPostRequestToRootGivesHTTP405() {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(ROOT_URL))
                 .POST(HttpRequest.BodyPublishers.noBody())
@@ -137,7 +176,6 @@ public class WebStarterTest {
                     var status = httpResponse.statusCode();
                     assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, status);
                 });
-
     }
 
 }

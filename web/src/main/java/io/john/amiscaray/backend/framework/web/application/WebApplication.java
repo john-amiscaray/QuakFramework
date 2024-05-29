@@ -86,6 +86,7 @@ public class WebApplication extends Application {
                     )));
             urlToHttpControllerMapping.put(url, controller);
         }
+        // TODO rewrite this algorithm. First sort the entries by the shortest url patterns based on number of URL parts there are. Then, look for paths starting with the current path, group them in controller groups and pop them.
         var controllersToAdd = new ArrayList<>(urlToHttpControllerMapping.entrySet());
         while (!controllersToAdd.isEmpty()) {
             var nextControllerMapping = controllersToAdd.get(0);
@@ -112,7 +113,7 @@ public class WebApplication extends Application {
             } else {
                 String finalSmallestCommonPrefix = smallestCommonPrefix;
                 var controllerMappingsWithPrefix = controllersToAdd.stream()
-                        .filter(mapping -> mapping.getKey().startsWith(finalSmallestCommonPrefix))
+                        .filter(mapping -> mapping.getKey().equals(finalSmallestCommonPrefix) || mapping.getKey().matches(finalSmallestCommonPrefix + "/.+"))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
                 var httpController = new HttpControllerGroup(controllerMappingsWithPrefix);
                 server.addServlet(properties.serverContextPath(), httpController.toString(), httpController);

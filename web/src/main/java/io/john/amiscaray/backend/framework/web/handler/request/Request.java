@@ -10,4 +10,6 @@ public sealed interface Request<T> permits SimpleRequest, DynamicPathRequest{
 
     Map<String, String> headers();
 
+    Map<String, String> queryParams();
+
 }

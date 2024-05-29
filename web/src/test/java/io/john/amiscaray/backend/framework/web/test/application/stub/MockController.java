@@ -19,7 +19,7 @@ public class MockController {
     @Handle(path="/", method=RequestMethod.GET)
     public Response<String> helloWorld(Request<Void> request) {
 
-        return new Response<>(HttpServletResponse.SC_OK, "Hello World");
+        return Response.of("Hello World");
 
     }
 
@@ -36,7 +36,7 @@ public class MockController {
         var age = Integer.parseInt(request.pathVariables().get("age"));
         var body = List.of(dummyUser(age));
 
-        return new Response<>(HttpServletResponse.SC_OK, body);
+        return Response.of(body);
 
     }
 

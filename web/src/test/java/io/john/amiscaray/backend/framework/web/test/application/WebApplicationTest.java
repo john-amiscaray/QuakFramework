@@ -20,8 +20,10 @@ import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUsersWithName;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,6 +45,17 @@ public class WebApplicationTest {
                                 Void.class,
                                 String.class,
                                 _request -> new Response<>(new HashMap<>(), HttpServletResponse.SC_OK, "Hello World")
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/users"),
+                        new SimplePathController<>(
+                                Void.class,
+                                List.class,
+                                request -> {
+                                    var name = request.queryParams().get("name");
+                                    return Response.of(dummyUsersWithName(name));
+                                }
                         )
                 )
                 .pathMapping(
@@ -181,6 +194,29 @@ public class WebApplicationTest {
                         assertEquals(MOCK_USER, body);
                     } catch (JsonProcessingException e) {
                         throw new AssertionError("Could not parse body as mock user: ", e);
+                    }
+                }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserWithQueryParamForName() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "users?name=John"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    List<MockUserInfo> body;
+                    try {
+                        body = MAPPER.readerFor(List.class).readValue((String) httpResponse.body());
+                        var status = httpResponse.statusCode();
+                        assertEquals(status, 200);
+                        assertEquals(dummyUsersWithName("John"), body);
+                    } catch (JsonProcessingException e) {
+                        throw new AssertionError("Could not parse body: ", e);
                     }
                 }
         );

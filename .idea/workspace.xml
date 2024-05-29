@@ -4,9 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Fix issue with path parameters not working with a single controller. Fix potential problem with the creation of controller groups">
+    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Common prefix algorithm improvements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/request/DynamicPathRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/request/DynamicPathRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/request/Request.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/request/Request.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/request/SimpleRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/request/SimpleRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/response/Response.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/handler/response/Response.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebStarterTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebStarterTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/stub/MockController.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/stub/MockController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/stub/MockControllerWithContextPath.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/stub/MockControllerWithContextPath.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/stub/MockAccount.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/stub/MockAccount.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/stub/MockUserInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/stub/MockUserInfo.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,18 +62,26 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "JUnit.All in backend.framework.core.executor": "Run",
+    "JUnit.All in backend.framework.data.executor": "Run",
+    "JUnit.All in backend.framework.executor": "Run",
+    "JUnit.All in backend.framework.web (1).executor": "Run",
+    "JUnit.All in backend.framework.web (2).executor": "Run",
+    "JUnit.All in backend.framework.web.executor": "Run",
     "JUnit.DatabaseProxyTest.executor": "Run",
     "JUnit.WebApplicationTest (1).executor": "Run",
     "JUnit.WebApplicationTest.executor": "Run",
     "JUnit.WebApplicationTest.testDeleteRequestYields204WithCustomHeaderWithDeletedID.executor": "Debug",
     "JUnit.WebApplicationTest.testGetRequestForUserInfoYields200AndHasUserIDStringInBody.executor": "Run",
     "JUnit.WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser.executor": "Run",
+    "JUnit.WebApplicationTest.testGetRequestForUserWithQueryParamForName.executor": "Debug",
     "JUnit.WebApplicationTest.testGetRequestToRootYieldsHelloWorld.executor": "Run",
     "JUnit.WebApplicationTest.testPostRequestToRootYields201Created.executor": "Debug",
     "JUnit.WebStarterTest.executor": "Run",
     "JUnit.WebStarterTest.testGetRequestAtRootUsingControllerClass.executor": "Debug",
     "JUnit.WebStarterTest.testGetRequestForAccountByID.executor": "Debug",
     "JUnit.WebStarterTest.testGetRequestForUsersWithAge.executor": "Run",
+    "JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountName.executor": "Run",
     "JUnit.WebStarterTest.testPOSTRequestToRootGivesHTTP405.executor": "Run",
     "JUnit.WebStarterTest.testPostRequestToSaveMockUser.executor": "Debug",
     "JUnit.java in backend.framework.data.executor": "Run",
@@ -99,24 +118,40 @@
       <recent name="C:\Projects\MyBackendFramework\web\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.java in backend.framework.web">
-    <configuration name="WebStarterTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
-      <option name="METHOD_NAME" value="testGetRequestAtRootUsingControllerClass" />
-      <option name="TEST_OBJECT" value="class" />
+  <component name="RunManager" selected="JUnit.All in backend.framework.web">
+    <configuration name="All in backend.framework.core" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.core" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="WebStarterTest.testGetRequestForAccountByID" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="All in backend.framework.data" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.data" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in backend.framework.web (2)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.web" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in backend.framework.web" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.web" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WebApplicationTest.testGetRequestForUserWithQueryParamForName" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
       <extension name="coverage">
         <pattern>
@@ -125,61 +160,20 @@
         </pattern>
       </extension>
       <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
-      <option name="METHOD_NAME" value="testGetRequestForAccountByID" />
+      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebApplicationTest" />
+      <option name="METHOD_NAME" value="testGetRequestForUserWithQueryParamForName" />
       <option name="TEST_OBJECT" value="method" />
-      <dir value="$PROJECT_DIR$/web/src/test/java" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="WebStarterTest.testGetRequestForUsersWithAge" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
-      <option name="METHOD_NAME" value="testGetRequestForUsersWithAge" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="WebStarterTest.testPOSTRequestToRootGivesHTTP405" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
-      <option name="METHOD_NAME" value="testPOSTRequestToRootGivesHTTP405" />
-      <option name="TEST_OBJECT" value="method" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="java in backend.framework.web" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/web/src/test/java" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.java in backend.framework.web" />
-        <item itemvalue="JUnit.WebStarterTest.testGetRequestForAccountByID" />
-        <item itemvalue="JUnit.WebStarterTest" />
-        <item itemvalue="JUnit.WebStarterTest.testPOSTRequestToRootGivesHTTP405" />
-        <item itemvalue="JUnit.WebStarterTest.testGetRequestForUsersWithAge" />
+        <item itemvalue="JUnit.All in backend.framework.web" />
+        <item itemvalue="JUnit.WebApplicationTest.testGetRequestForUserWithQueryParamForName" />
+        <item itemvalue="JUnit.All in backend.framework.web (2)" />
+        <item itemvalue="JUnit.All in backend.framework.data" />
+        <item itemvalue="JUnit.All in backend.framework.core" />
       </list>
     </recent_temporary>
   </component>
@@ -208,7 +202,8 @@
       <workItem from="1715364513479" duration="2185000" />
       <workItem from="1715459085783" duration="5672000" />
       <workItem from="1716146602169" duration="2320000" />
-      <workItem from="1716389018604" duration="17264000" />
+      <workItem from="1716389018604" duration="20280000" />
+      <workItem from="1716861642802" duration="5808000" />
     </task>
     <task id="LOCAL-00001" summary="Fix build issues with IntelliJ">
       <option name="closed" value="true" />
@@ -330,7 +325,15 @@
       <option name="project" value="LOCAL" />
       <updated>1716410676706</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="Common prefix algorithm improvements">
+      <option name="closed" value="true" />
+      <created>1716411662819</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1716411662819</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -352,28 +355,16 @@
     <MESSAGE value="Add new test. Fix dynamic path requests not working..." />
     <MESSAGE value="Add additional tests" />
     <MESSAGE value="Fix issue with path parameters not working with a single controller. Fix potential problem with the creation of controller groups" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix issue with path parameters not working with a single controller. Fix potential problem with the creation of controller groups" />
+    <MESSAGE value="Common prefix algorithm improvements" />
+    <option name="LAST_COMMIT_MESSAGE" value="Common prefix algorithm improvements" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebStarter.java</url>
-          <line>80</line>
-          <option name="timeStamp" value="63" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/servlet/HttpController.java</url>
-          <line>38</line>
-          <option name="timeStamp" value="72" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="io.john.amiscaray.backend.framework.web.servlet.HttpController" memberName="pathControllers" />
         <PinnedItemInfo parentTag="java.util.HashMap$Node" memberName="value" />
         <PinnedItemInfo parentTag="io.john.amiscaray.backend.framework.web.handler.request.Request" memberName="headers" />
+        <PinnedItemInfo parentTag="java.util.Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry" memberName="value" />
       </pinned-members>
     </pin-to-top-manager>
   </component>
