@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.data.test;
 
+import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 import io.john.amiscaray.backend.framework.data.query.numeric.*;
 import io.john.amiscaray.backend.framework.data.query.string.ValueContaining;
@@ -26,14 +27,9 @@ import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNu
 
 public class DatabaseProxyTest {
 
-    private static final ApplicationProperties testApplicationProperties = ApplicationProperties.builder()
-            .dbConnectionDriver("org.h2.Driver")
-            .dbConnectionURL("jdbc:h2:mem:test")
-            .hbm2ddl("update")
-            .dbUsername("sa")
-            .dbPassword("")
-            .sqlDialect("org.hibernate.dialect.H2Dialect")
-            .build();
+    private static final ApplicationProperties testApplicationProperties =
+            new Application(DatabaseProxyTest.class, new String[] {})
+                    .getApplicationProperties();
     private static final String hibernatePackage = "io.john.amiscaray.backend.framework.data.test.stub";
     private static final EmployeeTestDBConnector testDBConnector = new EmployeeTestDBConnector(testApplicationProperties);
     private static DatabaseProxy dbProxy;

@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.data.test.helper;
 
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
 import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,10 @@ public class EmployeeTestDBConnector implements TestDBConnector<Employee, Long> 
 
     @Override
     public Connection getDBConnection() throws SQLException {
-        return DriverManager.getConnection(properties.dbConnectionURL(), properties.dbUsername(), properties.dbPassword());
+        return DriverManager.getConnection(
+                properties.get(ApplicationProperty.DB_CONNECTION_URL),
+                properties.get(ApplicationProperty.DB_CONNECTION_USERNAME),
+                properties.get(ApplicationProperty.DB_CONNECTION_PASSWORD));
     }
 
     @Override

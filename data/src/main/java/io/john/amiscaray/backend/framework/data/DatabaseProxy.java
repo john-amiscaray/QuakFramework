@@ -30,12 +30,12 @@ public class DatabaseProxy {
     public DatabaseProxy(ApplicationProperties properties, String classScanPackage) {
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(Map.of(
-                        SQL_DIALECT.getName(), properties.sqlDialect(),
-                        DB_DRIVER_CLASS.getName(), properties.dbConnectionDriver(),
-                        DB_CONNECTION_URL.getName(), properties.dbConnectionURL(),
-                        DB_CONNECTION_USERNAME.getName(), properties.dbUsername(),
-                        DB_CONNECTION_PASSWORD.getName(), properties.dbPassword(),
-                        HBM2DDL.getName(), properties.hbm2ddl()
+                        SQL_DIALECT.getName(), properties.get(SQL_DIALECT),
+                        DB_DRIVER_CLASS.getName(), properties.get(DB_DRIVER_CLASS),
+                        DB_CONNECTION_URL.getName(), properties.get(DB_CONNECTION_URL),
+                        DB_CONNECTION_USERNAME.getName(), properties.get(DB_CONNECTION_USERNAME),
+                        DB_CONNECTION_PASSWORD.getName(), properties.get(DB_CONNECTION_PASSWORD),
+                        HBM2DDL.getName(), properties.get(HBM2DDL)
                 ))
                 .build();
         Reflections reflections = new Reflections(classScanPackage, Scanners.TypesAnnotated);

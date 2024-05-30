@@ -38,28 +38,12 @@ public class Application {
             try (var propertiesFileInputStream = main.getResourceAsStream("/application.properties")) {
                 var propertiesFromFile = new Properties();
                 propertiesFromFile.load(propertiesFileInputStream);
-                properties = parsePropertiesFromFile(propertiesFromFile);
+                properties = new ApplicationProperties(propertiesFromFile);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
         return properties;
-    }
-
-    private ApplicationProperties parsePropertiesFromFile(Properties properties) {
-        return ApplicationProperties.builder()
-                .contextPackage(CONTEXT_PACKAGE.getOrElse(properties, main.getPackageName()))
-                .serverPort(Integer.parseInt(PORT.getOrElseDefault(properties)))
-                .serverDirectory(SERVER_DIRECTORY.getOrElseDefault(properties))
-                .serverContextPath(CONTEXT_PATH.getOrElseDefault(properties))
-                .serverDocBase(DOCUMENT_BASE.getOrElseDefault(properties))
-                .dbUsername(DB_CONNECTION_USERNAME.getOrElseDefault(properties))
-                .dbPassword(DB_CONNECTION_PASSWORD.getOrElseDefault(properties))
-                .dbConnectionURL(DB_CONNECTION_URL.getOrElseDefault(properties))
-                .sqlDialect(SQL_DIALECT.getOrElseDefault(properties))
-                .dbConnectionDriver(DB_DRIVER_CLASS.getOrElseDefault(properties))
-                .hbm2ddl(HBM2DDL.getOrElseDefault(properties))
-                .build();
     }
 
 }
