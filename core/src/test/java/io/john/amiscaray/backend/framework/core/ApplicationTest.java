@@ -3,6 +3,8 @@ package io.john.amiscaray.backend.framework.core;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
+
 public class ApplicationTest {
 
     private final Application application = new Application(ApplicationTest.class, new String[0]);
@@ -11,17 +13,17 @@ public class ApplicationTest {
     void testPropertiesAreLoadedFromFile() {
         var properties = application.getApplicationProperties();
 
-        Assertions.assertEquals(properties.contextPackage(), "org.something.stupid");
-        Assertions.assertEquals(properties.serverPort(), 9000);
-        Assertions.assertEquals(properties.serverDirectory(), "myserver");
-        Assertions.assertEquals(properties.serverDocBase(), ".");
-        Assertions.assertEquals(properties.serverContextPath(), "/test");
-        Assertions.assertEquals(properties.dbConnectionURL(), "jdbc:h2:mem:test");
-        Assertions.assertEquals(properties.dbConnectionDriver(), "org.h2.Driver");
-        Assertions.assertEquals(properties.hbm2ddl(), "update");
-        Assertions.assertEquals(properties.dbUsername(), "sa");
-        Assertions.assertEquals(properties.dbPassword(), "");
-        Assertions.assertEquals(properties.sqlDialect(), "org.hibernate.dialect.H2Dialect");
+        Assertions.assertEquals(properties.get(CONTEXT_PACKAGE), "org.something.stupid");
+        Assertions.assertEquals(Integer.parseInt(properties.get(PORT)), 9000);
+        Assertions.assertEquals(properties.get(SERVER_DIRECTORY), "myserver");
+        Assertions.assertEquals(properties.get(DOCUMENT_BASE), ".");
+        Assertions.assertEquals(properties.get(CONTEXT_PATH), "/test");
+        Assertions.assertEquals(properties.get(DB_CONNECTION_URL), "jdbc:h2:mem:test");
+        Assertions.assertEquals(properties.get(DB_DRIVER_CLASS), "org.h2.Driver");
+        Assertions.assertEquals(properties.get(HBM2DDL), "update");
+        Assertions.assertEquals(properties.get(DB_CONNECTION_USERNAME), "sa");
+        Assertions.assertEquals(properties.get(DB_CONNECTION_PASSWORD), "");
+        Assertions.assertEquals(properties.get(SQL_DIALECT), "org.hibernate.dialect.H2Dialect");
     }
 
 }

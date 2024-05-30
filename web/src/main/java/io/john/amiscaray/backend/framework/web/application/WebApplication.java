@@ -1,6 +1,7 @@
 package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
@@ -39,14 +40,14 @@ public class WebApplication extends Application {
         }
         super.start();
         server = new Tomcat();
-        server.setBaseDir(properties.serverDirectory());
+        server.setBaseDir(properties.get(ApplicationProperty.SERVER_DIRECTORY));
 
         var connector1 = server.getConnector();
-        connector1.setPort(properties.serverPort());
+        connector1.setPort(Integer.parseInt(properties.get(ApplicationProperty.PORT)));
 
-        var docBase = new File(properties.serverDocBase()).getAbsolutePath();
+        var docBase = new File(properties.get(ApplicationProperty.DOCUMENT_BASE)).getAbsolutePath();
 
-        context = server.addContext(properties.serverContextPath(), docBase);
+        context = server.addContext(properties.get(ApplicationProperty.CONTEXT_PATH), docBase);
 
         registerServlets();
 
@@ -105,13 +106,13 @@ public class WebApplication extends Application {
             if (controllersToGroup.isEmpty()) {
                 var controller = new HttpControllerGroup(Map.ofEntries(currentControllerMapping));
                 var url = cleanURLPath(currentControllerMapping.getKey());
-                server.addServlet(properties.serverContextPath(), controller.toString(), controller);
+                server.addServlet(properties.get(ApplicationProperty.CONTEXT_PATH), controller.toString(), controller);
                 context.addServletMappingDecoded(url, controller.toString());
                 controllersToAdd.remove(currentControllerMapping);
             } else {
                 controllersToGroup.put(currentControllerMapping.getKey(), currentControllerMapping.getValue());
                 var httpController = new HttpControllerGroup(controllersToGroup);
-                server.addServlet(properties.serverContextPath(), httpController.toString(), httpController);
+                server.addServlet(properties.get(ApplicationProperty.CONTEXT_PATH), httpController.toString(), httpController);
                 context.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
                 controllersToAdd.removeAll(controllersToGroup.entrySet());
             }

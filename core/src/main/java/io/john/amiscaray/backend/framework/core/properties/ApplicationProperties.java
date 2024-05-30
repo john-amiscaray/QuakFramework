@@ -1,11 +1,21 @@
 package io.john.amiscaray.backend.framework.core.properties;
 
-import lombok.Builder;
 
-@Builder
-public record ApplicationProperties(String contextPackage, int serverPort, String serverDirectory, String serverDocBase,
-                                    String serverContextPath, String sqlDialect, String dbConnectionDriver,
-                                    String dbUsername, String dbPassword,
-                                    String hbm2ddl, String dbConnectionURL) {
+import lombok.AllArgsConstructor;
+
+import java.util.Properties;
+
+@AllArgsConstructor
+public class ApplicationProperties{
+
+    private final Properties fileProperties;
+
+    public String get(ApplicationProperty property) {
+        return property.getOrElseDefault(fileProperties);
+    }
+
+    public String getOrElse(ApplicationProperty property, String defaultValue) {
+        return property.getOrElse(fileProperties, defaultValue);
+    }
 
 }

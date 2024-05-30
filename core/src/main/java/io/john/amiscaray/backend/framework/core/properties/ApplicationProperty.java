@@ -32,11 +32,11 @@ public enum ApplicationProperty {
         return defaultValue;
     }
 
-    public String getOrElse(Properties properties, String defaultValue) {
+    String getOrElse(Properties properties, String defaultValue) {
         return Optional.ofNullable(properties.getProperty(name)).orElse(defaultValue);
     }
 
-    public String getOrElseDefault(Properties properties) {
+    String getOrElseDefault(Properties properties) {
         return Optional.of(properties.getProperty(name)).orElse(defaultValue);
     }
 }

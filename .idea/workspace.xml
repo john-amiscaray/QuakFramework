@@ -9,6 +9,10 @@
       <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,6 +63,7 @@
     "JUnit.All in backend.framework.web (1).executor": "Run",
     "JUnit.All in backend.framework.web (2).executor": "Run",
     "JUnit.All in backend.framework.web.executor": "Run",
+    "JUnit.ApplicationTest.executor": "Run",
     "JUnit.DatabaseProxyTest.executor": "Run",
     "JUnit.WebApplicationTest (1).executor": "Run",
     "JUnit.WebApplicationTest.executor": "Run",
@@ -87,7 +92,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "10-add-an-alternative-way-to-set-the-class-scan-package",
+    "git-widget-placeholder": "13-applicationproperties-refactor",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Projects/MyBackendFramework/web/src/main/resources",
     "node.js.detected.package.eslint": "true",
@@ -110,77 +115,54 @@
       <recent name="C:\Projects\MyBackendFramework\web\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ApplicationTest">
-    <configuration name="All in backend.framework.web (2)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
+  <component name="RunManager" selected="JUnit.All in backend.framework">
+    <configuration name="All in backend.framework" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="All in backend.framework.web" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ApplicationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="All in backend.framework.core" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.core" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.core.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.core" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.core.ApplicationTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="WebApplicationTest.testGetRequestForUserWithQueryParamForName" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebApplicationTest" />
-      <option name="METHOD_NAME" value="testGetRequestForUserWithQueryParamForName" />
-      <option name="TEST_OBJECT" value="method" />
+    <configuration name="All in backend.framework.data (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.data" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="WebStarterTest.testGetRequestToAccountWithQueryParamForAccountNameAndBalance" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+    <configuration name="All in backend.framework.data" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.data" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="All in backend.framework.web (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.web.test.application.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.web.test.application" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.web.test.application.WebStarterTest" />
-      <option name="METHOD_NAME" value="testGetRequestToAccountWithQueryParamForAccountNameAndBalance" />
-      <option name="TEST_OBJECT" value="method" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ApplicationTest" />
-        <item itemvalue="JUnit.All in backend.framework.web" />
-        <item itemvalue="JUnit.WebApplicationTest.testGetRequestForUserWithQueryParamForName" />
-        <item itemvalue="JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountNameAndBalance" />
-        <item itemvalue="JUnit.All in backend.framework.web (2)" />
+        <item itemvalue="JUnit.All in backend.framework" />
+        <item itemvalue="JUnit.All in backend.framework.web (1)" />
+        <item itemvalue="JUnit.All in backend.framework.data (1)" />
+        <item itemvalue="JUnit.All in backend.framework.core" />
+        <item itemvalue="JUnit.All in backend.framework.data" />
       </list>
     </recent_temporary>
   </component>
