@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.Properties;
 
 public enum ApplicationProperty {
+    CONTEXT_PACKAGE("application.context.package", ""),
     PORT("server.port", "8080"),
     CONTEXT_PATH("server.context.path", ""),
     DOCUMENT_BASE("server.document.base", "."),
@@ -29,6 +30,10 @@ public enum ApplicationProperty {
 
     public String getDefaultValue() {
         return defaultValue;
+    }
+
+    public String getOrElse(Properties properties, String defaultValue) {
+        return Optional.ofNullable(properties.getProperty(name)).orElse(defaultValue);
     }
 
     public String getOrElseDefault(Properties properties) {

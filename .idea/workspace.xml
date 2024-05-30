@@ -6,9 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Fix bug. Improve algorithm for grouping controllers.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/application/WebApplicationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/stub/MockUserInfo.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/io/john/amiscaray/backend/framework/web/test/stub/MockUserInfo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/test/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/test/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +87,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "9-add-new-web-module",
+    "git-widget-placeholder": "10-add-an-alternative-way-to-set-the-class-scan-package",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Projects/MyBackendFramework/web/src/main/resources",
     "node.js.detected.package.eslint": "true",
@@ -110,15 +110,7 @@
       <recent name="C:\Projects\MyBackendFramework\web\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.All in backend.framework.web">
-    <configuration name="All in backend.framework.data" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.data" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="TEST_OBJECT" value="package" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="JUnit.ApplicationTest">
     <configuration name="All in backend.framework.web (2)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
       <option name="PACKAGE_NAME" value="" />
@@ -131,6 +123,21 @@
       <module name="backend.framework.web" />
       <option name="PACKAGE_NAME" value="" />
       <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ApplicationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.core" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="io.john.amiscaray.backend.framework.core.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.core" />
+      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.core.ApplicationTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -169,11 +176,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ApplicationTest" />
         <item itemvalue="JUnit.All in backend.framework.web" />
         <item itemvalue="JUnit.WebApplicationTest.testGetRequestForUserWithQueryParamForName" />
         <item itemvalue="JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountNameAndBalance" />
         <item itemvalue="JUnit.All in backend.framework.web (2)" />
-        <item itemvalue="JUnit.All in backend.framework.data" />
       </list>
     </recent_temporary>
   </component>
@@ -205,6 +212,7 @@
       <workItem from="1716389018604" duration="20280000" />
       <workItem from="1716861642802" duration="5808000" />
       <workItem from="1716945870410" duration="3045000" />
+      <workItem from="1717100093482" duration="1154000" />
     </task>
     <task id="LOCAL-00001" summary="Fix build issues with IntelliJ">
       <option name="closed" value="true" />
@@ -366,7 +374,6 @@
     <MESSAGE value="Refactor" />
     <MESSAGE value="Minor" />
     <MESSAGE value="Make path variables work" />
-    <MESSAGE value="Expand testing" />
     <MESSAGE value="Add Web Starter framework" />
     <MESSAGE value="Add Logging" />
     <MESSAGE value="Add new test. Fix dynamic path requests not working..." />
@@ -375,7 +382,8 @@
     <MESSAGE value="Common prefix algorithm improvements" />
     <MESSAGE value="Add query params and miscellaneous changes" />
     <MESSAGE value="Fix bug. Improve algorithm for grouping controllers." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix bug. Improve algorithm for grouping controllers." />
+    <MESSAGE value="Expand testing" />
+    <option name="LAST_COMMIT_MESSAGE" value="Expand testing" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

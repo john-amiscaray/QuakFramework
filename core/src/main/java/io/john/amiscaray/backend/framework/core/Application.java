@@ -48,6 +48,7 @@ public class Application {
 
     private ApplicationProperties parsePropertiesFromFile(Properties properties) {
         return ApplicationProperties.builder()
+                .contextPackage(CONTEXT_PACKAGE.getOrElse(properties, main.getPackageName()))
                 .serverPort(Integer.parseInt(PORT.getOrElseDefault(properties)))
                 .serverDirectory(SERVER_DIRECTORY.getOrElseDefault(properties))
                 .serverContextPath(CONTEXT_PATH.getOrElseDefault(properties))
