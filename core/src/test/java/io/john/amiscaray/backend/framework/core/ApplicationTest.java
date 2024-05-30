@@ -11,6 +11,7 @@ public class ApplicationTest {
     void testPropertiesAreLoadedFromFile() {
         var properties = application.getApplicationProperties();
 
+        Assertions.assertEquals(properties.contextPackage(), "org.something.stupid");
         Assertions.assertEquals(properties.serverPort(), 9000);
         Assertions.assertEquals(properties.serverDirectory(), "myserver");
         Assertions.assertEquals(properties.serverDocBase(), ".");
