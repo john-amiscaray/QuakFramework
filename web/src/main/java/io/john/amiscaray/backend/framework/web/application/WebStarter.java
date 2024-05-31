@@ -29,9 +29,10 @@ public class WebStarter {
 
     public static WebApplication beginWebApplication(Class<?> main, String[] args) {
         var reflections = new Reflections(main.getPackageName(), Scanners.TypesAnnotated);
-        var applicationBuilder = WebApplication.builder()
-                .args(args)
-                .main(main);
+        var configurationBuilder = WebApplication.Configuration.builder()
+                .main(main)
+                .args(args);
+        var application = WebApplication.getInstance();
 
         var controllers = reflections.getTypesAnnotatedWith(Controller.class);
 
@@ -59,7 +60,7 @@ public class WebStarter {
                     var responseBodyTypeName = getRawTypeName(responseReturnType.getActualTypeArguments()[0]);
                     var responseBodyType = Class.forName(responseBodyTypeName);
 
-                    applicationBuilder.pathMapping(
+                    configurationBuilder.pathMapping(
                             new RequestMapping(handlerInfo.method(), contextPath + handlerInfo.path()),
                             new DynamicPathController<>(
                                     requestBodyType,
@@ -84,7 +85,7 @@ public class WebStarter {
             }
         }
 
-        var application = applicationBuilder.build();
+        application.init(configurationBuilder.build());
         application.startAsync();
         return application;
     }

@@ -27,16 +27,16 @@ public class DatabaseProxy {
     private final SessionFactory dbSessionFactory;
     private Session currentSession;
 
-    public DatabaseProxy(ApplicationProperties properties, String classScanPackage) {
+    public DatabaseProxy(String classScanPackage) {
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(Map.of(
-                        SQL_DIALECT.getName(), properties.get(SQL_DIALECT),
-                        DB_DRIVER_CLASS.getName(), properties.get(DB_DRIVER_CLASS),
-                        DB_CONNECTION_URL.getName(), properties.get(DB_CONNECTION_URL),
-                        DB_CONNECTION_USERNAME.getName(), properties.get(DB_CONNECTION_USERNAME),
-                        DB_CONNECTION_PASSWORD.getName(), properties.get(DB_CONNECTION_PASSWORD),
-                        HBM2DDL.getName(), properties.get(HBM2DDL)
-                ))
+                        SQL_DIALECT.getName(), SQL_DIALECT.getValue(),
+                        DB_DRIVER_CLASS.getName(), DB_DRIVER_CLASS.getValue(),
+                        DB_CONNECTION_URL.getName(), DB_CONNECTION_URL.getValue(),
+                        DB_CONNECTION_USERNAME.getName(), DB_CONNECTION_USERNAME.getValue(),
+                        DB_CONNECTION_PASSWORD.getName(), DB_CONNECTION_PASSWORD.getValue(),
+                        HBM2DDL.getName(), HBM2DDL.getValue())
+                )
                 .build();
         Reflections reflections = new Reflections(classScanPackage, Scanners.TypesAnnotated);
         MetadataSources sources = new MetadataSources(serviceRegistry);

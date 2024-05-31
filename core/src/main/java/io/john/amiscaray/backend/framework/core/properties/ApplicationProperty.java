@@ -1,8 +1,12 @@
 package io.john.amiscaray.backend.framework.core.properties;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Optional;
 import java.util.Properties;
 
+@Getter
 public enum ApplicationProperty {
     CONTEXT_PACKAGE("application.context.package", ""),
     PORT("server.port", "8080"),
@@ -11,25 +15,19 @@ public enum ApplicationProperty {
     SERVER_DIRECTORY("server.directory", "server"),
     SQL_DIALECT("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"),
     DB_DRIVER_CLASS("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver"),
-    DB_CONNECTION_URL("hibernate.connection.url", null),
+    DB_CONNECTION_URL("hibernate.connection.url", "jdbc:mysql://localhost:3306/test"),
     DB_CONNECTION_USERNAME("hibernate.connection.username", "root"),
     DB_CONNECTION_PASSWORD("hibernate.connection.password", ""),
     HBM2DDL("hibernate.hbm2ddl.auto", "none");
 
-    private final String name;
-    private final String defaultValue;
+    private String name;
+    private String defaultValue;
+    @Setter
+    private String value;
 
     ApplicationProperty(String name, String defaultValue) {
         this.name = name;
         this.defaultValue = defaultValue;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDefaultValue() {
-        return defaultValue;
     }
 
     String getOrElse(Properties properties, String defaultValue) {
