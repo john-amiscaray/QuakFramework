@@ -15,7 +15,7 @@ public enum ApplicationProperty {
     SERVER_DIRECTORY("server.directory", "server"),
     SQL_DIALECT("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"),
     DB_DRIVER_CLASS("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver"),
-    DB_CONNECTION_URL("hibernate.connection.url", null),
+    DB_CONNECTION_URL("hibernate.connection.url", "jdbc:mysql://localhost:3306/test"),
     DB_CONNECTION_USERNAME("hibernate.connection.username", "root"),
     DB_CONNECTION_PASSWORD("hibernate.connection.password", ""),
     HBM2DDL("hibernate.hbm2ddl.auto", "none");

@@ -4,12 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Make Web Application a singleton">
+    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Decouple Application and ApplicationProperties">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,6 +44,9 @@
     &quot;accountId&quot;: &quot;95d9dda1-2645-44c5-bb8b-42a0108074ac&quot;
   }
 }</component>
+  <component name="JvmLoggingSettingsStorage">
+    <option name="loggerId" value="Lombok Slf4j" />
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -61,6 +67,7 @@
     "JUnit.All in backend.framework.web (2).executor": "Run",
     "JUnit.All in backend.framework.web.executor": "Run",
     "JUnit.ApplicationTest.executor": "Run",
+    "JUnit.ApplicationTest.testPropertiesAreLoadedFromFile.executor": "Run",
     "JUnit.DatabaseProxyTest.executor": "Run",
     "JUnit.WebApplicationTest (1).executor": "Run",
     "JUnit.WebApplicationTest.executor": "Run",
@@ -114,7 +121,7 @@
       <recent name="C:\Projects\MyBackendFramework\web\src\main\resources" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.ApplicationTest">
+  <component name="RunManager" selected="JUnit.java in backend.framework.data">
     <configuration name="ApplicationTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.core" />
       <extension name="coverage">
@@ -130,17 +137,18 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="DatabaseProxyTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.data" />
+    <configuration name="ApplicationTest.testPropertiesAreLoadedFromFile" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.core" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="io.john.amiscaray.backend.framework.data.test.*" />
+          <option name="PATTERN" value="io.john.amiscaray.backend.framework.core.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
-      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.data.test" />
-      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.data.test.DatabaseProxyTest" />
-      <option name="TEST_OBJECT" value="class" />
+      <option name="PACKAGE_NAME" value="io.john.amiscaray.backend.framework.core" />
+      <option name="MAIN_CLASS_NAME" value="io.john.amiscaray.backend.framework.core.ApplicationTest" />
+      <option name="METHOD_NAME" value="testPropertiesAreLoadedFromFile" />
+      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -153,6 +161,14 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="java in backend.framework.data" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="backend.framework.data" />
+      <option name="TEST_OBJECT" value="directory" />
+      <dir value="$PROJECT_DIR$/data/src/test/java" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="java in backend.framework.web" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="backend.framework.web" />
       <option name="TEST_OBJECT" value="directory" />
@@ -161,21 +177,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="resources in backend.framework.core" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="backend.framework.core" />
-      <option name="TEST_OBJECT" value="directory" />
-      <dir value="$PROJECT_DIR$/core/src/test/resources" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="JUnit.ApplicationTest" />
+        <item itemvalue="JUnit.java in backend.framework.data" />
         <item itemvalue="JUnit.java in backend.framework.web" />
+        <item itemvalue="JUnit.ApplicationTest.testPropertiesAreLoadedFromFile" />
+        <item itemvalue="JUnit.ApplicationTest" />
         <item itemvalue="JUnit.java in backend.framework.core" />
-        <item itemvalue="JUnit.resources in backend.framework.core" />
-        <item itemvalue="JUnit.DatabaseProxyTest" />
       </list>
     </recent_temporary>
   </component>
@@ -361,7 +369,15 @@
       <option name="project" value="LOCAL" />
       <updated>1717189535078</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="Decouple Application and ApplicationProperties">
+      <option name="closed" value="true" />
+      <created>1717191421591</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1717191421591</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -388,18 +404,10 @@
     <MESSAGE value="Expand testing" />
     <MESSAGE value="Some base structure for DI framework" />
     <MESSAGE value="Make Web Application a singleton" />
-    <option name="LAST_COMMIT_MESSAGE" value="Make Web Application a singleton" />
+    <MESSAGE value="Decouple Application and ApplicationProperties" />
+    <option name="LAST_COMMIT_MESSAGE" value="Decouple Application and ApplicationProperties" />
   </component>
   <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java</url>
-          <line>34</line>
-          <option name="timeStamp" value="1" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="io.john.amiscaray.backend.framework.web.servlet.HttpController" memberName="pathControllers" />

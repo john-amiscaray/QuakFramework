@@ -60,14 +60,14 @@ public class WebApplication extends Application {
         }
         super.start();
         server = new Tomcat();
-        server.setBaseDir(properties.get(ApplicationProperty.SERVER_DIRECTORY));
+        server.setBaseDir(ApplicationProperty.SERVER_DIRECTORY.getValue());
 
         var connector1 = server.getConnector();
-        connector1.setPort(Integer.parseInt(properties.get(ApplicationProperty.PORT)));
+        connector1.setPort(Integer.parseInt(ApplicationProperty.PORT.getValue()));
 
-        var docBase = new File(properties.get(ApplicationProperty.DOCUMENT_BASE)).getAbsolutePath();
+        var docBase = new File(ApplicationProperty.DOCUMENT_BASE.getValue()).getAbsolutePath();
 
-        context = server.addContext(properties.get(ApplicationProperty.CONTEXT_PATH), docBase);
+        context = server.addContext(ApplicationProperty.CONTEXT_PATH.getValue(), docBase);
 
         registerServlets();
 
@@ -126,13 +126,13 @@ public class WebApplication extends Application {
             if (controllersToGroup.isEmpty()) {
                 var controller = new HttpControllerGroup(Map.ofEntries(currentControllerMapping));
                 var url = cleanURLPath(currentControllerMapping.getKey());
-                server.addServlet(properties.get(ApplicationProperty.CONTEXT_PATH), controller.toString(), controller);
+                server.addServlet(ApplicationProperty.CONTEXT_PATH.getValue(), controller.toString(), controller);
                 context.addServletMappingDecoded(url, controller.toString());
                 controllersToAdd.remove(currentControllerMapping);
             } else {
                 controllersToGroup.put(currentControllerMapping.getKey(), currentControllerMapping.getValue());
                 var httpController = new HttpControllerGroup(controllersToGroup);
-                server.addServlet(properties.get(ApplicationProperty.CONTEXT_PATH), httpController.toString(), httpController);
+                server.addServlet(ApplicationProperty.CONTEXT_PATH.getValue(), httpController.toString(), httpController);
                 context.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
                 controllersToAdd.removeAll(controllersToGroup.entrySet());
             }

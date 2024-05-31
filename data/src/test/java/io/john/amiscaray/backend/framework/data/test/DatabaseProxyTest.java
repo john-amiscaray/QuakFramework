@@ -27,12 +27,21 @@ import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNu
 
 public class DatabaseProxyTest {
 
-    private static final ApplicationProperties testApplicationProperties =
-            new DummyApplication(DatabaseProxyTest.class, new String[] {})
-                    .getApplicationProperties();
     private static final String hibernatePackage = "io.john.amiscaray.backend.framework.data.test.stub";
-    private static final EmployeeTestDBConnector testDBConnector = new EmployeeTestDBConnector(testApplicationProperties);
+    private static final EmployeeTestDBConnector testDBConnector;
     private static DatabaseProxy dbProxy;
+
+    static {
+
+        try {
+            var application = new DummyApplication(DatabaseProxyTest.class, new String[] {});
+            application.start();
+            testDBConnector = new EmployeeTestDBConnector(ApplicationProperties.getInstance());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 
     private static class DummyApplication extends Application {
         public DummyApplication(Class<?> main, String[] args) {
@@ -42,7 +51,7 @@ public class DatabaseProxyTest {
 
     @BeforeEach
     void cleanDB() throws SQLException, FileNotFoundException {
-        dbProxy = new DatabaseProxy(testApplicationProperties, hibernatePackage);
+        dbProxy = new DatabaseProxy(hibernatePackage);
         testDBConnector.clearTable();
         dbProxy.beginSession();
         testDBConnector.runQueryFromFile("/sql/sample/employee_sample_data.sql");

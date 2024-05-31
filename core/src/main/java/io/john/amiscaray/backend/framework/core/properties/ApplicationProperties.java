@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.core.properties;
 
+import java.util.Optional;
 import java.util.Properties;
 
 public class ApplicationProperties{
@@ -14,6 +15,12 @@ public class ApplicationProperties{
     public void init(Properties fileProperties, String classScanPackage) {
         this.fileProperties = fileProperties;
         this.classScanPackage = classScanPackage;
+
+        for (var applicationProperty : ApplicationProperty.class.getEnumConstants()) {
+            var value = Optional.ofNullable(fileProperties.getProperty(applicationProperty.getName()))
+                    .orElse(applicationProperty.getDefaultValue());
+            applicationProperty.setValue(value);
+        }
     }
 
     public static ApplicationProperties getInstance() {

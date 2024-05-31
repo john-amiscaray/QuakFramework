@@ -17,12 +17,18 @@ public abstract class Application {
         classScanPackage = main.getPackageName();
     }
 
-    public void start() {
+    public void start() throws Exception{
         initProperties();
     }
 
     public void startAsync() {
-        Thread.startVirtualThread(this::start);
+        Thread.startVirtualThread(() -> {
+            try {
+                this.start();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private void initProperties() {
