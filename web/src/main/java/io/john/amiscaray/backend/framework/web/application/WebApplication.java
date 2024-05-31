@@ -12,7 +12,6 @@ import lombok.Singular;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.commons.lang3.StringUtils;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +23,34 @@ import java.util.stream.Collectors;
 public class WebApplication extends Application {
     protected Tomcat server;
     protected Context context;
-    private final Map<RequestMapping, PathController<?, ?>> pathControllers;
+    private final Map<RequestMapping, PathController<?, ?>> pathControllers = new HashMap<>();
     private static final Logger LOG = LoggerFactory.getLogger(WebApplication.class);
+    private static WebApplication instance = null;
 
-    @Builder
-    private WebApplication(Class<?> main, @Singular("pathMapping") Map<RequestMapping, PathController<?, ?>> pathControllers, String[] args) {
-        super(main, args);
-        this.pathControllers = pathControllers;
+    public record Configuration(Class<?> main, String[] args, Map<RequestMapping, PathController<?, ?>> pathControllers) {
+        @Builder
+        public Configuration(Class<?> main, String[] args, @Singular("pathMapping") Map<RequestMapping, PathController<?, ?>> pathControllers) {
+            this.main = main;
+            this.args = args;
+            this.pathControllers = pathControllers;
+        }
+    }
+
+    public static WebApplication getInstance() {
+        if (instance == null) {
+            instance = new WebApplication();
+        }
+        return instance;
+    }
+
+    private WebApplication() {
+        super(WebApplication.class, new String[]{});
+    }
+
+    public void init(Configuration config) {
+        main = config.main;
+        args = config.args;
+        pathControllers.putAll(config.pathControllers);
     }
 
     @Override

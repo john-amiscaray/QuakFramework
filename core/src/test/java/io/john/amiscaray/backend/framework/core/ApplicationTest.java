@@ -7,7 +7,13 @@ import static io.john.amiscaray.backend.framework.core.properties.ApplicationPro
 
 public class ApplicationTest {
 
-    private final Application application = new Application(ApplicationTest.class, new String[0]);
+    private final Application application = new DummyApplication(ApplicationTest.class, new String[0]);
+
+    private static class DummyApplication extends Application {
+        public DummyApplication(Class<?> main, String[] args) {
+            super(main, args);
+        }
+    }
 
     @Test
     void testPropertiesAreLoadedFromFile() {

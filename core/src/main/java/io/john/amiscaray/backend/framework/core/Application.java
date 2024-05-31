@@ -4,9 +4,7 @@ import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties
 import java.io.IOException;
 import java.util.*;
 
-import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
-
-public class Application {
+public abstract class Application {
 
     protected ApplicationProperties properties;
     protected String classScanPackage;
