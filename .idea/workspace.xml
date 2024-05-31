@@ -4,15 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Fix bug. Improve algorithm for grouping controllers.">
+    <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Application properties refactor">
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/di/ApplicationContext.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/di/provider/Provide.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/di/provider/Provider.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,14 +18,19 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Interface" />
         <option value="module-info" />
-        <option value="AnnotationType" />
         <option value="Class" />
+        <option value="AnnotationType" />
+        <option value="Interface" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="13-applicationproperties-refactor" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -55,61 +56,61 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "JUnit.All in backend.framework.core.executor": "Run",
-    "JUnit.All in backend.framework.data.executor": "Run",
-    "JUnit.All in backend.framework.executor": "Run",
-    "JUnit.All in backend.framework.web (1).executor": "Run",
-    "JUnit.All in backend.framework.web (2).executor": "Run",
-    "JUnit.All in backend.framework.web.executor": "Run",
-    "JUnit.ApplicationTest.executor": "Run",
-    "JUnit.DatabaseProxyTest.executor": "Run",
-    "JUnit.WebApplicationTest (1).executor": "Run",
-    "JUnit.WebApplicationTest.executor": "Run",
-    "JUnit.WebApplicationTest.testDeleteRequestYields204WithCustomHeaderWithDeletedID.executor": "Debug",
-    "JUnit.WebApplicationTest.testGetRequestForUserInfoYields200AndHasUserIDStringInBody.executor": "Run",
-    "JUnit.WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser.executor": "Run",
-    "JUnit.WebApplicationTest.testGetRequestForUserWithQueryParamForName.executor": "Run",
-    "JUnit.WebApplicationTest.testGetRequestToRootYieldsHelloWorld.executor": "Run",
-    "JUnit.WebApplicationTest.testPostRequestToRootYields201Created.executor": "Debug",
-    "JUnit.WebStarterTest.executor": "Run",
-    "JUnit.WebStarterTest.testGetRequestAtRootUsingControllerClass.executor": "Debug",
-    "JUnit.WebStarterTest.testGetRequestForAccountByID.executor": "Debug",
-    "JUnit.WebStarterTest.testGetRequestForUsersWithAge.executor": "Run",
-    "JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountName.executor": "Run",
-    "JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountNameAndBalance.executor": "Run",
-    "JUnit.WebStarterTest.testPOSTRequestToRootGivesHTTP405.executor": "Run",
-    "JUnit.WebStarterTest.testPostRequestToSaveMockUser.executor": "Debug",
-    "JUnit.java in backend.framework.data.executor": "Run",
-    "JUnit.java in backend.framework.web.executor": "Run",
-    "Maven.backend.framework [clean].executor": "Run",
-    "Maven.backend.framework [install].executor": "Run",
-    "Maven.backend.framework [test].executor": "Run",
-    "Maven.backend.framework.data [clean].executor": "Run",
-    "Maven.backend.framework.data [install].executor": "Run",
-    "Maven.backend.framework.data [site].executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "13-applicationproperties-refactor",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Projects/MyBackendFramework/web/src/main/resources",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.stylelint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.stylelint": "",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.39310345",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "terminal",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;JUnit.All in backend.framework.core.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.All in backend.framework.data.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.All in backend.framework.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.All in backend.framework.web (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.All in backend.framework.web (2).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.All in backend.framework.web.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ApplicationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.DatabaseProxyTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest (1).executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest.testDeleteRequestYields204WithCustomHeaderWithDeletedID.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.WebApplicationTest.testGetRequestForUserInfoYields200AndHasUserIDStringInBody.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest.testGetRequestForUserWithIDYieldsMockUser.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest.testGetRequestForUserWithQueryParamForName.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest.testGetRequestToRootYieldsHelloWorld.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebApplicationTest.testPostRequestToRootYields201Created.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.WebStarterTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebStarterTest.testGetRequestAtRootUsingControllerClass.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.WebStarterTest.testGetRequestForAccountByID.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.WebStarterTest.testGetRequestForUsersWithAge.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountName.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebStarterTest.testGetRequestToAccountWithQueryParamForAccountNameAndBalance.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebStarterTest.testPOSTRequestToRootGivesHTTP405.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.WebStarterTest.testPostRequestToSaveMockUser.executor&quot;: &quot;Debug&quot;,
+    &quot;JUnit.java in backend.framework.data.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.java in backend.framework.web.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend.framework [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend.framework [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend.framework [test].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend.framework.data [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend.framework.data [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.backend.framework.data [site].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;12-add-dependency-injection-framework&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Projects/MyBackendFramework/web/src/main/resources&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.stylelint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.stylelint&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.39310345&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Projects\MyBackendFramework\web\src\main\resources" />
@@ -195,6 +196,8 @@
       <workItem from="1716861642802" duration="5808000" />
       <workItem from="1716945870410" duration="3045000" />
       <workItem from="1717100093482" duration="1154000" />
+      <workItem from="1717184667210" duration="1661000" />
+      <workItem from="1717186859239" duration="885000" />
     </task>
     <task id="LOCAL-00001" summary="Fix build issues with IntelliJ">
       <option name="closed" value="true" />
@@ -346,6 +349,17 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fix build issues with IntelliJ" />
     <MESSAGE value="Make packaging to jar from pom for web module" />
@@ -376,5 +390,9 @@
         <PinnedItemInfo parentTag="java.util.Collections$UnmodifiableMap$UnmodifiableEntrySet$UnmodifiableEntry" memberName="value" />
       </pinned-members>
     </pin-to-top-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
