@@ -1,13 +1,15 @@
 package io.john.amiscaray.backend.framework.core;
 
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
 
 public class ApplicationTest {
 
-    private final Application application = new DummyApplication(ApplicationTest.class, new String[0]);
+    private static final Application application = new DummyApplication(ApplicationTest.class, new String[0]);
 
     private static class DummyApplication extends Application {
         public DummyApplication(Class<?> main, String[] args) {
@@ -15,9 +17,14 @@ public class ApplicationTest {
         }
     }
 
+    @BeforeAll
+    static void setUp() throws Exception {
+        application.start();
+    }
+
     @Test
     void testPropertiesAreLoadedFromFile() {
-        var properties = application.getApplicationProperties();
+        var properties = ApplicationProperties.getInstance();
 
         Assertions.assertEquals(properties.get(CONTEXT_PACKAGE), "org.something.stupid");
         Assertions.assertEquals(Integer.parseInt(properties.get(PORT)), 9000);

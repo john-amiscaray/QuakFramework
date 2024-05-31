@@ -1,12 +1,12 @@
 package io.john.amiscaray.backend.framework.core;
 
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
+
 import java.io.IOException;
 import java.util.*;
 
 public abstract class Application {
 
-    protected ApplicationProperties properties;
     protected String classScanPackage;
     protected String[] args;
     protected Class<?> main;
@@ -17,31 +17,23 @@ public abstract class Application {
         classScanPackage = main.getPackageName();
     }
 
-    public void start() throws Exception {
-        properties = getApplicationProperties();
+    public void start() {
+        initProperties();
     }
 
     public void startAsync() {
-        Thread.startVirtualThread(() -> {
-            try {
-                start();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        });
+        Thread.startVirtualThread(this::start);
     }
 
-    public ApplicationProperties getApplicationProperties() {
-        if (properties == null) {
-            try (var propertiesFileInputStream = main.getResourceAsStream("/application.properties")) {
-                var propertiesFromFile = new Properties();
-                propertiesFromFile.load(propertiesFileInputStream);
-                properties = new ApplicationProperties(propertiesFromFile);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    private void initProperties() {
+        try (var propertiesFileInputStream = main.getResourceAsStream("/application.properties")) {
+            var applicationProperties = ApplicationProperties.getInstance();
+            var propertiesFromFile = new Properties();
+            propertiesFromFile.load(propertiesFileInputStream);
+            applicationProperties.init(propertiesFromFile, classScanPackage);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return properties;
     }
 
 }

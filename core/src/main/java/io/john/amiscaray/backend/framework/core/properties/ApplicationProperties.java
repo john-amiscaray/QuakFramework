@@ -1,14 +1,27 @@
 package io.john.amiscaray.backend.framework.core.properties;
 
-
-import lombok.AllArgsConstructor;
-
 import java.util.Properties;
 
-@AllArgsConstructor
 public class ApplicationProperties{
 
-    private final Properties fileProperties;
+    private static ApplicationProperties applicationPropertiesInstance;
+    private Properties fileProperties;
+    private String classScanPackage;
+
+    private ApplicationProperties() {
+    }
+
+    public void init(Properties fileProperties, String classScanPackage) {
+        this.fileProperties = fileProperties;
+        this.classScanPackage = classScanPackage;
+    }
+
+    public static ApplicationProperties getInstance() {
+        if (applicationPropertiesInstance == null) {
+            applicationPropertiesInstance = new ApplicationProperties();
+        }
+        return applicationPropertiesInstance;
+    }
 
     public String get(ApplicationProperty property) {
         return property.getOrElseDefault(fileProperties);
