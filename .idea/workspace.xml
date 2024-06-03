@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f524b703-59c0-4259-a820-9d54e5d54bba" name="Changes" comment="Decouple Application and ApplicationProperties">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/Application.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperties.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/main/java/io/john/amiscaray/backend/framework/core/properties/ApplicationProperty.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/core/src/test/java/io/john/amiscaray/backend/framework/core/ApplicationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/main/java/io/john/amiscaray/backend/framework/data/DatabaseProxy.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/data/src/test/java/io/john/amiscaray/backend/framework/data/test/DatabaseProxyTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/web/src/main/java/io/john/amiscaray/backend/framework/web/application/WebApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/core/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/core/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +93,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "16-application-framework-redesign",
+    "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Projects/MyBackendFramework/web/src/main/resources",
     "node.js.detected.package.eslint": "true",
