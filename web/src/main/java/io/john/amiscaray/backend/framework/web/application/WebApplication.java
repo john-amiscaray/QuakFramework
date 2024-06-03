@@ -12,7 +12,6 @@ import lombok.Singular;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.commons.lang3.StringUtils;
 import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +23,34 @@ import java.util.stream.Collectors;
 public class WebApplication extends Application {
     protected Tomcat server;
     protected Context context;
-    private final Map<RequestMapping, PathController<?, ?>> pathControllers;
+    private final Map<RequestMapping, PathController<?, ?>> pathControllers = new HashMap<>();
     private static final Logger LOG = LoggerFactory.getLogger(WebApplication.class);
+    private static WebApplication instance = null;
 
-    @Builder
-    private WebApplication(Class<?> main, @Singular("pathMapping") Map<RequestMapping, PathController<?, ?>> pathControllers, String[] args) {
-        super(main, args);
-        this.pathControllers = pathControllers;
+    public record Configuration(Class<?> main, String[] args, Map<RequestMapping, PathController<?, ?>> pathControllers) {
+        @Builder
+        public Configuration(Class<?> main, String[] args, @Singular("pathMapping") Map<RequestMapping, PathController<?, ?>> pathControllers) {
+            this.main = main;
+            this.args = args;
+            this.pathControllers = pathControllers;
+        }
+    }
+
+    public static WebApplication getInstance() {
+        if (instance == null) {
+            instance = new WebApplication();
+        }
+        return instance;
+    }
+
+    private WebApplication() {
+        super(WebApplication.class, new String[]{});
+    }
+
+    public void init(Configuration config) {
+        main = config.main;
+        args = config.args;
+        pathControllers.putAll(config.pathControllers);
     }
 
     @Override
@@ -40,14 +60,14 @@ public class WebApplication extends Application {
         }
         super.start();
         server = new Tomcat();
-        server.setBaseDir(properties.get(ApplicationProperty.SERVER_DIRECTORY));
+        server.setBaseDir(ApplicationProperty.SERVER_DIRECTORY.getValue());
 
         var connector1 = server.getConnector();
-        connector1.setPort(Integer.parseInt(properties.get(ApplicationProperty.PORT)));
+        connector1.setPort(Integer.parseInt(ApplicationProperty.PORT.getValue()));
 
-        var docBase = new File(properties.get(ApplicationProperty.DOCUMENT_BASE)).getAbsolutePath();
+        var docBase = new File(ApplicationProperty.DOCUMENT_BASE.getValue()).getAbsolutePath();
 
-        context = server.addContext(properties.get(ApplicationProperty.CONTEXT_PATH), docBase);
+        context = server.addContext(ApplicationProperty.CONTEXT_PATH.getValue(), docBase);
 
         registerServlets();
 
@@ -106,13 +126,13 @@ public class WebApplication extends Application {
             if (controllersToGroup.isEmpty()) {
                 var controller = new HttpControllerGroup(Map.ofEntries(currentControllerMapping));
                 var url = cleanURLPath(currentControllerMapping.getKey());
-                server.addServlet(properties.get(ApplicationProperty.CONTEXT_PATH), controller.toString(), controller);
+                server.addServlet(ApplicationProperty.CONTEXT_PATH.getValue(), controller.toString(), controller);
                 context.addServletMappingDecoded(url, controller.toString());
                 controllersToAdd.remove(currentControllerMapping);
             } else {
                 controllersToGroup.put(currentControllerMapping.getKey(), currentControllerMapping.getValue());
                 var httpController = new HttpControllerGroup(controllersToGroup);
-                server.addServlet(properties.get(ApplicationProperty.CONTEXT_PATH), httpController.toString(), httpController);
+                server.addServlet(ApplicationProperty.CONTEXT_PATH.getValue(), httpController.toString(), httpController);
                 context.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
                 controllersToAdd.removeAll(controllersToGroup.entrySet());
             }

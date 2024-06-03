@@ -37,7 +37,8 @@ public class WebApplicationTest {
 
     @BeforeAll
     static void startWebApplication() {
-        application = WebApplication.builder()
+        application = WebApplication.getInstance();
+        var configuration = WebApplication.Configuration.builder()
                 .main(WebApplicationTest.class)
                 .args(new String[]{})
                 .pathMapping(
@@ -111,6 +112,7 @@ public class WebApplicationTest {
                         )
                 )
                 .build();
+        application.init(configuration);
         application.startAsync();
     }
 
