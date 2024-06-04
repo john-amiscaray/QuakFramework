@@ -1,8 +1,11 @@
 package io.john.amiscaray.backend.framework.core;
 
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
+import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 public abstract class Application {
@@ -19,6 +22,7 @@ public abstract class Application {
 
     public void start() throws Exception{
         initProperties();
+        initContext();
     }
 
     public void startAsync() {
@@ -29,6 +33,15 @@ public abstract class Application {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private void initContext() {
+        var applicationContext = ApplicationContext.getInstance();
+        try {
+            applicationContext.init(classScanPackage);
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new ContextInitializationException(e);
+        }
     }
 
     private void initProperties() {
