@@ -1,9 +1,11 @@
 package io.john.amiscaray.backend.framework.core.di;
 
+import io.john.amiscaray.backend.framework.core.di.dependency.Dependency;
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
 import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.Provide;
+import io.john.amiscaray.backend.framework.core.di.provider.ProvidedWith;
 import io.john.amiscaray.backend.framework.core.di.provider.Provider;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
@@ -17,7 +19,7 @@ import java.util.stream.Stream;
 public class ApplicationContext {
 
     private static ApplicationContext applicationContextInstance;
-    private Map<Class<?>, Object> instances;
+    private Map<Dependency<?>, Object> instances;
     private String classScanPackage;
 
     private ApplicationContext() {
@@ -53,8 +55,19 @@ public class ApplicationContext {
         var canSatisfyDependencies = false;
         Predicate<Executable> executableHasItsDependenciesSatisfied = executable -> {
            var allParametersSatisfied = Arrays.stream(executable.getParameters())
-                .allMatch(parameter -> instances.containsKey(parameter.getType()));
-           var ifMethodThenDeclaringClassIsSatisfied = executable instanceof Constructor<?> || instances.containsKey(executable.getDeclaringClass());
+                .allMatch(parameter -> {
+                    var parameterDependencyName = getParameterDependencyName(parameter);
+                    return instances.keySet()
+                            .stream()
+                            .anyMatch(key -> {
+                                var couldDependencyBeUsed = key.type().equals(parameter.getType());
+                                if (!parameterDependencyName.isEmpty()) {
+                                    couldDependencyBeUsed &= key.name().equals(parameterDependencyName);
+                                }
+                                return couldDependencyBeUsed;
+                            });
+                });
+           var ifMethodThenDeclaringClassIsSatisfied = executable instanceof Constructor<?> || hasInstance(executable.getDeclaringClass());
            return allParametersSatisfied && ifMethodThenDeclaringClassIsSatisfied;
         };
         do {
@@ -66,9 +79,9 @@ public class ApplicationContext {
                             var returnedInstance = switch (executable) {
                                 case Method method -> {
                                     if (method.getParameters().length == 0) {
-                                        yield method.invoke(instances.get(method.getDeclaringClass()));
+                                        yield method.invoke(getInstance(method.getDeclaringClass()));
                                     }
-                                    yield method.invoke(instances.get(method.getDeclaringClass()), fetchInstancesOfParameters(method.getParameters()));
+                                    yield method.invoke(getInstance(method.getDeclaringClass()), fetchInstancesOfParameters(method.getParameters()));
                                 }
                                 case Constructor<?> constructor -> {
                                     if (constructor.getParameters().length == 0) {
@@ -77,8 +90,13 @@ public class ApplicationContext {
                                     yield constructor.newInstance(fetchInstancesOfParameters(constructor.getParameters()));
                                 }
                             };
-
-                            instances.put(Class.forName(typeName), returnedInstance);
+                            var dependencyName = executable.isAnnotationPresent(Provide.class) ?
+                                    executable.getAnnotation(Provide.class).dependencyName() :
+                                    "";
+                            if (dependencyName.isEmpty()) {
+                                dependencyName = executable.getName();
+                            }
+                            instances.put(new Dependency<>(dependencyName, Class.forName(typeName)), returnedInstance);
                         } catch (ClassNotFoundException | InvocationTargetException | IllegalAccessException |
                                  InstantiationException e) {
                             throw new ContextInitializationException(e);
@@ -103,10 +121,17 @@ public class ApplicationContext {
         }
     }
 
+    private String getParameterDependencyName(Parameter parameter) {
+        if (parameter.isAnnotationPresent(ProvidedWith.class)) {
+            return parameter.getAnnotation(ProvidedWith.class).dependencyName();
+        }
+        return "";
+    }
+
     private Object[] fetchInstancesOfParameters(Parameter[] parameters) {
         return Arrays.stream(parameters)
                 .map(Parameter::getType)
-                .map(clazz -> instances.get(clazz))
+                .map(this::getInstance)
                 .filter(Objects::nonNull)
                 .toArray(Object[]::new);
     }
@@ -118,8 +143,25 @@ public class ApplicationContext {
         return applicationContextInstance;
     }
 
+    public boolean hasInstance(Class<?> clazz) {
+        return instances.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().type().equals(clazz))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .isPresent();
+    }
+
     public <T> T getInstance(Class<T> clazz) {
-        return (T) instances.get(clazz);
+        return (T) instances.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().type().equals(clazz))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElseThrow();
+    }
+    public <T> T getInstance(Dependency<T> dependency) {
+        return (T) getInstance(dependency);
     }
 
 }

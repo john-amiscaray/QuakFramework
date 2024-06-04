@@ -1,6 +1,7 @@
 package io.john.amiscaray.backend.framework.core.di;
 
 import io.john.amiscaray.backend.framework.core.Application;
+import io.john.amiscaray.backend.framework.core.di.provider.Provider;
 import io.john.amiscaray.backend.framework.core.di.stub.MockStringProvider;
 import io.john.amiscaray.backend.framework.core.di.stub.MockUserAccountDetailsProvider;
 import io.john.amiscaray.backend.framework.core.di.stub.MockUserAccountProvider;

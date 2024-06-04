@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.CONSTRUCTOR, ElementType.METHOD})
-public @interface Provide {
+@Target({ElementType.PARAMETER})
+public @interface ProvidedWith {
 
-    String dependencyName() default "";
+    String dependencyName();
 
 }
