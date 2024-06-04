@@ -4,9 +4,8 @@ import io.john.amiscaray.backend.framework.core.di.dependency.Dependency;
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
 import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
-import io.john.amiscaray.backend.framework.core.di.provider.Provide;
-import io.john.amiscaray.backend.framework.core.di.provider.ProvidedWith;
-import io.john.amiscaray.backend.framework.core.di.provider.Provider;
+import io.john.amiscaray.backend.framework.core.di.provider.*;
+import org.apache.commons.lang3.ClassUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
@@ -32,11 +31,26 @@ public class ApplicationContext {
         var providers = reflections.getTypesAnnotatedWith(Provider.class)
                 .stream()
                 .toList();
-        var executablesToCall = Stream.concat(
+        var managedInstances = reflections.getTypesAnnotatedWith(ManagedType.class)
+                .stream()
+                .toList();
+        var executablesToCall = Stream.concat(Stream.concat(
                 providers.stream().flatMap(provider -> Stream.of(provider.getMethods())).filter(method -> method.isAnnotationPresent(Provide.class)),
                 providers.stream().map(this::getProviderConstructor)
-        );
+        ), managedInstances.stream().map(this::getManagedInstanceConstructor));
         buildDependencyGraph(executablesToCall.collect(Collectors.toList()));
+    }
+
+    private Constructor<?> getManagedInstanceConstructor(Class<?> managedInstanceClass) {
+        var constructors = managedInstanceClass.getDeclaredConstructors();
+        if (Arrays.stream(constructors).anyMatch(constructor -> constructor.isAnnotationPresent(Instantiate.class))) {
+            return Arrays.stream(constructors).filter(constructor -> constructor.isAnnotationPresent(Instantiate.class))
+                    .findFirst().orElseThrow();
+        }
+
+        return Arrays.stream(constructors)
+                .filter(constructor -> constructor.getParameters().length == 0)
+                .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(managedInstanceClass));
     }
 
     private Constructor<?> getProviderConstructor(Class<?> providerClass) {
@@ -74,7 +88,7 @@ public class ApplicationContext {
             executables.stream().filter(executableHasItsDependenciesSatisfied)
                     .findFirst()
                     .ifPresent(executable -> {
-                        var typeName = executable.getAnnotatedReturnType().getType().getTypeName();
+                        var returnType = ClassUtils.primitiveToWrapper((Class<?>) executable.getAnnotatedReturnType().getType());;
                         try {
                             var returnedInstance = switch (executable) {
                                 case Method method -> {
@@ -96,8 +110,8 @@ public class ApplicationContext {
                             if (dependencyName.isEmpty()) {
                                 dependencyName = executable.getName();
                             }
-                            instances.put(new Dependency<>(dependencyName, Class.forName(typeName)), returnedInstance);
-                        } catch (ClassNotFoundException | InvocationTargetException | IllegalAccessException |
+                            instances.put(new Dependency<>(dependencyName, returnType), returnedInstance);
+                        } catch (InvocationTargetException | IllegalAccessException |
                                  InstantiationException e) {
                             throw new ContextInitializationException(e);
                         }
@@ -112,8 +126,8 @@ public class ApplicationContext {
             for (var executable : executables) {
                 missingDependencies.addAll(Arrays.stream(executable.getParameters())
                         .map(Parameter::getType)
-                        .filter(type -> !instances.containsKey(type)).toList());
-                if (executable instanceof Method method && !instances.containsKey(method.getDeclaringClass())) {
+                        .filter(type -> !hasInstance(type)).toList());
+                if (executable instanceof Method method && !hasInstance(method.getDeclaringClass())) {
                     missingDependencies.add(method.getDeclaringClass());
                 }
             }
@@ -130,8 +144,15 @@ public class ApplicationContext {
 
     private Object[] fetchInstancesOfParameters(Parameter[] parameters) {
         return Arrays.stream(parameters)
-                .map(Parameter::getType)
-                .map(this::getInstance)
+                .map(parameter -> {
+                    if (parameter.isAnnotationPresent(ProvidedWith.class)) {
+                        var dependencyName = parameter.getAnnotation(ProvidedWith.class).dependencyName();
+                        if (!dependencyName.isEmpty()) {
+                            return getInstance(new Dependency<>(dependencyName, parameter.getType()));
+                        }
+                    }
+                    return getInstance(parameter.getType());
+                })
                 .filter(Objects::nonNull)
                 .toArray(Object[]::new);
     }
@@ -160,8 +181,12 @@ public class ApplicationContext {
                 .findFirst()
                 .orElseThrow();
     }
-    public <T> T getInstance(Dependency<T> dependency) {
-        return (T) getInstance(dependency);
+
+    public boolean hasInstance(Dependency<?> dependency) {
+        return instances.containsKey(dependency);
     }
 
+    public <T> T getInstance(Dependency<T> dependency) {
+        return (T) instances.get(dependency);
+    }
 }

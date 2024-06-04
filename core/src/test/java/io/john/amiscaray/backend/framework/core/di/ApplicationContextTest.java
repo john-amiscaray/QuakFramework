@@ -1,13 +1,11 @@
 package io.john.amiscaray.backend.framework.core.di;
 
 import io.john.amiscaray.backend.framework.core.Application;
-import io.john.amiscaray.backend.framework.core.di.provider.Provider;
-import io.john.amiscaray.backend.framework.core.di.stub.MockStringProvider;
-import io.john.amiscaray.backend.framework.core.di.stub.MockUserAccountDetailsProvider;
-import io.john.amiscaray.backend.framework.core.di.stub.MockUserAccountProvider;
+import io.john.amiscaray.backend.framework.core.di.dependency.Dependency;
+import io.john.amiscaray.backend.framework.core.di.stub.*;
 import io.john.amiscaray.backend.framework.core.di.stub.pojo.MockUser;
-import io.john.amiscaray.backend.framework.core.di.stub.MockUserProvider;
 import io.john.amiscaray.backend.framework.core.di.stub.pojo.MockUserAccount;
+import io.john.amiscaray.backend.framework.core.di.stub.pojo.MockStudent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +20,10 @@ public class ApplicationContextTest {
     private static final MockUserAccountProvider userAccountProvider = new MockUserAccountProvider(
             userProvider.getUser(),
             accountDetailsProvider.createdOn(),
-            accountDetailsProvider.balance()
+            accountDetailsProvider.balance(),
+            stringProvider.accountName()
     );
+    private static final MockStudentDetailsProvider studentDetailsProvider = new MockStudentDetailsProvider();
     private static ApplicationContext ctx;
 
     @BeforeAll
@@ -37,7 +37,7 @@ public class ApplicationContextTest {
     @Test
     public void testProvideSimpleString() {
 
-        assertEquals(stringProvider.username(), ctx.getInstance(String.class));
+        assertEquals(stringProvider.username(), ctx.getInstance(new Dependency<>("username", String.class)));
 
     }
 
@@ -52,6 +52,17 @@ public class ApplicationContextTest {
     public void testProvideMockUserAccount() {
 
         assertEquals(userAccountProvider.userAccount(), ctx.getInstance(MockUserAccount.class));
+
+    }
+
+    @Test
+    public void testProvideMockStudent() {
+
+        assertEquals(new MockStudent(
+                studentDetailsProvider.studentID(),
+                studentDetailsProvider.name(),
+                studentDetailsProvider.gpa()
+        ), ctx.getInstance(MockStudent.class));
 
     }
 

@@ -14,7 +14,7 @@ public class MockUserAccountDetailsProvider {
         return Date.from(Instant.ofEpochMilli(1717479300756L));
     }
 
-    @Provide
+    @Provide(dependencyName = "balance")
     public Long balance() {
         return 10000L;
     }
