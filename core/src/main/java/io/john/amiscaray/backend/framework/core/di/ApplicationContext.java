@@ -2,6 +2,7 @@ package io.john.amiscaray.backend.framework.core.di;
 
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
+import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.Provide;
 import io.john.amiscaray.backend.framework.core.di.provider.Provider;
 import org.reflections.Reflections;
@@ -31,9 +32,21 @@ public class ApplicationContext {
                 .toList();
         var executablesToCall = Stream.concat(
                 providers.stream().flatMap(provider -> Stream.of(provider.getMethods())).filter(method -> method.isAnnotationPresent(Provide.class)),
-                providers.stream().flatMap(provider -> Stream.of(provider.getConstructors()))
+                providers.stream().map(this::getProviderConstructor)
         );
         buildDependencyGraph(executablesToCall.collect(Collectors.toList()));
+    }
+
+    private Constructor<?> getProviderConstructor(Class<?> providerClass) {
+        var constructors = providerClass.getConstructors();
+        if (Arrays.stream(constructors).anyMatch(constructor -> constructor.isAnnotationPresent(Provide.class))) {
+            return Arrays.stream(constructors).filter(constructor -> constructor.isAnnotationPresent(Provide.class))
+                    .findFirst().orElseThrow();
+        }
+
+        return Arrays.stream(constructors)
+                .filter(constructor -> constructor.getParameters().length == 0)
+                .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(providerClass));
     }
 
     private void buildDependencyGraph(List<Executable> executables) {
