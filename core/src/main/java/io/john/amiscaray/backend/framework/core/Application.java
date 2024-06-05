@@ -45,7 +45,7 @@ public abstract class Application {
         postStop();
     }
 
-    public abstract void finish() throws Exception;
+    protected abstract void finish() throws Exception;
 
     protected abstract void startUp() throws Exception;
 

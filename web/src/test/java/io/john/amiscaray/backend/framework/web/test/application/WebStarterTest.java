@@ -15,6 +15,9 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static io.john.amiscaray.backend.framework.web.test.stub.MockAccount.*;
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUser;
@@ -29,16 +32,17 @@ public class WebStarterTest {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @BeforeAll
-    static void initApplication() {
+    static void initApplication() throws ExecutionException, InterruptedException, TimeoutException {
 
-        application = WebStarter.beginWebApplication(WebStarterTest.class, new String[] {});
+        application = WebStarter.beginWebApplication(WebStarterTest.class, new String[] {})
+                .get(10, TimeUnit.SECONDS);
 
     }
 
     @AfterAll
-    public static void stop() throws LifecycleException {
+    public static void stop() throws Exception {
 
-        application.finish();
+        application.stop();
 
     }
 
