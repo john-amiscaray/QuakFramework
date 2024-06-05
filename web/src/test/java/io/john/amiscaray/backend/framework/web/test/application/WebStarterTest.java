@@ -38,7 +38,7 @@ public class WebStarterTest {
     @AfterAll
     public static void stop() throws LifecycleException {
 
-        application.stop();
+        application.finish();
 
     }
 
