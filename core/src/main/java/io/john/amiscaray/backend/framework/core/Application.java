@@ -20,10 +20,13 @@ public abstract class Application {
         classScanPackage = main.getPackageName();
     }
 
-    public void start() throws Exception{
+    public final void start() throws Exception{
         initProperties();
         initContext();
+        startUp();
     }
+
+    protected abstract void startUp() throws Exception;
 
     public void startAsync() {
         Thread.startVirtualThread(() -> {

@@ -34,19 +34,18 @@ public class DatabaseProxyTest {
     static {
 
         try {
-            var application = new DummyApplication(DatabaseProxyTest.class, new String[] {});
+            var application = new Application(DatabaseProxyTest.class, new String[] {}) {
+                @Override
+                protected void startUp() {
+
+                }
+            };
             application.start();
             testDBConnector = new EmployeeTestDBConnector(ApplicationProperties.getInstance());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private static class DummyApplication extends Application {
-        public DummyApplication(Class<?> main, String[] args) {
-            super(main, args);
-        }
     }
 
     @BeforeEach

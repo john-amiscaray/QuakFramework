@@ -54,11 +54,10 @@ public class WebApplication extends Application {
     }
 
     @Override
-    public void start() throws Exception {
+    public void startUp() throws Exception {
         if (LOG.isInfoEnabled()) {
             LOG.info("START APPLICATION");
         }
-        super.start();
         server = new Tomcat();
         server.setBaseDir(ApplicationProperty.SERVER_DIRECTORY.getValue());
 

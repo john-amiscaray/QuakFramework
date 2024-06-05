@@ -13,7 +13,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationContextTest {
 
-    private static final Application application = new DummyApplication(ApplicationContext.class, new String[] {});
+    private static final Application application = new Application(ApplicationContext.class, new String[] {}) {
+        @Override
+        protected void startUp() {
+
+        }
+    };
     private static final MockStringProvider stringProvider = new MockStringProvider();
     private static final MockUserProvider userProvider = new MockUserProvider(stringProvider.username());
     private static final MockUserAccountDetailsProvider accountDetailsProvider = new MockUserAccountDetailsProvider();
@@ -64,12 +69,6 @@ public class ApplicationContextTest {
                 studentDetailsProvider.gpa()
         ), ctx.getInstance(MockStudent.class));
 
-    }
-
-    private static class DummyApplication extends Application {
-        public DummyApplication(Class<?> main, String[] args) {
-            super(main, args);
-        }
     }
 
 }
