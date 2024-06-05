@@ -4,6 +4,7 @@ import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
+import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
@@ -18,6 +19,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class WebStarter {
@@ -42,11 +45,9 @@ public class WebStarter {
 
         application.on(Application.LifecycleState.CONTEXT_LOADED, app -> {
             var reflections = new Reflections(main.getPackageName(), Scanners.TypesAnnotated);
-            var configurationBuilder = WebApplication.Configuration.builder()
-                    .main(main)
-                    .args(args);
             var controllers = reflections.getTypesAnnotatedWith(Controller.class);
             var ctx = ApplicationContext.getInstance();
+            Map<RequestMapping, PathController<?, ?>> pathControllers = new HashMap<>();
 
             for(var controller : controllers) {
                 try {
@@ -71,7 +72,7 @@ public class WebStarter {
                         var responseBodyTypeName = getRawTypeName(responseReturnType.getActualTypeArguments()[0]);
                         var responseBodyType = Class.forName(responseBodyTypeName);
 
-                        configurationBuilder.pathMapping(
+                        pathControllers.put(
                                 new RequestMapping(handlerInfo.method(), contextPath + handlerInfo.path()),
                                 new DynamicPathController<>(
                                         requestBodyType,
@@ -92,7 +93,7 @@ public class WebStarter {
                 }
             }
 
-            application.init(configurationBuilder.build());
+            application.addPathMappings(pathControllers);
 
             result.complete((WebApplication) app);
         });

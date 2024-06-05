@@ -140,6 +140,10 @@ public class WebApplication extends Application {
         }
     }
 
+    protected void addPathMappings(Map<RequestMapping, PathController<?, ?>> pathMappings) {
+        pathControllers.putAll(pathMappings);
+    }
+
     private int getNumPaths(String url) {
         if (url.startsWith("/")) {
             url = url.substring(1);
@@ -148,10 +152,6 @@ public class WebApplication extends Application {
             url = url.substring(0, url.length() - 1);
         }
         return url.split("/").length;
-    }
-
-    private boolean commonPrefixIsValid(String prefix) {
-        return !prefix.isEmpty() && !prefix.equals("/");
     }
 
     private String cleanURLPath(String urlPath) {
