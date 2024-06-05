@@ -15,6 +15,11 @@ public class ApplicationContextTest {
 
     private static final Application application = new Application(ApplicationContext.class, new String[] {}) {
         @Override
+        public void finish() {
+
+        }
+
+        @Override
         protected void startUp() {
 
         }

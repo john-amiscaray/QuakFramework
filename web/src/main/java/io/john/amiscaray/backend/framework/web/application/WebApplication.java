@@ -75,7 +75,7 @@ public class WebApplication extends Application {
         server.getServer().await();
     }
 
-    public void stop() throws LifecycleException {
+    public void finish() throws LifecycleException {
         server.stop();
         server.destroy();
     }

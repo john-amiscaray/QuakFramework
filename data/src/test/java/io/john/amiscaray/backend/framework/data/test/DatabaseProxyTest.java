@@ -36,6 +36,11 @@ public class DatabaseProxyTest {
         try {
             var application = new Application(DatabaseProxyTest.class, new String[] {}) {
                 @Override
+                public void finish() {
+
+                }
+
+                @Override
                 protected void startUp() {
 
                 }

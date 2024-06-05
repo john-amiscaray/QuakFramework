@@ -10,6 +10,11 @@ public class ApplicationTest {
 
     private static final Application application = new Application(ApplicationTest.class, new String[0]) {
         @Override
+        public void finish() throws Exception {
+
+        }
+
+        @Override
         protected void startUp() {
 
         }

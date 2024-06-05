@@ -19,7 +19,7 @@ public class MockUserAccountProvider {
     @Provide
     public MockUserAccountProvider(MockUser user,
                                    Date createdOn,
-                                   Long balance,
+                                   @ProvidedWith(dependencyName = "balance") Long balance,
                                    @ProvidedWith(dependencyName = "accountName")
                                    String accountName) {
         this.user = user;
