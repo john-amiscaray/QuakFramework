@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 public abstract class Application {
 
+    protected boolean hasStarted;
     protected String classScanPackage;
     protected String[] args;
     protected Class<?> main;
@@ -32,9 +33,13 @@ public abstract class Application {
         contextLoaded();
         startUp();
         postStart();
+        hasStarted = true;
     }
 
     public final void stop() throws Exception {
+        if (!hasStarted) {
+            throw new IllegalStateException("stop called before application started");
+        }
         preStop();
         finish();
         postStop();
@@ -74,7 +79,7 @@ public abstract class Application {
         }
     }
 
-    private void on(LifecycleState state, Consumer<Application> consumer) {
+    public void on(LifecycleState state, Consumer<Application> consumer) {
         lifecycleListeners.get(state).add(consumer);
     }
 
