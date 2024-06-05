@@ -5,6 +5,7 @@ module backend.framework.web.test {
     requires org.junit.jupiter.api;
     requires org.apache.tomcat.embed.core;
     requires java.net.http;
+    requires backend.framework.core;
 
     opens io.john.amiscaray.backend.framework.web.test.application to org.junit.platform.commons;
     opens io.john.amiscaray.backend.framework.web.test.application.stub;

@@ -63,7 +63,7 @@ public abstract class Application {
         var applicationContext = ApplicationContext.getInstance();
         try {
             applicationContext.init(classScanPackage);
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             throw new ContextInitializationException(e);
         }
     }

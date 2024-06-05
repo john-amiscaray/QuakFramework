@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
+import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationNameProvider;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
@@ -30,6 +31,7 @@ public class WebStarterTest {
     private static WebApplication application;
     private final TestConnectionUtil connectionUtil = TestConnectionUtil.getInstance();
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final MockApplicationNameProvider applicationNameProvider = new MockApplicationNameProvider();
 
     @BeforeAll
     static void initApplication() throws ExecutionException, InterruptedException, TimeoutException {
@@ -179,6 +181,23 @@ public class WebStarterTest {
                 httpResponse -> {
                     var status = httpResponse.statusCode();
                     assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, status);
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationPathRetrievesApplicationName() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    var body = httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    assertEquals(applicationNameProvider.applicationName(), body);
                 });
     }
 

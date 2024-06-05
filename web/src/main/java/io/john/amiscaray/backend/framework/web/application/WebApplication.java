@@ -49,6 +49,7 @@ public class WebApplication extends Application {
 
     public void init(Configuration config) {
         main = config.main;
+        classScanPackage = main.getPackageName();
         args = config.args;
         pathControllers.putAll(config.pathControllers);
     }
@@ -72,6 +73,7 @@ public class WebApplication extends Application {
 
         server.start();
         server.getService().addConnector(connector1);
+        hasStarted = true;
         server.getServer().await();
     }
 

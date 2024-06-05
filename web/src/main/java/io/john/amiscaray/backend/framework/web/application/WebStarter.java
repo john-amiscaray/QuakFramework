@@ -1,6 +1,8 @@
 package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
+import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
@@ -31,6 +33,11 @@ public class WebStarter {
 
     public static CompletableFuture<WebApplication> beginWebApplication(Class<?> main, String[] args) {
         var application = WebApplication.getInstance();
+        application.init(
+                WebApplication.Configuration.builder()
+                        .main(main)
+                        .args(args).build()
+        );
         var result = new CompletableFuture<WebApplication>();
 
         application.on(Application.LifecycleState.CONTEXT_LOADED, app -> {
@@ -39,11 +46,11 @@ public class WebStarter {
                     .main(main)
                     .args(args);
             var controllers = reflections.getTypesAnnotatedWith(Controller.class);
+            var ctx = ApplicationContext.getInstance();
 
             for(var controller : controllers) {
                 try {
-                    // TODO find a way to allow for non-empty constructors (i.e., dependency injection)
-                    var instance = controller.getConstructor().newInstance();
+                    var instance = ctx.getInstance(controller);
                     var handlerMethods = Arrays.stream(controller.getMethods())
                             .filter(method -> method.isAnnotationPresent(Handle.class))
                             .filter(method -> method.getReturnType().equals(Response.class))
@@ -80,12 +87,8 @@ public class WebStarter {
                                 )
                         );
                     }
-                } catch (InstantiationException e) {
-                    throw new RuntimeException("Controller could not be instantiated: ", e);
-                } catch (IllegalAccessException | InvocationTargetException | ClassNotFoundException e) {
+                } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
-                } catch (NoSuchMethodException e) {
-                    throw new RuntimeException("Controller did not have an empty constructor", e);
                 }
             }
 
