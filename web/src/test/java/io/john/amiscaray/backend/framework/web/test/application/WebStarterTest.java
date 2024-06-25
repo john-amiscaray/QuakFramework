@@ -2,11 +2,14 @@ package io.john.amiscaray.backend.framework.web.test.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
+import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationDetails;
+import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationUIDetails;
+import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationDetailsProvider;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.catalina.LifecycleException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,6 +18,9 @@ import org.junit.jupiter.api.Test;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static io.john.amiscaray.backend.framework.web.test.stub.MockAccount.*;
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUser;
@@ -27,18 +33,26 @@ public class WebStarterTest {
     private static WebApplication application;
     private final TestConnectionUtil connectionUtil = TestConnectionUtil.getInstance();
     private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final MockApplicationDetailsProvider applicationDetailsProvider = new MockApplicationDetailsProvider();
+    private static ApplicationContext ctx;
+    private static ApplicationDetails applicationDetails;
+    private static ApplicationUIDetails applicationUIDetails;
 
     @BeforeAll
-    static void initApplication() {
+    static void initApplication() throws ExecutionException, InterruptedException, TimeoutException {
 
-        application = WebStarter.beginWebApplication(WebStarterTest.class, new String[] {});
+        application = WebStarter.beginWebApplication(WebStarterTest.class, new String[] {})
+                .get(10, TimeUnit.SECONDS);
+        ctx = ApplicationContext.getInstance();
+        applicationDetails = ctx.getInstance(ApplicationDetails.class);
+        applicationUIDetails = ctx.getInstance(ApplicationUIDetails.class);
 
     }
 
     @AfterAll
-    public static void stop() throws LifecycleException {
+    public static void stop() throws Exception {
 
-        application.finish();
+        application.stop();
 
     }
 
@@ -175,6 +189,82 @@ public class WebStarterTest {
                 httpResponse -> {
                     var status = httpResponse.statusCode();
                     assertEquals(HttpServletResponse.SC_METHOD_NOT_ALLOWED, status);
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationNamePathRetrievesApplicationName() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application/name"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    var body = httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    assertEquals(applicationDetailsProvider.applicationName(), body);
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationVersionPathRetrievesApplicationVersion() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application/version"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    var body = httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    assertEquals(applicationDetailsProvider.version(), Float.parseFloat((String) body));
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationDetailsPathRetrievesApplicationDetails() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application/details"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    String body = (String) httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    try {
+                        assertEquals(applicationDetails, MAPPER.readerFor(ApplicationDetails.class).readValue(body));
+                    } catch (JsonProcessingException e) {
+                        Assertions.fail(e);
+                    }
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationDetailsPathRetrievesApplicationUIDetails() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application/details/ui"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    String body = (String) httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    try {
+                        assertEquals(applicationUIDetails, MAPPER.readerFor(ApplicationUIDetails.class).readValue(body));
+                    } catch (JsonProcessingException e) {
+                        Assertions.fail(e);
+                    }
                 });
     }
 

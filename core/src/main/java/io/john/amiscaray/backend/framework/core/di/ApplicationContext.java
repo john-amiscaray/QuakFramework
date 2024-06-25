@@ -3,6 +3,7 @@ package io.john.amiscaray.backend.framework.core.di;
 import io.john.amiscaray.backend.framework.core.di.dependency.Dependency;
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
+import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
 import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.*;
 import org.apache.commons.lang3.ClassUtils;
@@ -24,7 +25,7 @@ public class ApplicationContext {
     private ApplicationContext() {
     }
 
-    public void init(String classScanPackage) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void init(String classScanPackage) throws InvocationTargetException, DependencyInstantiationException, IllegalAccessException {
         this.classScanPackage = classScanPackage;
         instances = new HashMap<>();
         var reflections = new Reflections(classScanPackage, Scanners.TypesAnnotated);
@@ -74,7 +75,7 @@ public class ApplicationContext {
                     return instances.keySet()
                             .stream()
                             .anyMatch(key -> {
-                                var couldDependencyBeUsed = key.type().equals(parameter.getType());
+                                var couldDependencyBeUsed = key.type().equals(ClassUtils.primitiveToWrapper(parameter.getType()));
                                 if (!parameterDependencyName.isEmpty()) {
                                     couldDependencyBeUsed &= key.name().equals(parameterDependencyName);
                                 }
@@ -88,7 +89,7 @@ public class ApplicationContext {
             executables.stream().filter(executableHasItsDependenciesSatisfied)
                     .findFirst()
                     .ifPresent(executable -> {
-                        var returnType = ClassUtils.primitiveToWrapper((Class<?>) executable.getAnnotatedReturnType().getType());;
+                        var returnType = ClassUtils.primitiveToWrapper((Class<?>) executable.getAnnotatedReturnType().getType());
                         try {
                             var returnedInstance = switch (executable) {
                                 case Method method -> {
@@ -142,16 +143,17 @@ public class ApplicationContext {
         return "";
     }
 
-    private Object[] fetchInstancesOfParameters(Parameter[] parameters) {
+    public Object[] fetchInstancesOfParameters(Parameter[] parameters) {
         return Arrays.stream(parameters)
                 .map(parameter -> {
+                    var type = ClassUtils.primitiveToWrapper(parameter.getType());
                     if (parameter.isAnnotationPresent(ProvidedWith.class)) {
                         var dependencyName = parameter.getAnnotation(ProvidedWith.class).dependencyName();
                         if (!dependencyName.isEmpty()) {
-                            return getInstance(new Dependency<>(dependencyName, parameter.getType()));
+                            return getInstance(new Dependency<>(dependencyName, type));
                         }
                     }
-                    return getInstance(parameter.getType());
+                    return getInstance(type);
                 })
                 .filter(Objects::nonNull)
                 .toArray(Object[]::new);
@@ -174,6 +176,18 @@ public class ApplicationContext {
     }
 
     public <T> T getInstance(Class<T> clazz) {
+        if (!hasInstance(clazz)) {
+            try {
+                var clazzConstructorForInstantiation = getManagedInstanceConstructor(clazz);
+                if (clazzConstructorForInstantiation.getParameters().length == 0) {
+                    return (T) clazzConstructorForInstantiation.newInstance();
+                } else {
+                    return (T) clazzConstructorForInstantiation.newInstance(fetchInstancesOfParameters(clazzConstructorForInstantiation.getParameters()));
+                }
+            } catch (InvocationTargetException | DependencyInstantiationException | IllegalAccessException | java.lang.InstantiationException e) {
+                throw new DependencyInstantiationException(clazz, e);
+            }
+        }
         return (T) instances.entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().type().equals(clazz))

@@ -45,7 +45,7 @@ public abstract class Application {
         postStop();
     }
 
-    public abstract void finish() throws Exception;
+    protected abstract void finish() throws Exception;
 
     protected abstract void startUp() throws Exception;
 
@@ -63,7 +63,7 @@ public abstract class Application {
         var applicationContext = ApplicationContext.getInstance();
         try {
             applicationContext.init(classScanPackage);
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (InvocationTargetException | IllegalAccessException e) {
             throw new ContextInitializationException(e);
         }
     }

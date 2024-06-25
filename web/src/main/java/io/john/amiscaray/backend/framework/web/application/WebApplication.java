@@ -49,6 +49,7 @@ public class WebApplication extends Application {
 
     public void init(Configuration config) {
         main = config.main;
+        classScanPackage = main.getPackageName();
         args = config.args;
         pathControllers.putAll(config.pathControllers);
     }
@@ -72,6 +73,7 @@ public class WebApplication extends Application {
 
         server.start();
         server.getService().addConnector(connector1);
+        hasStarted = true;
         server.getServer().await();
     }
 
@@ -138,6 +140,10 @@ public class WebApplication extends Application {
         }
     }
 
+    protected void addPathMappings(Map<RequestMapping, PathController<?, ?>> pathMappings) {
+        pathControllers.putAll(pathMappings);
+    }
+
     private int getNumPaths(String url) {
         if (url.startsWith("/")) {
             url = url.substring(1);
@@ -146,10 +152,6 @@ public class WebApplication extends Application {
             url = url.substring(0, url.length() - 1);
         }
         return url.split("/").length;
-    }
-
-    private boolean commonPrefixIsValid(String prefix) {
-        return !prefix.isEmpty() && !prefix.equals("/");
     }
 
     private String cleanURLPath(String urlPath) {
