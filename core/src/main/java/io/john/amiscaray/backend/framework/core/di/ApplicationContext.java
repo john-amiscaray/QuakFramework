@@ -146,13 +146,14 @@ public class ApplicationContext {
     public Object[] fetchInstancesOfParameters(Parameter[] parameters) {
         return Arrays.stream(parameters)
                 .map(parameter -> {
+                    var type = ClassUtils.primitiveToWrapper(parameter.getType());
                     if (parameter.isAnnotationPresent(ProvidedWith.class)) {
                         var dependencyName = parameter.getAnnotation(ProvidedWith.class).dependencyName();
                         if (!dependencyName.isEmpty()) {
-                            return getInstance(new Dependency<>(dependencyName, parameter.getType()));
+                            return getInstance(new Dependency<>(dependencyName, type));
                         }
                     }
-                    return getInstance(parameter.getType());
+                    return getInstance(type);
                 })
                 .filter(Objects::nonNull)
                 .toArray(Object[]::new);

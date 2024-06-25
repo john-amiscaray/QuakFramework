@@ -8,19 +8,29 @@ import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
 
-@Controller
-public class MockControllerWithStringDependency {
+@Controller(contextPath = "/application")
+public class MockControllerWithDependencies {
 
     private final String applicationName;
+    private final float version;
 
     @Instantiate
-    public MockControllerWithStringDependency(@ProvidedWith(dependencyName="applicationName") String applicationName) {
+    public MockControllerWithDependencies(
+            @ProvidedWith(dependencyName="applicationName") String applicationName,
+            @ProvidedWith(dependencyName="version") float version
+    ) {
         this.applicationName = applicationName;
+        this.version = version;
     }
 
-    @Handle(method = RequestMethod.GET, path = "/application")
+    @Handle(method = RequestMethod.GET, path = "/name")
     public Response<String> getApplicationName(Request<Void> request) {
         return Response.of(applicationName);
+    }
+
+    @Handle(method = RequestMethod.GET, path = "/version")
+    public Response<Float> getApplicationVersion(Request<Void> request) {
+        return Response.of(version);
     }
 
 }

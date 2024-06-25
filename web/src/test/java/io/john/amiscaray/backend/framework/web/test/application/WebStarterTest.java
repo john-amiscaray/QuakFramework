@@ -4,10 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
-import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationNameProvider;
+import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationDetailsProvider;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.catalina.LifecycleException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -31,7 +30,7 @@ public class WebStarterTest {
     private static WebApplication application;
     private final TestConnectionUtil connectionUtil = TestConnectionUtil.getInstance();
     private static final ObjectMapper MAPPER = new ObjectMapper();
-    private static final MockApplicationNameProvider applicationNameProvider = new MockApplicationNameProvider();
+    private static final MockApplicationDetailsProvider applicationDetailsProvider = new MockApplicationDetailsProvider();
 
     @BeforeAll
     static void initApplication() throws ExecutionException, InterruptedException, TimeoutException {
@@ -185,9 +184,9 @@ public class WebStarterTest {
     }
 
     @Test
-    public void testGetRequestToApplicationPathRetrievesApplicationName() {
+    public void testGetRequestToApplicationNamePathRetrievesApplicationName() {
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(ROOT_URL + "application"))
+                .uri(URI.create(ROOT_URL + "application/name"))
                 .GET()
                 .build();
 
@@ -197,7 +196,24 @@ public class WebStarterTest {
                     var status = httpResponse.statusCode();
                     var body = httpResponse.body();
                     assertEquals(HttpServletResponse.SC_OK, status);
-                    assertEquals(applicationNameProvider.applicationName(), body);
+                    assertEquals(applicationDetailsProvider.applicationName(), body);
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationVersionPathRetrievesApplicationVersion() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application/version"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    var body = httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    assertEquals(applicationDetailsProvider.version(), Float.parseFloat((String) body));
                 });
     }
 
