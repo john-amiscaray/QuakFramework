@@ -75,7 +75,7 @@ public class ApplicationContext {
                     return instances.keySet()
                             .stream()
                             .anyMatch(key -> {
-                                var couldDependencyBeUsed = key.type().equals(parameter.getType());
+                                var couldDependencyBeUsed = key.type().equals(ClassUtils.primitiveToWrapper(parameter.getType()));
                                 if (!parameterDependencyName.isEmpty()) {
                                     couldDependencyBeUsed &= key.name().equals(parameterDependencyName);
                                 }
@@ -89,7 +89,7 @@ public class ApplicationContext {
             executables.stream().filter(executableHasItsDependenciesSatisfied)
                     .findFirst()
                     .ifPresent(executable -> {
-                        var returnType = ClassUtils.primitiveToWrapper((Class<?>) executable.getAnnotatedReturnType().getType());;
+                        var returnType = ClassUtils.primitiveToWrapper((Class<?>) executable.getAnnotatedReturnType().getType());
                         try {
                             var returnedInstance = switch (executable) {
                                 case Method method -> {
