@@ -14,16 +14,19 @@ public class MockControllerWithDependencies {
     private final String applicationName;
     private final float version;
     private final ApplicationDetails applicationDetails;
+    private final ApplicationUIDetails applicationUIDetails;
 
     @Instantiate
     public MockControllerWithDependencies(
             @ProvidedWith(dependencyName="applicationName") String applicationName,
             @ProvidedWith(dependencyName="version") float version,
-            ApplicationDetails applicationDetails
+            ApplicationDetails applicationDetails,
+            ApplicationUIDetails uiDetails
     ) {
         this.applicationName = applicationName;
         this.version = version;
         this.applicationDetails = applicationDetails;
+        this.applicationUIDetails = uiDetails;
     }
 
     @Handle(method = RequestMethod.GET, path = "/name")
@@ -39,6 +42,11 @@ public class MockControllerWithDependencies {
     @Handle(method = RequestMethod.GET, path = "/details")
     public Response<ApplicationDetails> getApplicationDetails(Request<Void> request) {
         return Response.of(applicationDetails);
+    }
+
+    @Handle(method = RequestMethod.GET, path = "/details/ui")
+    public Response<ApplicationUIDetails> getApplicationUIDetails(Request<Void> request) {
+        return Response.of(applicationUIDetails);
     }
 
 }

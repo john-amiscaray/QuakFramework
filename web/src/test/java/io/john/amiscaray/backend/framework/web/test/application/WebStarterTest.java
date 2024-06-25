@@ -6,6 +6,7 @@ import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
 import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationDetails;
+import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationUIDetails;
 import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationDetailsProvider;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,6 +36,7 @@ public class WebStarterTest {
     private static final MockApplicationDetailsProvider applicationDetailsProvider = new MockApplicationDetailsProvider();
     private static ApplicationContext ctx;
     private static ApplicationDetails applicationDetails;
+    private static ApplicationUIDetails applicationUIDetails;
 
     @BeforeAll
     static void initApplication() throws ExecutionException, InterruptedException, TimeoutException {
@@ -43,6 +45,7 @@ public class WebStarterTest {
                 .get(10, TimeUnit.SECONDS);
         ctx = ApplicationContext.getInstance();
         applicationDetails = ctx.getInstance(ApplicationDetails.class);
+        applicationUIDetails = ctx.getInstance(ApplicationUIDetails.class);
 
     }
 
@@ -238,6 +241,27 @@ public class WebStarterTest {
                     assertEquals(HttpServletResponse.SC_OK, status);
                     try {
                         assertEquals(applicationDetails, MAPPER.readerFor(ApplicationDetails.class).readValue(body));
+                    } catch (JsonProcessingException e) {
+                        Assertions.fail(e);
+                    }
+                });
+    }
+
+    @Test
+    public void testGetRequestToApplicationDetailsPathRetrievesApplicationUIDetails() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "application/details/ui"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    String body = (String) httpResponse.body();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    try {
+                        assertEquals(applicationUIDetails, MAPPER.readerFor(ApplicationUIDetails.class).readValue(body));
                     } catch (JsonProcessingException e) {
                         Assertions.fail(e);
                     }
