@@ -1,7 +1,9 @@
 package io.john.amiscaray.backend.framework.core.di.stub;
 
 import io.john.amiscaray.backend.framework.core.di.provider.Provide;
+import io.john.amiscaray.backend.framework.core.di.provider.ProvidedWith;
 import io.john.amiscaray.backend.framework.core.di.provider.Provider;
+import io.john.amiscaray.backend.framework.core.di.stub.pojo.MockUserAccount;
 
 @Provider
 public class MockStringProvider {
@@ -14,6 +16,19 @@ public class MockStringProvider {
     @Provide(dependencyName = "accountName")
     public String accountName() {
         return "Savings";
+    }
+
+    @Provide(dependencyName = "greeting")
+    public String greeting(
+            @ProvidedWith(dependencyName = "username") String username,
+            @ProvidedWith(dependencyName = "accountName") String accountName,
+            @ProvidedWith(dependencyName = "balance") Long balance) {
+        return String.format("Hello %s! This is your %s account with balance: $%s", username, accountName, balance);
+    }
+
+    @Provide(dependencyName = "accountString")
+    public String accountString(MockUserAccount userAccount) {
+        return userAccount.toString();
     }
 
 }

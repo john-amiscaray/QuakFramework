@@ -52,6 +52,24 @@ public class ApplicationContextTest {
     }
 
     @Test
+    public void testProvideGreeting() {
+
+        assertEquals(stringProvider.greeting(
+                stringProvider.username(),
+                stringProvider.accountName(),
+                userAccountProvider.userAccount().balance()
+        ), ctx.getInstance(new Dependency<>("greeting", String.class)));
+
+    }
+
+    @Test
+    public void testProvideAccountString() {
+
+        assertEquals(userAccountProvider.userAccount().toString(), ctx.getInstance(new Dependency<>("accountString", String.class)));
+
+    }
+
+    @Test
     public void testProvideMockUser() {
 
         assertEquals(userProvider.getUser(), ctx.getInstance(MockUser.class));
