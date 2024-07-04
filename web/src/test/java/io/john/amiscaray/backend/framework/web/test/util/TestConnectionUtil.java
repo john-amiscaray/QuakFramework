@@ -12,8 +12,8 @@ import java.util.function.Consumer;
 
 public class TestConnectionUtil {
 
-    private static final int REQUEST_TIMEOUT_SECONDS = 2;
-    private static final int MAX_CONNECTION_RETRIES = 40;
+    private static final int REQUEST_TIMEOUT_SECONDS = 1;
+    private static final int MAX_CONNECTION_RETRIES = 20;
     private static TestConnectionUtil singleton;
 
     public static final String ROOT_URL = "http://localhost:9000/test/";
