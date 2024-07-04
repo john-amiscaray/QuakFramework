@@ -100,7 +100,11 @@
                 <configuration>
                     <source>21</source>
                     <target>21</target>
-                    <compilerArgs>--enable-preview</compilerArgs>
+                    <compilerArgs>
+                        <argLine>--enable-preview</argLine>
+                        <argLine>--add-opens=java.base/java.lang=org.apache.tomcat.embed.core</argLine>
+                        <argLine>--add-opens=java.rmi/sun.rmi.transport=org.apache.tomcat.embed.core</argLine>
+                    </compilerArgs>
                     <annotationProcessorPaths>
                         <annotationProcessorPath>
                             <groupId>org.projectlombok</groupId>
