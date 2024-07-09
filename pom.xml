@@ -19,6 +19,7 @@
         <slf4j.version>2.0.7</slf4j.version>
         <maven-surefire-plugin.version>3.3.0</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
+        <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
     </properties>
 
     <modules>
@@ -134,4 +135,11 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-snapshots</id>
+            <url>http://10.0.0.224:8081/repository/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
