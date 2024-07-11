@@ -12,6 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        env:
+          MAVEN_SNAPSHOT_HOST: ${{ secrets.MAVEN_SNAPSHOT_HOST }}
+          MAVEN_SNAPSHOT_USER: ${{ secrets.MAVEN_SNAPSHOT_USER }}
+          MAVEN_SNAPSHOT_PASSWORD: ${{ secrets.MAVEN_SNAPSHOT_PASSWORD }}
       - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
@@ -32,3 +36,7 @@ jobs:
           name: codecov-umbrella
           path_to_write_report: ./coverage/codecov_report.txt
           verbose: true
+#      - name: Maven Deploy
+#        run: mvn -s settings.xml clean deploy -Dmaven.resolver.transport=wagon -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true
+#        env:
+#          SNAPSHOT_REPOSITORY_HOST: ${{ secrets.MAVEN_SNAPSHOT_HOST }}
