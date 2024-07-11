@@ -120,8 +120,8 @@ under the License.
      -->
     <server>
       <id>nexus-snapshots</id>
-      <username>admin</username>
-      <password>admin</password>
+      <username>${env.MAVEN_SNAPSHOT_USER}</username>
+      <password>${env.MAVEN_SNAPSHOT_PASSWORD}</password>
     </server>
 
     <!-- Another sample, using keys to authenticate.
