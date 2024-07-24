@@ -2,7 +2,6 @@ package io.john.amiscaray.backend.framework.data;
 
 import io.john.amiscaray.backend.framework.data.query.QueryCriteria;
 import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
-import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import jakarta.persistence.Entity;
 import jakarta.persistence.criteria.*;
 import org.hibernate.Session;

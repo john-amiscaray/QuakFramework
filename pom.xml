@@ -27,6 +27,7 @@
         <module>data</module>
         <module>web</module>
         <module>aggregate-report</module>
+        <module>generator</module>
     </modules>
 
     <dependencies>
