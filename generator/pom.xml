@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>generator</artifactId>
+    <artifactId>backend.framework.generator</artifactId>
     <packaging>jar</packaging>
 
 </project>
