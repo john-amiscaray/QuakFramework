@@ -26,6 +26,7 @@ public class ControllerWriterTest {
                 package io.john.amiscaray.controllers;
                 
                 import io.john.amiscaray.stub.model.Student;
+                import io.john.amiscaray.stub.data.StudentTableEntry;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
                 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
                 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
@@ -35,13 +36,30 @@ public class ControllerWriterTest {
                 
                     private DatabaseProxy databaseProxy;
                     
-                    public StudentController (DatabaseProxy databaseProxy) {
+                    public StudentController(DatabaseProxy databaseProxy) {
                         this.databaseProxy = databaseProxy;
                     }
                     
                     @Handle(method = RequestMethod.GET, path = "/")
                     public Response<List<Student>> getAll() {
-                        return Response.of(databaseProxy.queryAll(Student.class));
+                        return Response.of(
+                            databaseProxy.queryAll(StudentTableEntry.class)
+                                .stream()
+                                .map(StudentTableEntry::toStudentModel)
+                                .toList()
+                        );
+                    }
+                    
+                    @Handle(method = RequestMethod.GET, path = "/student/{id}")
+                    public Response<Student> getStudent(DynamicPathRequest<Void> request) {
+                        var id = request.pathVariables().get("id");
+                        var fetched = databaseProxy.fetchById(id, StudentTableEntry.class);
+                        
+                        if (fetched == null) {
+                            return new Response(404, null);
+                        }
+                    
+                        return Response.of(StudentTableEntry.toStudentModel(fetched));
                     }
                 
                 }
