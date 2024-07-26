@@ -53,16 +53,11 @@ public abstract class Application {
         Thread.startVirtualThread(() -> {
             try {
                 this.start();
+                this.on(LifecycleState.POST_STOP, Object::notifyAll);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    public void await() throws InterruptedException {
-        synchronized (this) {
-            this.wait();
-        }
     }
 
     private void initContext() {
