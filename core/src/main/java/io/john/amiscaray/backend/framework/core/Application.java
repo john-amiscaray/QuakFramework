@@ -52,8 +52,12 @@ public abstract class Application {
     public void startAsync() {
         Thread.startVirtualThread(() -> {
             try {
-                this.start();
-                this.on(LifecycleState.POST_STOP, Object::notifyAll);
+                start();
+                on(LifecycleState.POST_STOP, _application -> {
+                    synchronized (this) {
+                        this.notifyAll();
+                    }
+                });
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -105,7 +109,6 @@ public abstract class Application {
     }
 
     private void postStop() {
-        notifyAll();
         lifecycleListeners.get(LifecycleState.POST_STOP)
                 .forEach(consumer -> consumer.accept(this));
     }
