@@ -59,6 +59,12 @@ public abstract class Application {
         });
     }
 
+    public void await() throws InterruptedException {
+        synchronized (this) {
+            this.wait();
+        }
+    }
+
     private void initContext() {
         var applicationContext = ApplicationContext.getInstance();
         try {
@@ -104,6 +110,7 @@ public abstract class Application {
     }
 
     private void postStop() {
+        notifyAll();
         lifecycleListeners.get(LifecycleState.POST_STOP)
                 .forEach(consumer -> consumer.accept(this));
     }
