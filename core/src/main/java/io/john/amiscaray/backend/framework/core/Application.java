@@ -64,6 +64,12 @@ public abstract class Application {
         });
     }
 
+    public void await() throws InterruptedException {
+        synchronized (this) {
+            this.wait();
+        }
+    }
+
     private void initContext() {
         var applicationContext = ApplicationContext.getInstance();
         try {
