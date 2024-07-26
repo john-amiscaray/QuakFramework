@@ -65,8 +65,10 @@ public abstract class Application {
     }
 
     public void await() throws InterruptedException {
-        synchronized (this) {
-            this.wait();
+        while (hasStarted) {
+            synchronized (this) {
+                wait();
+            }
         }
     }
 
