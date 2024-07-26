@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 public abstract class Application {
 
     protected boolean hasStarted;
+    protected boolean contextLoaded;
     protected String classScanPackage;
     protected String[] args;
     protected Class<?> main;
@@ -31,6 +32,7 @@ public abstract class Application {
         initProperties();
         initContext();
         contextLoaded();
+        contextLoaded = true;
         startUp();
         postStart();
         hasStarted = true;
@@ -65,7 +67,7 @@ public abstract class Application {
     }
 
     public void await() throws InterruptedException {
-        while (hasStarted) {
+        while (contextLoaded) {
             synchronized (this) {
                 wait();
             }
