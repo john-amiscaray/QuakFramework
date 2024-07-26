@@ -121,6 +121,8 @@ public abstract class Application {
     private void postStop() {
         lifecycleListeners.get(LifecycleState.POST_STOP)
                 .forEach(consumer -> consumer.accept(this));
+        contextLoaded = false;
+        hasStarted = false;
     }
 
     public enum LifecycleState {
