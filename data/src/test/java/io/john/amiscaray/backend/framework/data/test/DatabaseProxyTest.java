@@ -243,8 +243,8 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testDeleteByNonExistentIDResultsInNull() {
-        assertNull(dbProxy.fetchById(21L, Employee.class));
+    void testDeleteByNonExistentIDThrowsException() {
+        assertThrows(IllegalArgumentException.class, () -> dbProxy.delete(21L, Employee.class));
     }
 
     @Test

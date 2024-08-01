@@ -79,8 +79,11 @@ public class DatabaseProxy {
 
     public void delete(Object entityId, Class<?> entityType) {
         checkSessionStarted();
-        var transaction = currentSession.beginTransaction();
         var entity = fetchById(entityId, entityType);
+        if (entity == null) {
+            throw new IllegalArgumentException("Could not find entity of type " + entityType.getSimpleName() + " with ID: " + entityId);
+        }
+        var transaction = currentSession.beginTransaction();
         currentSession.remove(entity);
         transaction.commit();
     }
