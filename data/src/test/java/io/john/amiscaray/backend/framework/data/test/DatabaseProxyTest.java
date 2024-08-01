@@ -21,6 +21,7 @@ import org.junit.jupiter.api.*;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate.*;
@@ -98,6 +99,11 @@ public class DatabaseProxyTest {
         var fetchedEmployee = dbProxy.fetchById(1L, Employee.class);
 
         assertEquals(new Employee(1L, "Billy", "Tech"), fetchedEmployee);
+    }
+
+    @Test
+    void testQueryingByEmployeeWithNonExistentIDReturnsNull() {
+        assertNull(dbProxy.fetchById(21L, Employee.class));
     }
 
     @Test
@@ -234,6 +240,11 @@ public class DatabaseProxyTest {
         assertEquals(List.of(
                 new Employee(5L, "Jeff", "Corporate")
         ), fetchedEmployees);
+    }
+
+    @Test
+    void testDeleteByNonExistentIDResultsInNull() {
+        assertNull(dbProxy.fetchById(21L, Employee.class));
     }
 
     @Test

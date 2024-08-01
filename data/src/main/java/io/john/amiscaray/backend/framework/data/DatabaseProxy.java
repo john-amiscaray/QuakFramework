@@ -74,16 +74,13 @@ public class DatabaseProxy {
 
     public <T> T fetchById(Object entityId, Class<T> entityType) {
         checkSessionStarted();
-        var transaction = currentSession.beginTransaction();
-        var entity = currentSession.byId(entityType).getReference(entityId);
-        transaction.commit();
-        return entity;
+        return currentSession.get(entityType, entityId);
     }
 
     public void delete(Object entityId, Class<?> entityType) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
-        var entity = currentSession.byId(entityType).getReference(entityId);
+        var entity = fetchById(entityId, entityType);
         currentSession.remove(entity);
         transaction.commit();
     }
