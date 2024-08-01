@@ -50,17 +50,24 @@ public class ControllerWriter {
         var sourceCode = String.format("""
                 package %1$s;
                 
+                import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
+                import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
+                import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
+                import io.john.amiscaray.backend.framework.web.handler.response.Response;
                 import %4$s.%2$s;
                 import %6$s.%5$s;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
                 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
                 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
                 
+                import java.util.List;
+                
                 @Controller
                 public class %2$sController {
                 
                     private DatabaseProxy databaseProxy;
                     
+                    @Instantiate
                     public %2$sController(DatabaseProxy databaseProxy) {
                         this.databaseProxy = databaseProxy;
                     }
@@ -76,7 +83,7 @@ public class ControllerWriter {
                     }
                     
                     @Handle(method = RequestMethod.GET, path = "/%3$s/{id}")
-                    public Response<Student> get%2$s(DynamicPathRequest<Void> request) {
+                    public Response<%2$s> get%2$s(DynamicPathRequest<Void> request) {
                         var id = request.pathVariables().get("id");
                         var fetched = databaseProxy.fetchById(id, StudentTableEntry.class);
                         
@@ -84,7 +91,7 @@ public class ControllerWriter {
                             return new Response(404, null);
                         }
                     
-                        return Response.of(StudentTableEntry.toStudentModel(fetched));
+                        return Response.of(%5$s.%7$s(fetched));
                     }
                 
                 }

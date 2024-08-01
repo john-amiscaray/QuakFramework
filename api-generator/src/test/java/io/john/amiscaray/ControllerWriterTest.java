@@ -25,17 +25,24 @@ public class ControllerWriterTest {
                 """
                 package io.john.amiscaray.controllers;
                 
+                import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
+                import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
+                import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
+                import io.john.amiscaray.backend.framework.web.handler.response.Response;
                 import io.john.amiscaray.stub.model.Student;
                 import io.john.amiscaray.stub.data.StudentTableEntry;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
                 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
                 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
                 
+                import java.util.List;
+                
                 @Controller
                 public class StudentController {
                 
                     private DatabaseProxy databaseProxy;
                     
+                    @Instantiate
                     public StudentController(DatabaseProxy databaseProxy) {
                         this.databaseProxy = databaseProxy;
                     }
