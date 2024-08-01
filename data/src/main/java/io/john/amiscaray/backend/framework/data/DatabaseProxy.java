@@ -74,16 +74,16 @@ public class DatabaseProxy {
 
     public <T> T fetchById(Object entityId, Class<T> entityType) {
         checkSessionStarted();
-        var transaction = currentSession.beginTransaction();
-        var entity = currentSession.byId(entityType).getReference(entityId);
-        transaction.commit();
-        return entity;
+        return currentSession.get(entityType, entityId);
     }
 
     public void delete(Object entityId, Class<?> entityType) {
         checkSessionStarted();
+        var entity = fetchById(entityId, entityType);
+        if (entity == null) {
+            throw new IllegalArgumentException("Could not find entity of type " + entityType.getSimpleName() + " with ID: " + entityId);
+        }
         var transaction = currentSession.beginTransaction();
-        var entity = currentSession.byId(entityType).getReference(entityId);
         currentSession.remove(entity);
         transaction.commit();
     }
