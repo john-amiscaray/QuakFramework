@@ -5,6 +5,7 @@ import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
 import io.john.amiscaray.model.GeneratedClass;
 import jakarta.persistence.Id;
+import org.apache.commons.lang3.StringUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -44,7 +45,12 @@ public class ControllerWriter {
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
                 .orElseThrow();
-        return new PropertyDescriptor(idField.getName(), dataClass).getReadMethod();
+        return Arrays.stream(dataClass.getMethods())
+                .filter(method -> method.getName().equals("get" + StringUtils.capitalize(idField.getName())))
+                .filter(method -> method.getReturnType().equals(idField.getType()))
+                .filter(method -> method.getParameterCount() == 0)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Data class " + dataClass.getSimpleName() + " is missing a getter for its ID field. This is required for API generation."));
     }
 
     private Method getEntityGeneratorFromRestModel(Class<?> dtoClass) {
