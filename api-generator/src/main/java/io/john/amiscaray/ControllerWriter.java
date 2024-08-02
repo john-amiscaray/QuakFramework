@@ -1,9 +1,13 @@
 package io.john.amiscaray;
 
+import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
 import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
 import io.john.amiscaray.model.GeneratedClass;
+import jakarta.persistence.Id;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -35,7 +39,29 @@ public class ControllerWriter {
         return annotatedMethods.getFirst();
     }
 
-    public GeneratedClass writeNewController(String targetPackage, Class<?> restModel) {
+    private Method getIdGetterFromDataClass(Class<?> dataClass) throws IntrospectionException {
+        var idField = Arrays.stream(dataClass.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(Id.class))
+                .findFirst()
+                .orElseThrow();
+        return new PropertyDescriptor(idField.getName(), dataClass).getReadMethod();
+    }
+
+    private Method getEntityGeneratorFromRestModel(Class<?> dtoClass) {
+        var annotatedMethods = Arrays.stream(dtoClass.getMethods())
+                .filter(method -> method.isAnnotationPresent(EntityGenerator.class))
+                .toList();
+
+        if (annotatedMethods.isEmpty()) {
+            throw new IllegalStateException("A Rest Model should have a method annotated with @EntityGenerator");
+        } else if (annotatedMethods.size() > 1) {
+            throw new IllegalStateException("A Rest Model should have exactly ONE method annotated with @EntityGenerator");
+        }
+
+        return annotatedMethods.getFirst();
+    }
+
+    public GeneratedClass writeNewController(String targetPackage, Class<?> restModel) throws IntrospectionException {
 
         if (!restModel.isAnnotationPresent(RestModel.class)) {
             throw new IllegalArgumentException("The class passed to write a new controller for must be annotated with @RestModel");
@@ -46,12 +72,15 @@ public class ControllerWriter {
 
         var entityClass = restModel.getAnnotation(RestModel.class).dataClass();
         var modelGeneratorMethod = getModelGeneratorFromDataClass(entityClass);
+        var entityGeneratorMethod = getEntityGeneratorFromRestModel(restModel);
+        var entityIdGetterMethod = getIdGetterFromDataClass(entityClass);
 
         var sourceCode = String.format("""
                 package %1$s;
                 
                 import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
                 import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
+                import io.john.amiscaray.backend.framework.web.handler.request.Request;
                 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
                 import io.john.amiscaray.backend.framework.web.handler.response.Response;
                 import %4$s.%2$s;
@@ -60,6 +89,7 @@ public class ControllerWriter {
                 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
                 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
                 
+                import java.util.HashMap;
                 import java.util.List;
                 
                 @Controller
@@ -72,8 +102,20 @@ public class ControllerWriter {
                         this.databaseProxy = databaseProxy;
                     }
                     
-                    @Handle(method = RequestMethod.GET, path = "/")
-                    public Response<List<%2$s>> getAll() {
+                    @Handle(method = RequestMethod.POST, path = "/%3$s")
+                    public Response<Void> save%2$s(Request<%2$s> request) {
+                        var %3$s = request.body();
+                        var entity = %2$s.%8$s(%3$s);
+                        databaseProxy.persist(entity);
+                        
+                        var headers = new HashMap<String, String>();
+                        headers.put("Location", "/%3$s/" + entity.%9$s());
+                        
+                        return new Response(headers, 201, null);
+                    }
+                    
+                    @Handle(method = RequestMethod.GET, path = "/%3$s")
+                    public Response<List<%2$s>> getAll(Request<Void> request) {
                         return Response.of(
                             databaseProxy.queryAll(%5$s.class)
                                 .stream()
@@ -101,7 +143,9 @@ public class ControllerWriter {
                 restModelPackage,
                 entityClass.getSimpleName(),
                 entityClass.getPackageName(),
-                modelGeneratorMethod.getName());
+                modelGeneratorMethod.getName(),
+                entityGeneratorMethod.getName(),
+                entityIdGetterMethod.getName());
 
         return new GeneratedClass(restModelName + "Controller.java", sourceCode);
     }
