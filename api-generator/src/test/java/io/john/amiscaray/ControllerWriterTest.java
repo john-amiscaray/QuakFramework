@@ -109,7 +109,10 @@ public class ControllerWriterTest {
                         if (isUpdate) {
                             return new Response(204, null);
                         } else {
-                            return new Response(201, null);
+                            var headers = new HashMap<String, String>();
+                            headers.put("Location", "/student/" + entity.getId());
+                            
+                            return new Response(headers, 201, null);
                         }
                     }
                     
