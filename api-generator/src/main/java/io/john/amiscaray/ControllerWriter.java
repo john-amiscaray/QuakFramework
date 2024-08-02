@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
@@ -40,17 +41,38 @@ public class ControllerWriter {
         return annotatedMethods.getFirst();
     }
 
-    private Method getIdGetterFromDataClass(Class<?> dataClass) throws IntrospectionException {
-        var idField = Arrays.stream(dataClass.getDeclaredFields())
+    private Field findIDFieldForDataClass(Class<?> dataClass) {
+        return Arrays.stream(dataClass.getDeclaredFields())
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
-                .orElseThrow();
-        return Arrays.stream(dataClass.getMethods())
-                .filter(method -> method.getName().equals("get" + StringUtils.capitalize(idField.getName())))
-                .filter(method -> method.getReturnType().equals(idField.getType()))
-                .filter(method -> method.getParameterCount() == 0)
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Data class " + dataClass.getSimpleName() + " is missing a getter for its ID field. This is required for API generation."));
+                .orElseThrow(() -> new IllegalStateException("Missing an ID attribute for data class: " + dataClass.getName()));
+    }
+
+    private Method getIdGetterFromDataClass(Class<?> dataClass) throws IntrospectionException {
+        var idField = findIDFieldForDataClass(dataClass);
+
+        return new PropertyDescriptor(idField.getName(), dataClass).getReadMethod();
+    }
+
+    private Method getIdSetterFromDataClass(Class<?> dataClass) throws IntrospectionException {
+        var idField = findIDFieldForDataClass(dataClass);
+
+        return new PropertyDescriptor(idField.getName(), dataClass).getWriteMethod();
+    }
+
+    private String getStringToIDConversionMethodName(Class<?> dataClass) throws IntrospectionException {
+        var idField = findIDFieldForDataClass(dataClass);
+        String result = "String.valueOf";
+
+        if (idField.getType().equals(Long.class)) {
+            result = "Long.parseLong";
+        } else if (idField.getType().equals(Double.class)) {
+            result = "Double.parseDouble";
+        } else if (idField.getType().equals(Float.class)) {
+            result = "Float.parseFloat";
+        }
+
+        return result;
     }
 
     private Method getEntityGeneratorFromRestModel(Class<?> dtoClass) {
@@ -79,7 +101,9 @@ public class ControllerWriter {
         var entityClass = restModel.getAnnotation(RestModel.class).dataClass();
         var modelGeneratorMethod = getModelGeneratorFromDataClass(entityClass);
         var entityGeneratorMethod = getEntityGeneratorFromRestModel(restModel);
-        var entityIdGetterMethod = getIdGetterFromDataClass(entityClass);
+        var entityIDGetterMethod = getIdGetterFromDataClass(entityClass);
+        var entityIDSetterMethod = getIdSetterFromDataClass(entityClass);
+        var stringToEntityIDConversionMethod = getStringToIDConversionMethodName(entityClass);
 
         var sourceCode = String.format("""
                 package %1$s;
@@ -132,7 +156,7 @@ public class ControllerWriter {
                     
                     @Handle(method = RequestMethod.GET, path = "/%3$s/{id}")
                     public Response<%2$s> get%2$s(DynamicPathRequest<Void> request) {
-                        var id = request.pathVariables().get("id");
+                        var id = %11$s(request.pathVariables().get("id"));
                         var fetched = databaseProxy.fetchById(id, StudentTableEntry.class);
                         
                         if (fetched == null) {
@@ -144,7 +168,7 @@ public class ControllerWriter {
                     
                     @Handle(method = RequestMethod.DELETE, path = "/%3$s/{id}")
                     public Response<Void> delete(DynamicPathRequest<Void> request) {
-                        var id = request.pathVariables().get("id");
+                        var id = %11$s(request.pathVariables().get("id"));
                         
                         try {
                             databaseProxy.delete(id, %5$s.class);
@@ -153,6 +177,22 @@ public class ControllerWriter {
                         }
                         
                         return new Response(204, null);
+                    }
+                    
+                    @Handle(method = RequestMethod.PUT, path = "/%3$s/{id}")
+                    public Response<Void> putStudent(DynamicPathRequest<%2$s> request) {
+                        var id = %11$s(request.pathVariables().get("id"));
+                        
+                        var entity = %2$s.%8$s(request.body());
+                        entity.%10$s(id);
+                        var isUpdate = databaseProxy.put(entity, id, %5$s.class);
+                        
+                        if (isUpdate) {
+                            return new Response(204, null);
+                        } else {
+                            return new Response(201, null);
+                        }
+                        
                     }
                 
                 }
@@ -164,7 +204,9 @@ public class ControllerWriter {
                 entityClass.getPackageName(),
                 modelGeneratorMethod.getName(),
                 entityGeneratorMethod.getName(),
-                entityIdGetterMethod.getName());
+                entityIDGetterMethod.getName(),
+                entityIDSetterMethod.getName(),
+                stringToEntityIDConversionMethod);
 
         return new GeneratedClass(restModelName + "Controller.java", sourceCode);
     }

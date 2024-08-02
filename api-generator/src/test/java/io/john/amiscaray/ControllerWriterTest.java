@@ -75,7 +75,7 @@ public class ControllerWriterTest {
                     
                     @Handle(method = RequestMethod.GET, path = "/student/{id}")
                     public Response<Student> getStudent(DynamicPathRequest<Void> request) {
-                        var id = request.pathVariables().get("id");
+                        var id = Long.parseLong(request.pathVariables().get("id"));
                         var fetched = databaseProxy.fetchById(id, StudentTableEntry.class);
                         
                         if (fetched == null) {
@@ -87,7 +87,7 @@ public class ControllerWriterTest {
                     
                     @Handle(method = RequestMethod.DELETE, path = "/student/{id}")
                     public Response<Void> delete(DynamicPathRequest<Void> request) {
-                        var id = request.pathVariables().get("id");
+                        var id = Long.parseLong(request.pathVariables().get("id"));
                         
                         try {
                             databaseProxy.delete(id, StudentTableEntry.class);
@@ -96,6 +96,22 @@ public class ControllerWriterTest {
                         }
                         
                         return new Response(204, null);
+                    }
+                    
+                    @Handle(method = RequestMethod.PUT, path = "/student/{id}")
+                    public Response<Void> putStudent(DynamicPathRequest<Student> request) {
+                        var id = Long.parseLong(request.pathVariables().get("id"));
+                        
+                        var entity = Student.toStudentEntry(request.body());
+                        entity.setId(id);
+                        var isUpdate = databaseProxy.put(entity, id, StudentTableEntry.class);
+                        
+                        if (isUpdate) {
+                            return new Response(204, null);
+                        } else {
+                            return new Response(201, null);
+                        }
+                        
                     }
                 
                 }

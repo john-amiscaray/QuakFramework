@@ -58,6 +58,12 @@ public class DatabaseProxy {
         currentSession = null;
     }
 
+    public <T> boolean existsById(Object entityID, Class<T> entityType) {
+        checkSessionStarted();
+        var optionalEntity = currentSession.byId(entityType).loadOptional(entityID);
+        return optionalEntity.isPresent();
+    }
+
     public void persist(Object entity) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -65,11 +71,15 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-    public void update(Object entity) {
+    public <T> boolean put(Object entity, Object entityID, Class<T> entityType) {
+        var isUpdate = existsById(entityID, entityType);
+
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         currentSession.merge(entity);
         transaction.commit();
+
+        return isUpdate;
     }
 
     public <T> T fetchById(Object entityId, Class<T> entityType) {

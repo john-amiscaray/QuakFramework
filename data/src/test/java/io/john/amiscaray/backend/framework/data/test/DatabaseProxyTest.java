@@ -21,7 +21,6 @@ import org.junit.jupiter.api.*;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate.*;
@@ -92,6 +91,16 @@ public class DatabaseProxyTest {
                 new Employee(4L, "Annie", "Corporate"),
                 new Employee(5L, "Jeff", "Corporate")
         ), resultingTable);
+    }
+
+    @Test
+    void testExistsEmployeeWithIDOf1() {
+        assertTrue(dbProxy.existsById(1, Employee.class));
+    }
+
+    @Test
+    void testDoesNotExistEmployeeWithIDOf82() {
+        assertFalse(dbProxy.existsById(82, Employee.class));
     }
 
     @Test
@@ -289,8 +298,8 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeeNamedJohnToJohnnyUsingUpdateMethod() throws SQLException {
-        dbProxy.update(new Employee(3L, "Johnny", "Tech"));
+    void testUpdateEmployeeNamedJohnToJohnnyUsingPutMethod() throws SQLException {
+        var isUpdate = dbProxy.put(new Employee(3L, "Johnny", "Tech"), 3L, Employee.class);
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech"),
@@ -299,6 +308,7 @@ public class DatabaseProxyTest {
                 new Employee(4L, "Annie", "Corporate"),
                 new Employee(5L, "Jeff", "Corporate")
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
+        assertTrue(isUpdate);
     }
 
     @Test
