@@ -84,6 +84,19 @@ public class ControllerWriterTest {
                     
                         return Response.of(StudentTableEntry.toStudentModel(fetched));
                     }
+                    
+                    @Handle(method = RequestMethod.DELETE, path = "/student/{id}")
+                    public Response<Void> delete(DynamicPathRequest<Void> request) {
+                        var id = request.pathVariables().get("id");
+                        
+                        try {
+                            databaseProxy.delete(id, StudentTableEntry.class);
+                        } catch (IllegalArgumentException e) {
+                            return new Response(404, null);
+                        }
+                        
+                        return new Response(204, null);
+                    }
                 
                 }
                 """

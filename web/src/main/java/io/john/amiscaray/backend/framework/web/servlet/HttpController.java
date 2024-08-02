@@ -86,10 +86,12 @@ public class HttpController extends HttpServlet {
         servletResponse.setStatus(response.status());
         writeResponseHeaders(response.headers(), servletResponse);
 
-        if (controller.responseBodyType().equals(String.class)) {
-            servletResponse.getWriter().print(response.body());
-        } else if (!controller.responseBodyType().equals(Void.class)) {
-            MAPPER.writerFor(controller.responseBodyType()).writeValue(servletResponse.getWriter(), controller.responseBodyType().cast(response.body()));
+        if (response.status() >= 200 && response.status() < 300) {
+            if (controller.responseBodyType().equals(String.class)) {
+                servletResponse.getWriter().print(response.body());
+            } else if (!controller.responseBodyType().equals(Void.class)) {
+                MAPPER.writerFor(controller.responseBodyType()).writeValue(servletResponse.getWriter(), controller.responseBodyType().cast(response.body()));
+            }
         }
     }
 

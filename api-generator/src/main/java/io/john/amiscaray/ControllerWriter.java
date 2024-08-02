@@ -141,6 +141,19 @@ public class ControllerWriter {
                     
                         return Response.of(%5$s.%7$s(fetched));
                     }
+                    
+                    @Handle(method = RequestMethod.DELETE, path = "/%3$s/{id}")
+                    public Response<Void> delete(DynamicPathRequest<Void> request) {
+                        var id = request.pathVariables().get("id");
+                        
+                        try {
+                            databaseProxy.delete(id, %5$s.class);
+                        } catch (IllegalArgumentException e) {
+                            return new Response(404, null);
+                        }
+                        
+                        return new Response(204, null);
+                    }
                 
                 }
                 """, targetPackage,
