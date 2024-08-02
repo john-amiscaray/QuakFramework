@@ -111,7 +111,21 @@ public class ControllerWriterTest {
                         } else {
                             return new Response(201, null);
                         }
+                    }
+                    
+                    @Handle(method = RequestMethod.PATCH, path = "/student/{id}")
+                    public Response<Void> patchStudent(DynamicPathRequest<Student> request) {
+                        var id = Long.parseLong(request.pathVariables().get("id"));
                         
+                        var entity = Student.toStudentEntry(request.body());
+                        entity.setId(id);
+                        var foundEntity = databaseProxy.patch(entity, id, StudentTableEntry.class);
+                        
+                        if (foundEntity) {
+                            return new Response(204, null);
+                        } else {
+                            return new Response(404, null);
+                        }
                     }
                 
                 }

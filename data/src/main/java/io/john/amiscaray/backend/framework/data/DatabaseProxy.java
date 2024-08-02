@@ -82,6 +82,20 @@ public class DatabaseProxy {
         return isUpdate;
     }
 
+    public <T> boolean patch(Object entity, Object entityID, Class<T> entityType) {
+        var exists = existsById(entityID, entityType);
+        if (!exists) {
+            return false;
+        }
+
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        currentSession.merge(entity);
+        transaction.commit();
+
+        return true;
+    }
+
     public <T> T fetchById(Object entityId, Class<T> entityType) {
         checkSessionStarted();
         return currentSession.get(entityType, entityId);

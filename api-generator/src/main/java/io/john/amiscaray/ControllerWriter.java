@@ -180,7 +180,7 @@ public class ControllerWriter {
                     }
                     
                     @Handle(method = RequestMethod.PUT, path = "/%3$s/{id}")
-                    public Response<Void> putStudent(DynamicPathRequest<%2$s> request) {
+                    public Response<Void> put%2$s(DynamicPathRequest<%2$s> request) {
                         var id = %11$s(request.pathVariables().get("id"));
                         
                         var entity = %2$s.%8$s(request.body());
@@ -192,7 +192,21 @@ public class ControllerWriter {
                         } else {
                             return new Response(201, null);
                         }
+                    }
+                    
+                    @Handle(method = RequestMethod.PATCH, path = "/%3$s/{id}")
+                    public Response<Void> patch%2$s(DynamicPathRequest<%2$s> request) {
+                        var id = %11$s(request.pathVariables().get("id"));
                         
+                        var entity = %2$s.%8$s(request.body());
+                        entity.%10$s(id);
+                        var foundEntity = databaseProxy.patch(entity, id, %5$s.class);
+                        
+                        if (foundEntity) {
+                            return new Response(204, null);
+                        } else {
+                            return new Response(404, null);
+                        }
                     }
                 
                 }
