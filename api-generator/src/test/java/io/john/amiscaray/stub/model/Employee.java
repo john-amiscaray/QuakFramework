@@ -2,27 +2,26 @@ package io.john.amiscaray.stub.model;
 
 import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
-import io.john.amiscaray.stub.data.StudentTableEntry;
+import io.john.amiscaray.stub.data.EmployeeTableEntry;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@RestModel(dataClass = StudentTableEntry.class)
+@RestModel(dataClass = EmployeeTableEntry.class)
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Student {
+public class Employee {
 
-    private long id;
     private String name;
-    private int age;
-    private float gpa;
+    private String department;
+    private String address;
 
     @EntityGenerator
-    public static StudentTableEntry toStudentEntry(Student student) {
-        return new StudentTableEntry(student.id, student.name, student.age, student.gpa);
+    public static EmployeeTableEntry toEmployeeEntity(Employee employee) {
+        return new EmployeeTableEntry(null, employee.name, employee.department, employee.address);
     }
 
 }

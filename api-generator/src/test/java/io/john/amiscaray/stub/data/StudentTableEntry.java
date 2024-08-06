@@ -4,6 +4,7 @@ import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
 import io.john.amiscaray.stub.model.Student;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "Student")
 public class StudentTableEntry {
 
     @Id

@@ -145,7 +145,7 @@ public class ControllerWriter {
                     }
                     
                     @Handle(method = RequestMethod.GET, path = "/%3$s")
-                    public Response<List<%2$s>> getAll(Request<Void> request) {
+                    public Response<List<%2$s>> getAll%2$s(Request<Void> request) {
                         return Response.of(
                             databaseProxy.queryAll(%5$s.class)
                                 .stream()
@@ -157,7 +157,7 @@ public class ControllerWriter {
                     @Handle(method = RequestMethod.GET, path = "/%3$s/{id}")
                     public Response<%2$s> get%2$s(DynamicPathRequest<Void> request) {
                         var id = %11$s(request.pathVariables().get("id"));
-                        var fetched = databaseProxy.fetchById(id, StudentTableEntry.class);
+                        var fetched = databaseProxy.fetchById(id, %5$s.class);
                         
                         if (fetched == null) {
                             return new Response(404, null);
@@ -167,7 +167,7 @@ public class ControllerWriter {
                     }
                     
                     @Handle(method = RequestMethod.DELETE, path = "/%3$s/{id}")
-                    public Response<Void> delete(DynamicPathRequest<Void> request) {
+                    public Response<Void> delete%2$s(DynamicPathRequest<Void> request) {
                         var id = %11$s(request.pathVariables().get("id"));
                         
                         try {
