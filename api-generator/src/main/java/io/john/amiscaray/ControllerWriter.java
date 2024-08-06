@@ -5,7 +5,6 @@ import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
 import io.john.amiscaray.model.GeneratedClass;
 import jakarta.persistence.Id;
-import org.apache.commons.lang3.StringUtils;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -60,7 +59,7 @@ public class ControllerWriter {
         return new PropertyDescriptor(idField.getName(), dataClass).getWriteMethod();
     }
 
-    private String getStringToIDConversionMethodName(Class<?> dataClass) throws IntrospectionException {
+    private String getStringToIDConversionMethodName(Class<?> dataClass) {
         var idField = findIDFieldForDataClass(dataClass);
         String result = "String.valueOf";
 
