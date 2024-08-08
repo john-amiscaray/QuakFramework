@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 public abstract class Application {
 
     protected boolean hasStarted;
+    protected boolean contextLoaded;
     protected String classScanPackage;
     protected String[] args;
     protected Class<?> main;
@@ -31,6 +32,7 @@ public abstract class Application {
         initProperties();
         initContext();
         contextLoaded();
+        contextLoaded = true;
         startUp();
         postStart();
         hasStarted = true;
@@ -52,11 +54,24 @@ public abstract class Application {
     public void startAsync() {
         Thread.startVirtualThread(() -> {
             try {
-                this.start();
+                start();
+                on(LifecycleState.POST_STOP, _application -> {
+                    synchronized (this) {
+                        this.notifyAll();
+                    }
+                });
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    public void await() throws InterruptedException {
+        while (contextLoaded) {
+            synchronized (this) {
+                wait();
+            }
+        }
     }
 
     private void initContext() {
@@ -106,6 +121,8 @@ public abstract class Application {
     private void postStop() {
         lifecycleListeners.get(LifecycleState.POST_STOP)
                 .forEach(consumer -> consumer.accept(this));
+        contextLoaded = false;
+        hasStarted = false;
     }
 
     public enum LifecycleState {

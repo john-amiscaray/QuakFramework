@@ -28,6 +28,7 @@
         <module>web</module>
         <module>aggregate-report</module>
         <module>generator</module>
+        <module>api-generator</module>
     </modules>
 
     <dependencies>

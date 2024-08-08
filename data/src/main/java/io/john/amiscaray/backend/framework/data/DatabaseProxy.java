@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.data;
 
+import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
 import io.john.amiscaray.backend.framework.data.query.QueryCriteria;
 import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
 import jakarta.persistence.Entity;
@@ -14,8 +15,6 @@ import org.hibernate.service.ServiceRegistry;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +57,12 @@ public class DatabaseProxy {
         currentSession = null;
     }
 
+    public <T> boolean existsById(Object entityID, Class<T> entityType) {
+        checkSessionStarted();
+        var optionalEntity = currentSession.byId(entityType).loadOptional(entityID);
+        return optionalEntity.isPresent();
+    }
+
     public void persist(Object entity) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -65,11 +70,29 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-    public void update(Object entity) {
+    public <T> boolean put(Object entity, Object entityID, Class<T> entityType) {
+        var isUpdate = existsById(entityID, entityType);
+
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         currentSession.merge(entity);
         transaction.commit();
+
+        return isUpdate;
+    }
+
+    public <T> boolean patch(Object entity, Object entityID, Class<T> entityType) {
+        var exists = existsById(entityID, entityType);
+        if (!exists) {
+            return false;
+        }
+
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        currentSession.merge(entity);
+        transaction.commit();
+
+        return true;
     }
 
     public <T> T fetchById(Object entityId, Class<T> entityType) {
@@ -88,10 +111,6 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-    public static DatabaseQuery.DatabaseQueryBuilder queryBuilder() {
-        return DatabaseQuery.builder();
-    }
-
     public <T> List<T> queryAll(Class<T> entityType) {
         return queryAll(entityType, DatabaseQuery.builder().build());
     }
@@ -104,7 +123,7 @@ public class DatabaseProxy {
         Root<T> root = cr.from(entityType);
         var selection = cr.select(root);
 
-        for (QueryCriteria criteria : databaseQuery.criteria) {
+        for (QueryCriteria criteria : databaseQuery.criteria()) {
             selection.where(criteria.getTestPredicate(root, cb));
         }
 
@@ -121,7 +140,7 @@ public class DatabaseProxy {
         CriteriaDelete<T> delete = cb.createCriteriaDelete(entityType);
         Root<T> root = delete.from(entityType);
 
-        delete.where(deletionCriteria.criteria.stream()
+        delete.where(deletionCriteria.criteria().stream()
                 .map(criteria -> criteria.getTestPredicate(root, cb))
                 .toArray(Predicate[]::new));
 
@@ -138,7 +157,7 @@ public class DatabaseProxy {
 
         update.set(fieldUpdate.fieldName(), fieldUpdate.updateExpression().createExpression(root, cb));
 
-        for (QueryCriteria criteria : updateCriteria.criteria) {
+        for (QueryCriteria criteria : updateCriteria.criteria()) {
             update.where(criteria.getTestPredicate(root, cb));
         }
 
@@ -161,61 +180,6 @@ public class DatabaseProxy {
     private void checkSessionStarted() {
         if (currentSession == null) {
             throw new IllegalStateException("Attempted to access database without an active session");
-        }
-    }
-
-    private record DatabaseQuery(List<QueryCriteria> criteria) {
-
-        public static DatabaseQueryBuilder builder() {
-            return new DatabaseQueryBuilder();
-        }
-
-        public static class DatabaseQueryBuilder {
-            private ArrayList<QueryCriteria> criteria;
-
-            DatabaseQueryBuilder() {
-            }
-
-            public DatabaseQueryBuilder withCriteria(QueryCriteria criteria) {
-                if (this.criteria == null) this.criteria = new ArrayList<>();
-                this.criteria.add(criteria);
-                return this;
-            }
-
-            public DatabaseQueryBuilder withCriteria(Collection<? extends QueryCriteria> criteria) {
-                if (criteria == null) {
-                    throw new NullPointerException("criteria cannot be null");
-                }
-                if (this.criteria == null) this.criteria = new ArrayList<>();
-                this.criteria.addAll(criteria);
-                return this;
-            }
-
-            public DatabaseQueryBuilder clearCriteria() {
-                if (this.criteria != null)
-                    this.criteria.clear();
-                return this;
-            }
-
-            public DatabaseQuery build() {
-                List<QueryCriteria> criteria;
-                switch (this.criteria == null ? 0 : this.criteria.size()) {
-                    case 0:
-                        criteria = java.util.Collections.emptyList();
-                        break;
-                    case 1:
-                        criteria = java.util.Collections.singletonList(this.criteria.get(0));
-                        break;
-                    default:
-                        criteria = java.util.Collections.unmodifiableList(new ArrayList<>(this.criteria));
-                }
-
-                return new DatabaseQuery(criteria);
-            }
-
-            public String toString() {
-                return "DatabaseProxy.DatabaseQuery.DatabaseQueryBuilder(criteria=" + this.criteria + ")";
-            }
         }
     }
 

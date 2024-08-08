@@ -2,6 +2,7 @@ package io.john.amiscaray.backend.framework.data.test;
 
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
+import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
 import io.john.amiscaray.backend.framework.data.query.numeric.*;
 import io.john.amiscaray.backend.framework.data.query.string.ValueContaining;
 import io.john.amiscaray.backend.framework.data.query.string.ValueEndsWith;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.*;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate.*;
@@ -95,6 +95,16 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testExistsEmployeeWithIDOf1() {
+        assertTrue(dbProxy.existsById(1, Employee.class));
+    }
+
+    @Test
+    void testDoesNotExistEmployeeWithIDOf82() {
+        assertFalse(dbProxy.existsById(82, Employee.class));
+    }
+
+    @Test
     void testEmployeeCanBeQueriedById() {
         var fetchedEmployee = dbProxy.fetchById(1L, Employee.class);
 
@@ -108,8 +118,7 @@ public class DatabaseProxyTest {
 
     @Test
     void testEmployeeCanBeQueriedByIdsBetween2And4() {
-        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
-                .queryBuilder()
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(new ValueBetween("id", 2, 4))
                 .build());
 
@@ -122,8 +131,8 @@ public class DatabaseProxyTest {
 
     @Test
     void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4() {
-        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
-                .queryBuilder()
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery
+                .builder()
                 .withCriteria(new ValueGreaterThanOrEqualTo("id", 2)
                         .and(new ValueLessThanOrEqualTo("id", 4)))
                 .build());
@@ -137,8 +146,7 @@ public class DatabaseProxyTest {
 
     @Test
     void testQueryEmployeeByIdLessThan4() {
-        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
-                .queryBuilder()
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(new ValueLessThan("id", 4))
                 .build());
 
@@ -151,8 +159,7 @@ public class DatabaseProxyTest {
 
     @Test
     void testQueryEmployeeByIdGreaterThan4() {
-        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseProxy
-                .queryBuilder()
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(new ValueGreaterThan("id", 4))
                 .build());
 
@@ -164,7 +171,7 @@ public class DatabaseProxyTest {
     @Test
     void testEmployeeQueryNameIsJohn() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueIs("name", "John"))
                         .build());
 
@@ -174,7 +181,7 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeWhereNameIsOneOfJohnOrElli() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueIsOneOf("name", "John", "Elli"))
                         .build());
 
@@ -187,7 +194,7 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameStartsWithJo() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueStartsWith("name", "Jo"))
                         .build());
 
@@ -197,7 +204,7 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameEndsWithHN() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueEndsWith("name", "hn"))
                         .build());
 
@@ -207,7 +214,7 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameContainsLL() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueContaining("name", "ll"))
                         .build());
 
@@ -220,7 +227,7 @@ public class DatabaseProxyTest {
     @Test
     public void testQueryEmployeeNameContainsLLAndStartsWithEAsTwoSeparateCriteria() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueContaining("name", "ll"))
                         .withCriteria(new ValueStartsWith("name", "E"))
                         .build());
@@ -233,7 +240,7 @@ public class DatabaseProxyTest {
     @Test
     void testQueryEmployeeNameLike() {
         var fetchedEmployees = dbProxy.queryAll(
-                Employee.class, DatabaseProxy.queryBuilder()
+                Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueLike("name", "J_ff"))
                         .build());
 
@@ -249,7 +256,7 @@ public class DatabaseProxyTest {
 
     @Test
     void testDeleteEmployeeWithDepartmentCorporate() throws SQLException {
-        dbProxy.deleteAll(DatabaseProxy.queryBuilder()
+        dbProxy.deleteAll(DatabaseQuery.builder()
                         .withCriteria(new ValueIs("department", "Corporate"))
                         .build(), Employee.class);
 
@@ -262,7 +269,7 @@ public class DatabaseProxyTest {
 
     @Test
     void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException {
-        dbProxy.deleteAll(DatabaseProxy.queryBuilder()
+        dbProxy.deleteAll(DatabaseQuery.builder()
                         .withCriteria(new ValueLessThan("id", 2)
                                 .or(new ValueGreaterThan("id", 3)))
                 .build(), Employee.class);
@@ -275,7 +282,7 @@ public class DatabaseProxyTest {
 
     @Test
     void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException {
-        dbProxy.updateAll(Employee.class, "department", String.class, DatabaseProxy.queryBuilder()
+        dbProxy.updateAll(Employee.class, "department", String.class, DatabaseQuery.builder()
                 .withCriteria(new ValueIs("department", "Tech"))
                 .build(), "Technology");
 
@@ -289,8 +296,8 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeeNamedJohnToJohnnyUsingUpdateMethod() throws SQLException {
-        dbProxy.update(new Employee(3L, "Johnny", "Tech"));
+    void testUpdateEmployeeNamedJohnToJohnnyUsingPutMethod() throws SQLException {
+        var isUpdate = dbProxy.put(new Employee(3L, "Johnny", "Tech"), 3L, Employee.class);
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech"),
@@ -299,12 +306,13 @@ public class DatabaseProxyTest {
                 new Employee(4L, "Annie", "Corporate"),
                 new Employee(5L, "Jeff", "Corporate")
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
+        assertTrue(isUpdate);
     }
 
     @Test
     void testUpdateEmployeesInCorporateDepartmentToDoubleSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                DatabaseProxy.queryBuilder()
+                DatabaseQuery.builder()
                         .withCriteria(new ValueIs("department","Corporate"))
                         .build(),
                 new ProductFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2)));
@@ -321,7 +329,7 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeesInTechDepartmentToHalveSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                DatabaseProxy.queryBuilder()
+                DatabaseQuery.builder()
                         .withCriteria(new ValueIs("department","Tech"))
                         .build(),
                 new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2)));
@@ -373,7 +381,7 @@ public class DatabaseProxyTest {
 
     @Test
     public void testQueryEmployeeByIDGreaterThan2AndDepartmentIsCorporateAsConjunction() {
-        var resultSet = dbProxy.queryAll(Employee.class, DatabaseProxy.queryBuilder()
+        var resultSet = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                         .withCriteria(new ValueGreaterThan("id", 2).and(new ValueIs("department", "Corporate")))
                         .build());
 
@@ -385,7 +393,7 @@ public class DatabaseProxyTest {
 
     @Test
     public void testQueryEmployeeByIDGreaterThan2AndDepartmentIsCorporateAsSeparateCriteria() {
-        var resultSet = dbProxy.queryAll(Employee.class, DatabaseProxy.queryBuilder()
+        var resultSet = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(new ValueGreaterThan("id", 2))
                 .withCriteria(new ValueIs("department", "Corporate"))
                 .build());
@@ -401,7 +409,7 @@ public class DatabaseProxyTest {
         dbProxy.updateAll(Employee.class,
                 "department",
                 String.class,
-                DatabaseProxy.queryBuilder()
+                DatabaseQuery.builder()
                         .withCriteria(new ValueGreaterThan("department", 2))
                         .withCriteria(new ValueIs("department", "Corporate"))
                         .build(),
