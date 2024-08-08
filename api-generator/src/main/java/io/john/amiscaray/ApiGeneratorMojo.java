@@ -56,9 +56,9 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
         for(var type : types) {
             var generatedClass = controllerWriter.writeNewController(targetPackage, type);
-            File outputFile = new File(file, generatedClass.name());
+            File outputFile = new File(file, generatedClass.getName());
             try (FileWriter writer = new FileWriter(outputFile)) {
-                writer.write(generatedClass.sourceCode());
+                writer.write(generatedClass.getSourceCode());
             } catch (IOException e) {
                 throw new MojoExecutionException("Error writing file " + outputFile, e);
             }
