@@ -9,7 +9,7 @@
 
     <artifactId>backend.framework.api-generator</artifactId>
     <packaging>maven-plugin</packaging>
-    <name>api-generator Maven Mojo</name>
+    <name>api-generator</name>
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>

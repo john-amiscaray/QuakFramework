@@ -18,10 +18,11 @@ public class Employee {
     private String name;
     private String department;
     private String address;
+    private Long salary;
 
     @EntityGenerator
     public static EmployeeTableEntry toEmployeeEntity(Employee employee) {
-        return new EmployeeTableEntry(null, employee.name, employee.department, employee.address);
+        return new EmployeeTableEntry(null, employee.name, employee.department, employee.address, employee.salary);
     }
 
 }

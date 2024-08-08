@@ -1,5 +1,7 @@
 package io.john.amiscaray;
 
+import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
+import io.john.amiscaray.backend.framework.generator.api.APIQuery;
 import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
 import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
@@ -10,7 +12,11 @@ import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 public class ControllerWriter {
 
@@ -88,6 +94,62 @@ public class ControllerWriter {
         return annotatedMethods.getFirst();
     }
 
+    private List<Method> getAPIQueryMethods(Class<?> dataClass) {
+        var annotatedMethods = Arrays.stream(dataClass.getMethods())
+                .sorted(Comparator.comparing(Method::getName))
+                .filter(method -> method.isAnnotationPresent(APIQuery.class))
+                .toList();
+
+        for (var method : annotatedMethods) {
+            var errorMessage = "Method " + method.getName() + " annotated with @APIQuery should: ";
+            var errors = new ArrayList<String>();
+
+            if (!method.getReturnType().equals(DatabaseQuery.class)) {
+                errors.add("be annotated with @APIQuery should return a DatabaseQuery");
+            }
+
+            if (method.getParameterCount() != 0) {
+                errors.add("be annotated with @APIQuery should not have any parameters");
+            }
+
+            if (!Modifier.isStatic(method.getModifiers())) {
+                errors.add("be static");
+            }
+
+            if (!errors.isEmpty()) {
+                errorMessage += String.join(", ", errors) + ".";
+                throw new IllegalStateException(errorMessage);
+            }
+        }
+
+        return annotatedMethods;
+    }
+
+    private String generateAPIQueryEndpoints(String rootPathName, Class<?> dataClass, String restModelName, String restModelMappingMethodName) {
+        var queryMethods = getAPIQueryMethods(dataClass);
+        var dataClassName = dataClass.getSimpleName();
+        var result = new StringBuilder();
+        for (var queryMethod : queryMethods) {
+            var queryPath = queryMethod.getAnnotation(APIQuery.class).path();
+            if (queryPath.startsWith("/")) {
+                queryPath = queryPath.substring(1);
+            }
+            var methodName = queryMethod.getName();
+            result.append(String.format("""
+                    @Handle(method = RequestMethod.GET, path = "/%1$s/%2$s")
+                    public Response<List<%5$s>> %3$s(Request<Void> request) {
+                        var query = %4$s.%3$s();
+                        return Response.of(databaseProxy.queryAll(%4$s.class, query)
+                            .stream()
+                            .map(%4$s::%6$s)
+                            .toList());
+                    }
+                    """, rootPathName, queryPath, methodName, dataClassName, restModelName, restModelMappingMethodName));
+        }
+
+        return result.toString().stripTrailing();
+    }
+
     public GeneratedClass writeNewController(String targetPackage, Class<?> restModel) throws IntrospectionException {
 
         if (!restModel.isAnnotationPresent(RestModel.class)) {
@@ -98,11 +160,13 @@ public class ControllerWriter {
         var restModelPackage = restModel.getPackageName();
 
         var entityClass = restModel.getAnnotation(RestModel.class).dataClass();
+        var rootPath = restModelName.toLowerCase();
         var modelGeneratorMethod = getModelGeneratorFromDataClass(entityClass);
         var entityGeneratorMethod = getEntityGeneratorFromRestModel(restModel);
         var entityIDGetterMethod = getIdGetterFromDataClass(entityClass);
         var entityIDSetterMethod = getIdSetterFromDataClass(entityClass);
         var stringToEntityIDConversionMethod = getStringToIDConversionMethodName(entityClass);
+        var queryMethodImpls = generateAPIQueryEndpoints(rootPath, entityClass, restModelName, modelGeneratorMethod.getName()).indent(4);
 
         var sourceCode = String.format("""
                 package %1$s;
@@ -211,10 +275,11 @@ public class ControllerWriter {
                         }
                     }
                 
+                %12$s
                 }
                 """, targetPackage,
                 restModelName,
-                restModelName.toLowerCase(),
+                rootPath,
                 restModelPackage,
                 entityClass.getSimpleName(),
                 entityClass.getPackageName(),
@@ -222,7 +287,8 @@ public class ControllerWriter {
                 entityGeneratorMethod.getName(),
                 entityIDGetterMethod.getName(),
                 entityIDSetterMethod.getName(),
-                stringToEntityIDConversionMethod);
+                stringToEntityIDConversionMethod,
+                queryMethodImpls);
 
         return new GeneratedClass(restModelName + "Controller.java", sourceCode);
     }

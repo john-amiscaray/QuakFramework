@@ -132,6 +132,7 @@ public class ControllerWriterTest {
                         }
                     }
                 
+                
                 }
                 """
         ), actualGenerated);
@@ -248,6 +249,23 @@ public class ControllerWriterTest {
                         } else {
                             return new Response(404, null);
                         }
+                    }
+                    
+                    @Handle(method = RequestMethod.GET, path = "/employee/sales")
+                    public Response<List<Employee>> queryEmployeesInSalesDepartment(Request<Void> request) {
+                        var query = EmployeeTableEntry.queryEmployeesInSalesDepartment();
+                        return Response.of(databaseProxy.queryAll(EmployeeTableEntry.class, query)
+                            .stream()
+                            .map(EmployeeTableEntry::toEmployeeDTO)
+                            .toList());
+                    }
+                    @Handle(method = RequestMethod.GET, path = "/employee/salary/high")
+                    public Response<List<Employee>> queryEmployeesWithHighSalaries(Request<Void> request) {
+                        var query = EmployeeTableEntry.queryEmployeesWithHighSalaries();
+                        return Response.of(databaseProxy.queryAll(EmployeeTableEntry.class, query)
+                            .stream()
+                            .map(EmployeeTableEntry::toEmployeeDTO)
+                            .toList());
                     }
                 
                 }

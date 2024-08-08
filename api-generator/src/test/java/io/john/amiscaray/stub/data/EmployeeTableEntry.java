@@ -1,5 +1,9 @@
 package io.john.amiscaray.stub.data;
 
+import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
+import io.john.amiscaray.backend.framework.data.query.ValueIs;
+import io.john.amiscaray.backend.framework.data.query.numeric.ValueGreaterThan;
+import io.john.amiscaray.backend.framework.generator.api.APIQuery;
 import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
 import io.john.amiscaray.stub.model.Employee;
 import jakarta.persistence.*;
@@ -22,10 +26,26 @@ public class EmployeeTableEntry {
     private String name;
     private String department;
     private String address;
+    private long salary;
 
     @ModelGenerator
     public static Employee toEmployeeDTO(EmployeeTableEntry entry) {
-        return new Employee(entry.getName(), entry.getDepartment(), entry.getAddress());
+        return new Employee(entry.getName(), entry.getDepartment(), entry.getAddress(), entry.getSalary());
+    }
+
+    @APIQuery(path = "sales")
+    public static DatabaseQuery queryEmployeesInSalesDepartment() {
+        return DatabaseQuery.builder()
+                .withCriteria(new ValueIs("department", "sales"))
+                .build();
+
+    }
+
+    @APIQuery(path = "salary/high")
+    public static DatabaseQuery queryEmployeesWithHighSalaries() {
+        return DatabaseQuery.builder()
+                .withCriteria(new ValueGreaterThan("salary", 100000))
+                .build();
     }
 
 }
