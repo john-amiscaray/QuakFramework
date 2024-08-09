@@ -74,7 +74,7 @@ public class ControllerWriterTest {
                         );
                     }
                     
-                    @Handle(method = RequestMethod.GET, path = "/student/{id}")
+                    @Handle(method = RequestMethod.GET, path = "/student/{id}Long")
                     public Response<Student> getStudent(DynamicPathRequest<Void> request) {
                         try {
                             var id = Long.parseLong(request.pathVariables().get("id"));
@@ -90,7 +90,7 @@ public class ControllerWriterTest {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.DELETE, path = "/student/{id}")
+                    @Handle(method = RequestMethod.DELETE, path = "/student/{id}Long")
                     public Response<Void> deleteStudent(DynamicPathRequest<Void> request) {
                         try {
                             var id = Long.parseLong(request.pathVariables().get("id"));
@@ -107,7 +107,7 @@ public class ControllerWriterTest {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.PUT, path = "/student/{id}")
+                    @Handle(method = RequestMethod.PUT, path = "/student/{id}Long")
                     public Response<Void> putStudent(DynamicPathRequest<Student> request) {
                         try {
                             var id = Long.parseLong(request.pathVariables().get("id"));
@@ -129,7 +129,7 @@ public class ControllerWriterTest {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.PATCH, path = "/student/{id}")
+                    @Handle(method = RequestMethod.PATCH, path = "/student/{id}Long")
                     public Response<Void> patchStudent(DynamicPathRequest<Student> request) {
                         try {
                             var id = Long.parseLong(request.pathVariables().get("id"));
@@ -209,7 +209,7 @@ public class ControllerWriterTest {
                         );
                     }
                     
-                    @Handle(method = RequestMethod.GET, path = "/employee/{id}")
+                    @Handle(method = RequestMethod.GET, path = "/employee/{id}Double")
                     public Response<Employee> getEmployee(DynamicPathRequest<Void> request) {
                         try {
                             var id = Double.parseDouble(request.pathVariables().get("id"));
@@ -225,7 +225,7 @@ public class ControllerWriterTest {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.DELETE, path = "/employee/{id}")
+                    @Handle(method = RequestMethod.DELETE, path = "/employee/{id}Double")
                     public Response<Void> deleteEmployee(DynamicPathRequest<Void> request) {
                         try {
                             var id = Double.parseDouble(request.pathVariables().get("id"));
@@ -242,7 +242,7 @@ public class ControllerWriterTest {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.PUT, path = "/employee/{id}")
+                    @Handle(method = RequestMethod.PUT, path = "/employee/{id}Double")
                     public Response<Void> putEmployee(DynamicPathRequest<Employee> request) {
                         try {
                             var id = Double.parseDouble(request.pathVariables().get("id"));
@@ -264,7 +264,7 @@ public class ControllerWriterTest {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.PATCH, path = "/employee/{id}")
+                    @Handle(method = RequestMethod.PATCH, path = "/employee/{id}Double")
                     public Response<Void> patchEmployee(DynamicPathRequest<Employee> request) {
                         try {
                             var id = Double.parseDouble(request.pathVariables().get("id"));

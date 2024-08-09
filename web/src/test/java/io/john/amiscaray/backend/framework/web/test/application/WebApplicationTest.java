@@ -79,7 +79,7 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.GET, "/user/{id}"),
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long"),
                         new DynamicPathController<>(
                                 Void.class,
                                 MockUserInfo.class,
@@ -91,7 +91,7 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.DELETE, "/user/{id}"),
+                        new RequestMapping(RequestMethod.DELETE, "/user/{id}Long"),
                         new DynamicPathController<>(
                                 Void.class,
                                 String.class,
@@ -102,7 +102,15 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.GET, "/user/{id}/info"),
+                        new RequestMapping(RequestMethod.GET, "/user/addresses"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                List.class,
+                                request -> Response.of(dummyUsers().stream().map(MockUserInfo::getAddress).toList())
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long/info"),
                         new DynamicPathController<>(
                                 String.class,
                                 String.class,
@@ -252,6 +260,29 @@ public class WebApplicationTest {
                         var status = httpResponse.statusCode();
                         assertEquals(status, 200);
                         assertEquals(dummyUsersWithAgeAndName(21, "John"), Arrays.stream(body).toList());
+                    } catch (JsonProcessingException e) {
+                        throw new AssertionError("Could not parse body: ", e);
+                    }
+                }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserAddressesReturnsListOfAddresses() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/addresses"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    String[] body;
+                    try {
+                        body = MAPPER.readerFor(String[].class).readValue((String) httpResponse.body());
+                        var status = httpResponse.statusCode();
+                        assertEquals(status, 200);
+                        assertEquals(dummyUsers().stream().map(MockUserInfo::getAddress).toList(), Arrays.stream(body).toList());
                     } catch (JsonProcessingException e) {
                         throw new AssertionError("Could not parse body: ", e);
                     }
