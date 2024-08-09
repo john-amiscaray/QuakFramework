@@ -24,6 +24,7 @@ public class HttpControllerGroup extends HttpServlet {
         if (controllers.containsKey(path)) {
             var controller = controllers.get(path);
             controller.service(req, res);
+            return;
         } else {
             for (var mapping : controllers.entrySet()) {
                 var controller = mapping.getValue();
@@ -52,5 +53,6 @@ public class HttpControllerGroup extends HttpServlet {
                 }
             }
         }
+        res.setStatus(404);
     }
 }

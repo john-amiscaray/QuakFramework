@@ -178,6 +178,20 @@ public class WebStarterTest {
     }
 
     @Test
+    public void testGetRequestToNonExistentSubPathOfAccountToYield404() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "accounts/account/something/stupid"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    assertEquals(HttpServletResponse.SC_NOT_FOUND, httpResponse.statusCode());
+                });
+    }
+
+    @Test
     public void testPostRequestToRootGivesHTTP405() {
         var request = HttpRequest.newBuilder()
                 .uri(URI.create(ROOT_URL))
