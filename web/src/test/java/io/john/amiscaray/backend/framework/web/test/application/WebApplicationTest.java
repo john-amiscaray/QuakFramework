@@ -120,6 +120,30 @@ public class WebApplicationTest {
                                         "User " + request.pathVariables().get("id"))
                         )
                 )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long/address"),
+                        new DynamicPathController<>(
+                                String.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "User " + request.pathVariables().get("id") + " : " + dummyUser().getAddress())
+
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long/{address}String"),
+                        new DynamicPathController<>(
+                                String.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        request.pathVariables().get("id") + " : " + request.pathVariables().get("address"))
+
+                        )
+                )
                 .build();
         application.init(configuration);
         application.startAsync();
@@ -287,6 +311,32 @@ public class WebApplicationTest {
                         throw new AssertionError("Could not parse body: ", e);
                     }
                 }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserIDAddressReturnsProperInfoString() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/1/address"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals(httpResponse.body(), "User 1 : " + dummyUser().getAddress())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathWithMultipleVariables() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/21/jumpstreet"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("21 : jumpstreet", httpResponse.body())
         );
     }
 
