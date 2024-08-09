@@ -219,58 +219,74 @@ public class ControllerWriter {
                     
                     @Handle(method = RequestMethod.GET, path = "/%3$s/{id}")
                     public Response<%2$s> get%2$s(DynamicPathRequest<Void> request) {
-                        var id = %11$s(request.pathVariables().get("id"));
-                        var fetched = databaseProxy.fetchById(id, %5$s.class);
+                        try {
+                            var id = %11$s(request.pathVariables().get("id"));
+                            var fetched = databaseProxy.fetchById(id, %5$s.class);
+                            
+                            if (fetched == null) {
+                                return new Response(404, null);
+                            }
                         
-                        if (fetched == null) {
+                            return Response.of(%5$s.%7$s(fetched));
+                        } catch (NumberFormatException e) {
                             return new Response(404, null);
                         }
-                    
-                        return Response.of(%5$s.%7$s(fetched));
                     }
                     
                     @Handle(method = RequestMethod.DELETE, path = "/%3$s/{id}")
                     public Response<Void> delete%2$s(DynamicPathRequest<Void> request) {
-                        var id = %11$s(request.pathVariables().get("id"));
-                        
                         try {
-                            databaseProxy.delete(id, %5$s.class);
-                        } catch (IllegalArgumentException e) {
+                            var id = %11$s(request.pathVariables().get("id"));
+                            
+                            try {
+                                databaseProxy.delete(id, %5$s.class);
+                            } catch (IllegalArgumentException e) {
+                                return new Response(404, null);
+                            }
+                            
+                            return new Response(204, null);
+                        } catch (NumberFormatException e) {
                             return new Response(404, null);
                         }
-                        
-                        return new Response(204, null);
                     }
                     
                     @Handle(method = RequestMethod.PUT, path = "/%3$s/{id}")
                     public Response<Void> put%2$s(DynamicPathRequest<%2$s> request) {
-                        var id = %11$s(request.pathVariables().get("id"));
-                        
-                        var entity = %2$s.%8$s(request.body());
-                        entity.%10$s(id);
-                        var isUpdate = databaseProxy.put(entity, id, %5$s.class);
-                        
-                        if (isUpdate) {
-                            return new Response(204, null);
-                        } else {
-                            var headers = new HashMap<String, String>();
-                            headers.put("Location", "/%3$s/" + entity.%9$s());
+                        try {
+                            var id = %11$s(request.pathVariables().get("id"));
                             
-                            return new Response(headers, 201, null);
+                            var entity = %2$s.%8$s(request.body());
+                            entity.%10$s(id);
+                            var isUpdate = databaseProxy.put(entity, id, %5$s.class);
+                            
+                            if (isUpdate) {
+                                return new Response(204, null);
+                            } else {
+                                var headers = new HashMap<String, String>();
+                                headers.put("Location", "/%3$s/" + entity.%9$s());
+                                
+                                return new Response(headers, 201, null);
+                            }
+                        } catch (NumberFormatException e) {
+                            return new Response(404, null);
                         }
                     }
                     
                     @Handle(method = RequestMethod.PATCH, path = "/%3$s/{id}")
                     public Response<Void> patch%2$s(DynamicPathRequest<%2$s> request) {
-                        var id = %11$s(request.pathVariables().get("id"));
-                        
-                        var entity = %2$s.%8$s(request.body());
-                        entity.%10$s(id);
-                        var foundEntity = databaseProxy.patch(entity, id, %5$s.class);
-                        
-                        if (foundEntity) {
-                            return new Response(204, null);
-                        } else {
+                        try {
+                            var id = %11$s(request.pathVariables().get("id"));
+                            
+                            var entity = %2$s.%8$s(request.body());
+                            entity.%10$s(id);
+                            var foundEntity = databaseProxy.patch(entity, id, %5$s.class);
+                            
+                            if (foundEntity) {
+                                return new Response(204, null);
+                            } else {
+                                return new Response(404, null);
+                            }
+                        } catch (NumberFormatException e) {
                             return new Response(404, null);
                         }
                     }
