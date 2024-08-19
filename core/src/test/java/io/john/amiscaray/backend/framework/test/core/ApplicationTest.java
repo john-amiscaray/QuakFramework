@@ -1,11 +1,11 @@
-package io.john.amiscaray.backend.framework.core;
+package io.john.amiscaray.backend.framework.test.core;
 
+import io.john.amiscaray.backend.framework.core.Application;
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static io.john.amiscaray.backend.framework.core.Application.*;
-import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationTest {
@@ -24,17 +24,17 @@ public class ApplicationTest {
     public void testPropertiesAreLoadedFromFile() throws Exception {
         application.start();
 
-        Assertions.assertEquals(CONTEXT_PACKAGE.getValue(), "org.something.stupid");
-        Assertions.assertEquals(Integer.parseInt(PORT.getValue()), 9000);
-        Assertions.assertEquals(SERVER_DIRECTORY.getValue(), "myserver");
-        Assertions.assertEquals(DOCUMENT_BASE.getValue(), ".");
-        Assertions.assertEquals(CONTEXT_PATH.getValue(), "/test");
-        Assertions.assertEquals(DB_CONNECTION_URL.getValue(), "jdbc:h2:mem:test");
-        Assertions.assertEquals(DB_DRIVER_CLASS.getValue(), "org.h2.Driver");
-        Assertions.assertEquals(HBM2DDL.getValue(), "update");
-        Assertions.assertEquals(DB_CONNECTION_USERNAME.getValue(), "sa");
-        Assertions.assertEquals(DB_CONNECTION_PASSWORD.getValue(), "");
-        Assertions.assertEquals(SQL_DIALECT.getValue(), "org.hibernate.dialect.H2Dialect");
+        Assertions.assertEquals(ApplicationProperty.CONTEXT_PACKAGE.getValue(), "org.something.stupid");
+        Assertions.assertEquals(Integer.parseInt(ApplicationProperty.PORT.getValue()), 9000);
+        Assertions.assertEquals(ApplicationProperty.SERVER_DIRECTORY.getValue(), "myserver");
+        Assertions.assertEquals(ApplicationProperty.DOCUMENT_BASE.getValue(), ".");
+        Assertions.assertEquals(ApplicationProperty.CONTEXT_PATH.getValue(), "/test");
+        Assertions.assertEquals(ApplicationProperty.DB_CONNECTION_URL.getValue(), "jdbc:h2:mem:test");
+        Assertions.assertEquals(ApplicationProperty.DB_DRIVER_CLASS.getValue(), "org.h2.Driver");
+        Assertions.assertEquals(ApplicationProperty.HBM2DDL.getValue(), "update");
+        Assertions.assertEquals(ApplicationProperty.DB_CONNECTION_USERNAME.getValue(), "sa");
+        Assertions.assertEquals(ApplicationProperty.DB_CONNECTION_PASSWORD.getValue(), "");
+        Assertions.assertEquals(ApplicationProperty.SQL_DIALECT.getValue(), "org.hibernate.dialect.H2Dialect");
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ApplicationTest {
 
     @Test
     public void testLifecycleMethodsAreCalledInTheCorrectOrder() throws Exception {
-        application.on(LifecycleState.PRE_START, app -> {
+        application.on(Application.LifecycleState.PRE_START, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 assertApplicationLifeCycleStatesHaveBeenCalled(
                         dummyApp,
@@ -97,7 +97,7 @@ public class ApplicationTest {
                 Assertions.fail(WRONG_APPLICATION_TYPE_MESSAGE);
             }
         });
-        application.on(LifecycleState.CONTEXT_LOADED, app -> {
+        application.on(Application.LifecycleState.CONTEXT_LOADED, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 assertApplicationLifeCycleStatesHaveBeenCalled(
                         dummyApp,
@@ -111,7 +111,7 @@ public class ApplicationTest {
                 Assertions.fail(WRONG_APPLICATION_TYPE_MESSAGE);
             }
         });
-        application.on(LifecycleState.POST_START, app -> {
+        application.on(Application.LifecycleState.POST_START, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 assertApplicationLifeCycleStatesHaveBeenCalled(
                         dummyApp,
@@ -125,7 +125,7 @@ public class ApplicationTest {
                 Assertions.fail(WRONG_APPLICATION_TYPE_MESSAGE);
             }
         });
-        application.on(LifecycleState.PRE_STOP, app -> {
+        application.on(Application.LifecycleState.PRE_STOP, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 assertApplicationLifeCycleStatesHaveBeenCalled(
                         dummyApp,
@@ -139,7 +139,7 @@ public class ApplicationTest {
                 Assertions.fail(WRONG_APPLICATION_TYPE_MESSAGE);
             }
         });
-        application.on(LifecycleState.POST_STOP, app -> {
+        application.on(Application.LifecycleState.POST_STOP, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 assertApplicationLifeCycleStatesHaveBeenCalled(
                         dummyApp,
@@ -175,7 +175,7 @@ public class ApplicationTest {
 
     private void setUpListeners(Application application) {
 
-        application.on(LifecycleState.PRE_START, app -> {
+        application.on(Application.LifecycleState.PRE_START, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 dummyApp.hasPreStartBeenCalled = true;
             } else {
@@ -183,7 +183,7 @@ public class ApplicationTest {
             }
         });
 
-        application.on(LifecycleState.CONTEXT_LOADED, app -> {
+        application.on(Application.LifecycleState.CONTEXT_LOADED, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 dummyApp.hasContextLoadedBeenCalled = true;
             } else {
@@ -191,7 +191,7 @@ public class ApplicationTest {
             }
         });
 
-        application.on(LifecycleState.POST_START, app -> {
+        application.on(Application.LifecycleState.POST_START, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 dummyApp.hasPostStartBeenCalled = true;
             } else {
@@ -199,7 +199,7 @@ public class ApplicationTest {
             }
         });
 
-        application.on(LifecycleState.PRE_STOP, app -> {
+        application.on(Application.LifecycleState.PRE_STOP, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 dummyApp.hasPreStopBeenCalled = true;
             } else {
@@ -207,7 +207,7 @@ public class ApplicationTest {
             }
         });
 
-        application.on(LifecycleState.POST_STOP, app -> {
+        application.on(Application.LifecycleState.POST_STOP, app -> {
             if (app instanceof DummyApplication dummyApp) {
                 dummyApp.hasPostStopBeenCalled = true;
             } else {

@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.core.di.stub;
+package io.john.amiscaray.backend.framework.test.core.di.stub;
 
 import io.john.amiscaray.backend.framework.core.di.provider.Provide;
 import io.john.amiscaray.backend.framework.core.di.provider.Provider;

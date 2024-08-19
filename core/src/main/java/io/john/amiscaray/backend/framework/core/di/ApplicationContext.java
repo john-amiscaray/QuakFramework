@@ -1,14 +1,17 @@
 package io.john.amiscaray.backend.framework.core.di;
 
-import io.john.amiscaray.backend.framework.core.di.dependency.Dependency;
+import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
-import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
+import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
 import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.*;
+import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
@@ -19,7 +22,9 @@ import java.util.stream.Stream;
 public class ApplicationContext {
 
     private static ApplicationContext applicationContextInstance;
-    private Map<Dependency<?>, Object> instances;
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationContext.class);
+    private Map<DependencyID<?>, Object> instances;
+    @Getter
     private String classScanPackage;
 
     private ApplicationContext() {
@@ -39,7 +44,8 @@ public class ApplicationContext {
                 providers.stream().flatMap(provider -> Stream.of(provider.getMethods())).filter(method -> method.isAnnotationPresent(Provide.class)),
                 providers.stream().map(this::getProviderConstructor)
         ), managedInstances.stream().map(this::getManagedInstanceConstructor));
-        buildDependencyGraph(executablesToCall.collect(Collectors.toList()));
+        buildInitialDependencyGraph(executablesToCall.collect(Collectors.toList()));
+        loadDependenciesFromStartupDependencyProviders();
     }
 
     private Constructor<?> getManagedInstanceConstructor(Class<?> managedInstanceClass) {
@@ -66,7 +72,7 @@ public class ApplicationContext {
                 .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(providerClass));
     }
 
-    private void buildDependencyGraph(List<Executable> executables) {
+    private void buildInitialDependencyGraph(List<Executable> executables) {
         var canSatisfyDependencies = false;
         Predicate<Executable> executableHasItsDependenciesSatisfied = executable -> {
            var allParametersSatisfied = Arrays.stream(executable.getParameters())
@@ -111,7 +117,7 @@ public class ApplicationContext {
                             if (dependencyName.isEmpty()) {
                                 dependencyName = executable.getName();
                             }
-                            instances.put(new Dependency<>(dependencyName, returnType), returnedInstance);
+                            instances.put(new DependencyID<>(dependencyName, returnType), returnedInstance);
                         } catch (InvocationTargetException | IllegalAccessException |
                                  InstantiationException e) {
                             throw new ContextInitializationException(e);
@@ -136,6 +142,18 @@ public class ApplicationContext {
         }
     }
 
+    private void loadDependenciesFromStartupDependencyProviders() {
+        var startupDependencyProviders = ServiceLoader.load(StartupDependencyProvider.class);
+
+        for (var dependencyProvider : startupDependencyProviders) {
+            var dependency = dependencyProvider.provideDependency(this);
+            if (instances.containsKey(dependency.id())) {
+                LOG.warn("StartupDependencyProvider {} overrides existing dependency with ID {}", dependencyProvider.getClass().getName(), dependency.id());
+            }
+            instances.put(dependency.id(), dependency.instance());
+        }
+    }
+
     private String getParameterDependencyName(Parameter parameter) {
         if (parameter.isAnnotationPresent(ProvidedWith.class)) {
             return parameter.getAnnotation(ProvidedWith.class).dependencyName();
@@ -150,7 +168,7 @@ public class ApplicationContext {
                     if (parameter.isAnnotationPresent(ProvidedWith.class)) {
                         var dependencyName = parameter.getAnnotation(ProvidedWith.class).dependencyName();
                         if (!dependencyName.isEmpty()) {
-                            return getInstance(new Dependency<>(dependencyName, type));
+                            return getInstance(new DependencyID<>(dependencyName, type));
                         }
                     }
                     return getInstance(type);
@@ -196,11 +214,11 @@ public class ApplicationContext {
                 .orElseThrow();
     }
 
-    public boolean hasInstance(Dependency<?> dependency) {
-        return instances.containsKey(dependency);
+    public boolean hasInstance(DependencyID<?> dependencyID) {
+        return instances.containsKey(dependencyID);
     }
 
-    public <T> T getInstance(Dependency<T> dependency) {
-        return (T) instances.get(dependency);
+    public <T> T getInstance(DependencyID<T> dependencyID) {
+        return (T) instances.get(dependencyID);
     }
 }

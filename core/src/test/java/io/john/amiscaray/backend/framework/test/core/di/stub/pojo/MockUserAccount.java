@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.core.di.stub.pojo;
+package io.john.amiscaray.backend.framework.test.core.di.stub.pojo;
 
 import java.util.Date;
 
