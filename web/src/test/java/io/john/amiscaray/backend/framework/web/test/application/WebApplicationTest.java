@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
+import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
@@ -79,7 +80,7 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.GET, "/user/{id}"),
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long"),
                         new DynamicPathController<>(
                                 Void.class,
                                 MockUserInfo.class,
@@ -91,7 +92,7 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.DELETE, "/user/{id}"),
+                        new RequestMapping(RequestMethod.DELETE, "/user/{id}Long"),
                         new DynamicPathController<>(
                                 Void.class,
                                 String.class,
@@ -102,7 +103,15 @@ public class WebApplicationTest {
                         )
                 )
                 .pathMapping(
-                        new RequestMapping(RequestMethod.GET, "/user/{id}/info"),
+                        new RequestMapping(RequestMethod.GET, "/user/addresses"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                List.class,
+                                request -> Response.of(dummyUsers().stream().map(MockUserInfo::getAddress).toList())
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long/info"),
                         new DynamicPathController<>(
                                 String.class,
                                 String.class,
@@ -110,6 +119,66 @@ public class WebApplicationTest {
                                         new HashMap<>(),
                                         HttpServletResponse.SC_OK,
                                         "User " + request.pathVariables().get("id"))
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long/address"),
+                        new DynamicPathController<>(
+                                String.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "User " + request.pathVariables().get("id") + " : " + dummyUser().getAddress())
+
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/{id}Long/{address}String"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        request.pathVariables().get("id") + " : " + request.pathVariables().get("address"))
+
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/balance/{balance}Float"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "Float: " + request.pathVariables().get("balance")
+                                )
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/balance/{balance}Double/double"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "Double: " + request.pathVariables().get("balance")
+                                )
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/balance/{balance}Integer"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "Int: " + request.pathVariables().get("balance")
+                                )
                         )
                 )
                 .build();
@@ -256,6 +325,94 @@ public class WebApplicationTest {
                         throw new AssertionError("Could not parse body: ", e);
                     }
                 }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserAddressesReturnsListOfAddresses() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/addresses"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    String[] body;
+                    try {
+                        body = MAPPER.readerFor(String[].class).readValue((String) httpResponse.body());
+                        var status = httpResponse.statusCode();
+                        assertEquals(status, 200);
+                        assertEquals(dummyUsers().stream().map(MockUserInfo::getAddress).toList(), Arrays.stream(body).toList());
+                    } catch (JsonProcessingException e) {
+                        throw new AssertionError("Could not parse body: ", e);
+                    }
+                }
+        );
+    }
+
+    @Test
+    public void testGetRequestForUserIDAddressReturnsProperInfoString() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/1/address"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals(httpResponse.body(), "User 1 : " + dummyUser().getAddress())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathWithMultipleVariables() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/21/jumpstreet"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("21 : jumpstreet", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathOfUserBalanceWithBalanceAsInteger() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/balance/3"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("Int: 3", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathOfUserBalanceWithBalanceAsFloat() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/balance/3.14"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("Float: 3.14", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathOfUserBalanceWithBalanceAsDouble() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/balance/3.14/double"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("Double: 3.14", httpResponse.body())
         );
     }
 

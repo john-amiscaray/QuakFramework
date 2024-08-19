@@ -38,9 +38,26 @@ public class HttpControllerGroup extends HttpServlet {
                         var currentPathPart = pathParts[i];
                         if (currentPatternPart.equals(currentPathPart)) {
                             continue;
-                        } else if (currentPatternPart.matches("\\{.*}")) {
+                        } else if (currentPatternPart.matches("\\{[a-z]+}(String|Long|Integer|Double|Float)?")) {
+                            var pathVariableParts = currentPatternPart.split("}", 2);
+                            var identifier = pathVariableParts[0].substring(1);
+                            var type = pathVariableParts[1];
+                            if ("Long".equals(type) && !isPathVariableLong(currentPathPart)) {
+                                pathsMatch = false;
+                                break;
+                            } else if ("Integer".equals(type) && !isPathVariableInt(currentPathPart)) {
+                                pathsMatch = false;
+                                break;
+                            } else if ("Double".equals(type) && !isPathVariableDouble(currentPathPart)) {
+                                pathsMatch = false;
+                                break;
+                            } else if ("Float".equals(type) && !isPathVariableFloat(currentPathPart)) {
+                                pathsMatch = false;
+                                break;
+                            }
+                            // if the type is string or not specified, then it's a string so no check is needed
                             pathVariables.put(
-                                    currentPatternPart.substring(1, currentPatternPart.length() - 1),
+                                    identifier,
                                     currentPathPart);
                             continue;
                         }
@@ -55,4 +72,41 @@ public class HttpControllerGroup extends HttpServlet {
         }
         res.setStatus(404);
     }
+
+    private boolean isPathVariableLong(String pathPart) {
+        try {
+            Long.parseLong(pathPart);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isPathVariableInt(String pathPart) {
+        try {
+            Integer.parseInt(pathPart);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isPathVariableDouble(String pathPart) {
+        try {
+            Double.parseDouble(pathPart);
+            return !isPathVariableInt(pathPart); // Exclusively a double, not an int
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isPathVariableFloat(String pathPart) {
+        try {
+            Float.parseFloat(pathPart);
+            return !isPathVariableInt(pathPart); // Exclusively a float, not an int
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
 }

@@ -65,16 +65,35 @@ public class ControllerWriter {
         return new PropertyDescriptor(idField.getName(), dataClass).getWriteMethod();
     }
 
-    private String getStringToIDConversionMethodName(Class<?> dataClass) {
+    private String getStringToEntityIDConversionMethodName(Class<?> dataClass) {
         var idField = findIDFieldForDataClass(dataClass);
         String result = "String.valueOf";
 
         if (idField.getType().equals(Long.class)) {
             result = "Long.parseLong";
+        } else if (idField.getType().equals(Integer.class)) {
+            result = "Integer.parseInt";
         } else if (idField.getType().equals(Double.class)) {
             result = "Double.parseDouble";
         } else if (idField.getType().equals(Float.class)) {
             result = "Float.parseFloat";
+        }
+
+        return result;
+    }
+
+    private String getEntityIDTypeString(Class<?> dataClass) {
+        var idField = findIDFieldForDataClass(dataClass);
+        String result = "String";
+
+        if (idField.getType().equals(Long.class)) {
+            result = "Long";
+        } else if (idField.getType().equals(Integer.class)) {
+            result = "Integer";
+        } else if (idField.getType().equals(Double.class)) {
+            result = "Double";
+        } else if (idField.getType().equals(Float.class)) {
+            result = "Float";
         }
 
         return result;
@@ -165,7 +184,8 @@ public class ControllerWriter {
         var entityGeneratorMethod = getEntityGeneratorFromRestModel(restModel);
         var entityIDGetterMethod = getIdGetterFromDataClass(entityClass);
         var entityIDSetterMethod = getIdSetterFromDataClass(entityClass);
-        var stringToEntityIDConversionMethod = getStringToIDConversionMethodName(entityClass);
+        var stringToEntityIDConversionMethod = getStringToEntityIDConversionMethodName(entityClass);
+        var entityIDTypeString = getEntityIDTypeString(entityClass);
         var queryMethodImpls = generateAPIQueryEndpoints(rootPath, entityClass, restModelName, modelGeneratorMethod.getName()).indent(4);
 
         var sourceCode = String.format("""
@@ -217,7 +237,7 @@ public class ControllerWriter {
                         );
                     }
                     
-                    @Handle(method = RequestMethod.GET, path = "/%3$s/{id}")
+                    @Handle(method = RequestMethod.GET, path = "/%3$s/{id}%12$s")
                     public Response<%2$s> get%2$s(DynamicPathRequest<Void> request) {
                         try {
                             var id = %11$s(request.pathVariables().get("id"));
@@ -233,7 +253,7 @@ public class ControllerWriter {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.DELETE, path = "/%3$s/{id}")
+                    @Handle(method = RequestMethod.DELETE, path = "/%3$s/{id}%12$s")
                     public Response<Void> delete%2$s(DynamicPathRequest<Void> request) {
                         try {
                             var id = %11$s(request.pathVariables().get("id"));
@@ -250,7 +270,7 @@ public class ControllerWriter {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.PUT, path = "/%3$s/{id}")
+                    @Handle(method = RequestMethod.PUT, path = "/%3$s/{id}%12$s")
                     public Response<Void> put%2$s(DynamicPathRequest<%2$s> request) {
                         try {
                             var id = %11$s(request.pathVariables().get("id"));
@@ -272,7 +292,7 @@ public class ControllerWriter {
                         }
                     }
                     
-                    @Handle(method = RequestMethod.PATCH, path = "/%3$s/{id}")
+                    @Handle(method = RequestMethod.PATCH, path = "/%3$s/{id}%12$s")
                     public Response<Void> patch%2$s(DynamicPathRequest<%2$s> request) {
                         try {
                             var id = %11$s(request.pathVariables().get("id"));
@@ -291,7 +311,7 @@ public class ControllerWriter {
                         }
                     }
                 
-                %12$s
+                %13$s
                 }
                 """, targetPackage,
                 restModelName,
@@ -304,6 +324,7 @@ public class ControllerWriter {
                 entityIDGetterMethod.getName(),
                 entityIDSetterMethod.getName(),
                 stringToEntityIDConversionMethod,
+                entityIDTypeString,
                 queryMethodImpls);
 
         return new GeneratedClass(restModelName + "Controller.java", sourceCode);
