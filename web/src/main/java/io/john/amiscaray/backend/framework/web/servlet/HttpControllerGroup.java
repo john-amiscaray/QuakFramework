@@ -94,7 +94,7 @@ public class HttpControllerGroup extends HttpServlet {
     private boolean isPathVariableDouble(String pathPart) {
         try {
             Double.parseDouble(pathPart);
-            return true;
+            return !isPathVariableInt(pathPart); // Exclusively a double, not an int
         } catch (NumberFormatException e) {
             return false;
         }
@@ -103,7 +103,7 @@ public class HttpControllerGroup extends HttpServlet {
     private boolean isPathVariableFloat(String pathPart) {
         try {
             Float.parseFloat(pathPart);
-            return true;
+            return !isPathVariableInt(pathPart); // Exclusively a float, not an int
         } catch (NumberFormatException e) {
             return false;
         }

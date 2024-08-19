@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
+import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
@@ -135,13 +136,49 @@ public class WebApplicationTest {
                 .pathMapping(
                         new RequestMapping(RequestMethod.GET, "/user/{id}Long/{address}String"),
                         new DynamicPathController<>(
-                                String.class,
+                                Void.class,
                                 String.class,
                                 request -> new Response<>(
                                         new HashMap<>(),
                                         HttpServletResponse.SC_OK,
                                         request.pathVariables().get("id") + " : " + request.pathVariables().get("address"))
 
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/balance/{balance}Float"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "Float: " + request.pathVariables().get("balance")
+                                )
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/balance/{balance}Double/double"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "Double: " + request.pathVariables().get("balance")
+                                )
+                        )
+                )
+                .pathMapping(
+                        new RequestMapping(RequestMethod.GET, "/user/balance/{balance}Integer"),
+                        new DynamicPathController<>(
+                                Void.class,
+                                String.class,
+                                request -> new Response<>(
+                                        new HashMap<>(),
+                                        HttpServletResponse.SC_OK,
+                                        "Int: " + request.pathVariables().get("balance")
+                                )
                         )
                 )
                 .build();
@@ -337,6 +374,45 @@ public class WebApplicationTest {
                 request,
                 HttpResponse.BodyHandlers.ofString(),
                 httpResponse -> assertEquals("21 : jumpstreet", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathOfUserBalanceWithBalanceAsInteger() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/balance/3"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("Int: 3", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathOfUserBalanceWithBalanceAsFloat() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/balance/3.14"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("Float: 3.14", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testGetRequestForPathOfUserBalanceWithBalanceAsDouble() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/balance/3.14/double"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> assertEquals("Double: 3.14", httpResponse.body())
         );
     }
 
