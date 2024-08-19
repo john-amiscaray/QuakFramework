@@ -18,6 +18,8 @@ import org.reflections.scanners.Scanners;
 import java.util.List;
 import java.util.Map;
 
+import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
+
 public class DatabaseProxy {
 
     private final SessionFactory dbSessionFactory;
