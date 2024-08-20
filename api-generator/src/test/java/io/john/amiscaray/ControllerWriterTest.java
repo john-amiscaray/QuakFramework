@@ -28,7 +28,7 @@ public class ControllerWriterTest {
                 """
                 package io.john.amiscaray.controllers;
                 
-                import provider.di.io.john.amiscaray.backend.framework.core.test.Instantiate;
+                import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
                 import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
                 import io.john.amiscaray.backend.framework.web.handler.request.Request;
                 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
@@ -163,7 +163,7 @@ public class ControllerWriterTest {
                 """
                 package io.john.amiscaray.controllers;
                 
-                import provider.di.io.john.amiscaray.backend.framework.core.test.Instantiate;
+                import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
                 import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
                 import io.john.amiscaray.backend.framework.web.handler.request.Request;
                 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
