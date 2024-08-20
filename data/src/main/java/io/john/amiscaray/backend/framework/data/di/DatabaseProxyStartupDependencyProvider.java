@@ -6,6 +6,8 @@ import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency
 import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 
+import java.util.List;
+
 public class DatabaseProxyStartupDependencyProvider implements DependencyProvider<DatabaseProxy> {
 
     @Override
@@ -19,6 +21,11 @@ public class DatabaseProxyStartupDependencyProvider implements DependencyProvide
                 new DependencyID<>("databaseProxy", DatabaseProxy.class),
                 new DatabaseProxy(context.getClassScanPackage())
                 );
+    }
+
+    @Override
+    public List<DependencyID<?>> getDependencies() {
+        return List.of();
     }
 
 }

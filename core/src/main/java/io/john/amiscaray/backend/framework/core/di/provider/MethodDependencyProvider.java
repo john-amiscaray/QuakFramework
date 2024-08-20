@@ -7,11 +7,12 @@ import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantia
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provide;
 import lombok.AllArgsConstructor;
 
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 @AllArgsConstructor
-public class MethodDependencyProvider<T, U> implements DependencyProvider<U>{
+public class MethodDependencyProvider<T, U> implements ReflectiveDependencyProvider<U>{
 
     private final Method methodReturningInstance;
     private final T providerInstance;
@@ -31,4 +32,8 @@ public class MethodDependencyProvider<T, U> implements DependencyProvider<U>{
         }
     }
 
+    @Override
+    public Executable getExecutableReturningInstance() {
+        return methodReturningInstance;
+    }
 }

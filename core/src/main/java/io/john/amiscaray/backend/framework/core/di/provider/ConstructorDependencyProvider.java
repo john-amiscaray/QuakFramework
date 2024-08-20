@@ -7,10 +7,11 @@ import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantia
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 
 @AllArgsConstructor
-public class ConstructorDependencyProvider<T> implements DependencyProvider<T> {
+public class ConstructorDependencyProvider<T> implements ReflectiveDependencyProvider<T> {
 
     private Constructor<T> constructorReturningInstance;
 
@@ -27,5 +28,10 @@ public class ConstructorDependencyProvider<T> implements DependencyProvider<T> {
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new DependencyInstantiationException(constructorReturningInstance.getDeclaringClass(), e);
         }
+    }
+
+    @Override
+    public Executable getExecutableReturningInstance() {
+        return constructorReturningInstance;
     }
 }
