@@ -1,8 +1,8 @@
 package io.john.amiscaray.backend.framework.web.test.application.stub;
 
-import io.john.amiscaray.backend.framework.core.di.provider.Provide;
-import io.john.amiscaray.backend.framework.core.di.provider.ProvidedWith;
-import io.john.amiscaray.backend.framework.core.di.provider.Provider;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provide;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provider;
 
 @Provider
 public class StyleProvider {

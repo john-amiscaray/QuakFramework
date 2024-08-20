@@ -1,4 +1,4 @@
-import io.john.amiscaray.backend.framework.core.di.provider.StartupDependencyProvider;
+import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 import io.john.amiscaray.backend.framework.data.di.DatabaseProxyStartupDependencyProvider;
 
 module backend.framework.data {
@@ -18,5 +18,5 @@ module backend.framework.data {
     exports io.john.amiscaray.backend.framework.data.update;
     exports io.john.amiscaray.backend.framework.data.update.numeric;
 
-    provides StartupDependencyProvider with DatabaseProxyStartupDependencyProvider;
+    provides DependencyProvider with DatabaseProxyStartupDependencyProvider;
 }

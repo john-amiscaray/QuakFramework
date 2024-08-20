@@ -1,6 +1,7 @@
 package io.john.amiscaray.backend.framework.core.di.provider;
 
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
+import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
 
 /**
@@ -10,7 +11,9 @@ import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency
  * context.
  * @param <T> The types of the dependency being provided
  */
-public interface StartupDependencyProvider<T> {
+public interface DependencyProvider<T> {
+
+    DependencyID<T> getDependencyID();
 
     ProvidedDependency<T> provideDependency(ApplicationContext context);
 

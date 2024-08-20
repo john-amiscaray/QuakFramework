@@ -1,4 +1,4 @@
-import io.john.amiscaray.backend.framework.core.di.provider.StartupDependencyProvider;
+import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 
 module backend.framework.core {
     exports io.john.amiscaray.backend.framework.core.properties;
@@ -7,10 +7,11 @@ module backend.framework.core {
     exports io.john.amiscaray.backend.framework.core.di.exception;
     exports io.john.amiscaray.backend.framework.core.di.provider;
     exports io.john.amiscaray.backend.framework.core.di;
+    exports io.john.amiscaray.backend.framework.core.di.provider.annotation;
     requires lombok;
     requires org.reflections;
     requires org.apache.commons.lang3;
     requires org.slf4j;
 
-    uses StartupDependencyProvider;
+    uses DependencyProvider;
 }

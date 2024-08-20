@@ -6,6 +6,7 @@ import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantia
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
 import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.*;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.*;
 import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
 import org.reflections.Reflections;
@@ -143,7 +144,7 @@ public class ApplicationContext {
     }
 
     private void loadDependenciesFromStartupDependencyProviders() {
-        var startupDependencyProviders = ServiceLoader.load(StartupDependencyProvider.class);
+        var startupDependencyProviders = ServiceLoader.load(DependencyProvider.class);
 
         for (var dependencyProvider : startupDependencyProviders) {
             var dependency = dependencyProvider.provideDependency(this);
