@@ -11,6 +11,14 @@ import static io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockEmp
 public class EmployeeStartupDependencyProvider implements DependencyProvider<MockEmployee> {
 
     @Override
+    public DependencyID<MockEmployee> getDependencyID() {
+        return new DependencyID<>(
+                "employee",
+                MockEmployee.class
+        );
+    }
+
+    @Override
     public ProvidedDependency<MockEmployee> provideDependency(ApplicationContext context) {
         return new ProvidedDependency<>(
                 new DependencyID<>(

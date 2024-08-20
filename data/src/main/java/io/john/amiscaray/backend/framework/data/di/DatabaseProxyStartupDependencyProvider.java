@@ -9,6 +9,11 @@ import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 public class DatabaseProxyStartupDependencyProvider implements DependencyProvider<DatabaseProxy> {
 
     @Override
+    public DependencyID<DatabaseProxy> getDependencyID() {
+        return new DependencyID<>("databaseProxy", DatabaseProxy.class);
+    }
+
+    @Override
     public ProvidedDependency<DatabaseProxy> provideDependency(ApplicationContext context) {
         return new ProvidedDependency<>(
                 new DependencyID<>("databaseProxy", DatabaseProxy.class),
