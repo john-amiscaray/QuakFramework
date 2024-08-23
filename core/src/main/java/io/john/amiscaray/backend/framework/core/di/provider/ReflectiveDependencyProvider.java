@@ -2,6 +2,7 @@ package io.john.amiscaray.backend.framework.core.di.provider;
 
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Executable;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ public interface ReflectiveDependencyProvider<T> extends DependencyProvider<T> {
 
         for(var parameter : parameters) {
             var dependencyName = parameter.isAnnotationPresent(ProvidedWith.class) ? parameter.getAnnotation(ProvidedWith.class).dependencyName() : "";
-            result.add(new DependencyID<>(dependencyName, parameter.getType()));
+            result.add(new DependencyID<>(dependencyName, ClassUtils.primitiveToWrapper(parameter.getType())));
         }
 
         return result;

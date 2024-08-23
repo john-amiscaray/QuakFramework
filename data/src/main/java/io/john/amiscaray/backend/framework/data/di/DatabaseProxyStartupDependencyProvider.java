@@ -17,9 +17,12 @@ public class DatabaseProxyStartupDependencyProvider implements DependencyProvide
 
     @Override
     public ProvidedDependency<DatabaseProxy> provideDependency(ApplicationContext context) {
+        var databaseProxy = new DatabaseProxy(context.getClassScanPackage());
+        databaseProxy.beginSession();
+
         return new ProvidedDependency<>(
                 new DependencyID<>("databaseProxy", DatabaseProxy.class),
-                new DatabaseProxy(context.getClassScanPackage())
+                databaseProxy
                 );
     }
 
