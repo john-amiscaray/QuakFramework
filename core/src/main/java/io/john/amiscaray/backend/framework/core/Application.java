@@ -1,8 +1,8 @@
 package io.john.amiscaray.backend.framework.core;
 
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
-import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

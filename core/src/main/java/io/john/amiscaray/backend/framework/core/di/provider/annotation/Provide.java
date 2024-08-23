@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.core.di.provider;
+package io.john.amiscaray.backend.framework.core.di.provider.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

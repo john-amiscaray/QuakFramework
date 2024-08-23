@@ -1,3 +1,6 @@
+import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
+import io.john.amiscaray.backend.framework.data.di.DatabaseProxyStartupDependencyProvider;
+
 module backend.framework.data {
     requires java.logging;
     requires jakarta.persistence;
@@ -14,4 +17,6 @@ module backend.framework.data {
     exports io.john.amiscaray.backend.framework.data.query;
     exports io.john.amiscaray.backend.framework.data.update;
     exports io.john.amiscaray.backend.framework.data.update.numeric;
+
+    provides DependencyProvider with DatabaseProxyStartupDependencyProvider;
 }

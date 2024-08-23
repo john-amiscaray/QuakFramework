@@ -191,7 +191,7 @@ public class ControllerWriter {
         var sourceCode = String.format("""
                 package %1$s;
                 
-                import io.john.amiscaray.backend.framework.core.di.provider.Instantiate;
+                import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
                 import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
                 import io.john.amiscaray.backend.framework.web.handler.request.Request;
                 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;

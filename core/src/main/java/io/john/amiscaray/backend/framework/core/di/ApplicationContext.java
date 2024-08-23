@@ -1,25 +1,29 @@
 package io.john.amiscaray.backend.framework.core.di;
 
-import io.john.amiscaray.backend.framework.core.di.dependency.Dependency;
-import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
-import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
+import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
+import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
 import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.*;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.*;
+import lombok.Getter;
 import org.apache.commons.lang3.ClassUtils;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ApplicationContext {
 
     private static ApplicationContext applicationContextInstance;
-    private Map<Dependency<?>, Object> instances;
+    private static final Logger LOG = LoggerFactory.getLogger(ApplicationContext.class);
+    private Map<DependencyID<?>, Object> instances;
+    @Getter
     private String classScanPackage;
 
     private ApplicationContext() {
@@ -35,11 +39,20 @@ public class ApplicationContext {
         var managedInstances = reflections.getTypesAnnotatedWith(ManagedType.class)
                 .stream()
                 .toList();
-        var executablesToCall = Stream.concat(Stream.concat(
-                providers.stream().flatMap(provider -> Stream.of(provider.getMethods())).filter(method -> method.isAnnotationPresent(Provide.class)),
-                providers.stream().map(this::getProviderConstructor)
-        ), managedInstances.stream().map(this::getManagedInstanceConstructor));
-        buildDependencyGraph(executablesToCall.collect(Collectors.toList()));
+        var dependencyProviders = new ArrayList<DependencyProvider<?>>(providers.stream()
+                .map(this::getProviderConstructor)
+                .map(ConstructorDependencyProvider::new)
+                .toList());
+        dependencyProviders.addAll(providers.stream()
+                .flatMap(provider -> Stream.of(provider.getMethods()))
+                .filter(method -> method.isAnnotationPresent(Provide.class))
+                .map(MethodDependencyProvider::new)
+                .toList()
+        );
+        dependencyProviders.addAll(managedInstances.stream().map(this::getManagedInstanceConstructor).map(ConstructorDependencyProvider::new).toList());
+        dependencyProviders.addAll(ServiceLoader.load(DependencyProvider.class).stream().map(ServiceLoader.Provider::get).map(provider -> (DependencyProvider<?>) provider).toList());
+
+        buildDependencyGraph(dependencyProviders);
     }
 
     private Constructor<?> getManagedInstanceConstructor(Class<?> managedInstanceClass) {
@@ -66,71 +79,31 @@ public class ApplicationContext {
                 .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(providerClass));
     }
 
-    private void buildDependencyGraph(List<Executable> executables) {
+    private void buildDependencyGraph(List<DependencyProvider<?>> dependencyProviders) {
         var canSatisfyDependencies = false;
-        Predicate<Executable> executableHasItsDependenciesSatisfied = executable -> {
-           var allParametersSatisfied = Arrays.stream(executable.getParameters())
-                .allMatch(parameter -> {
-                    var parameterDependencyName = getParameterDependencyName(parameter);
-                    return instances.keySet()
-                            .stream()
-                            .anyMatch(key -> {
-                                var couldDependencyBeUsed = key.type().equals(ClassUtils.primitiveToWrapper(parameter.getType()));
-                                if (!parameterDependencyName.isEmpty()) {
-                                    couldDependencyBeUsed &= key.name().equals(parameterDependencyName);
-                                }
-                                return couldDependencyBeUsed;
-                            });
-                });
-           var ifMethodThenDeclaringClassIsSatisfied = executable instanceof Constructor<?> || hasInstance(executable.getDeclaringClass());
-           return allParametersSatisfied && ifMethodThenDeclaringClassIsSatisfied;
+        Predicate<DependencyProvider<?>> providerHasItsDependenciesSatisfied = provider -> {
+            List<DependencyID<?>> dependencies = provider.getDependencies();
+            return dependencies.stream()
+                    .allMatch(dependency -> dependency.name().isEmpty() ? hasInstance(dependency.type()) : hasInstance(dependency));
         };
         do {
-            executables.stream().filter(executableHasItsDependenciesSatisfied)
+            dependencyProviders.stream().filter(providerHasItsDependenciesSatisfied)
                     .findFirst()
-                    .ifPresent(executable -> {
-                        var returnType = ClassUtils.primitiveToWrapper((Class<?>) executable.getAnnotatedReturnType().getType());
-                        try {
-                            var returnedInstance = switch (executable) {
-                                case Method method -> {
-                                    if (method.getParameters().length == 0) {
-                                        yield method.invoke(getInstance(method.getDeclaringClass()));
-                                    }
-                                    yield method.invoke(getInstance(method.getDeclaringClass()), fetchInstancesOfParameters(method.getParameters()));
-                                }
-                                case Constructor<?> constructor -> {
-                                    if (constructor.getParameters().length == 0) {
-                                        yield constructor.newInstance();
-                                    }
-                                    yield constructor.newInstance(fetchInstancesOfParameters(constructor.getParameters()));
-                                }
-                            };
-                            var dependencyName = executable.isAnnotationPresent(Provide.class) ?
-                                    executable.getAnnotation(Provide.class).dependencyName() :
-                                    "";
-                            if (dependencyName.isEmpty()) {
-                                dependencyName = executable.getName();
-                            }
-                            instances.put(new Dependency<>(dependencyName, returnType), returnedInstance);
-                        } catch (InvocationTargetException | IllegalAccessException |
-                                 InstantiationException e) {
-                            throw new ContextInitializationException(e);
-                        }
-                        executables.remove(executable);
+                    .ifPresent(provider -> {
+                        var providedInstance = provider.provideDependency(this);
+                        instances.put(providedInstance.id(), providedInstance.instance());
+                        dependencyProviders.remove(provider);
                     });
-            canSatisfyDependencies = executables.stream()
-                    .anyMatch(executableHasItsDependenciesSatisfied);
+            canSatisfyDependencies = dependencyProviders.stream()
+                    .anyMatch(providerHasItsDependenciesSatisfied);
         } while (canSatisfyDependencies);
 
-        if (!executables.isEmpty()) {
+        if (!dependencyProviders.isEmpty()) {
             var missingDependencies = new HashSet<Class<?>>();
-            for (var executable : executables) {
-                missingDependencies.addAll(Arrays.stream(executable.getParameters())
-                        .map(Parameter::getType)
+            for (var provider : dependencyProviders) {
+                missingDependencies.addAll(provider.getDependencies().stream()
+                        .map(DependencyID::type)
                         .filter(type -> !hasInstance(type)).toList());
-                if (executable instanceof Method method && !hasInstance(method.getDeclaringClass())) {
-                    missingDependencies.add(method.getDeclaringClass());
-                }
             }
             throw new DependencyResolutionException(missingDependencies);
         }
@@ -150,7 +123,7 @@ public class ApplicationContext {
                     if (parameter.isAnnotationPresent(ProvidedWith.class)) {
                         var dependencyName = parameter.getAnnotation(ProvidedWith.class).dependencyName();
                         if (!dependencyName.isEmpty()) {
-                            return getInstance(new Dependency<>(dependencyName, type));
+                            return getInstance(new DependencyID<>(dependencyName, type));
                         }
                     }
                     return getInstance(type);
@@ -196,11 +169,11 @@ public class ApplicationContext {
                 .orElseThrow();
     }
 
-    public boolean hasInstance(Dependency<?> dependency) {
-        return instances.containsKey(dependency);
+    public boolean hasInstance(DependencyID<?> dependencyID) {
+        return instances.containsKey(dependencyID);
     }
 
-    public <T> T getInstance(Dependency<T> dependency) {
-        return (T) instances.get(dependency);
+    public <T> T getInstance(DependencyID<T> dependencyID) {
+        return (T) instances.get(dependencyID);
     }
 }

@@ -1,9 +1,9 @@
-package io.john.amiscaray.backend.framework.core.di.stub;
+package io.john.amiscaray.backend.framework.test.core.di.stub;
 
-import io.john.amiscaray.backend.framework.core.di.provider.Provide;
-import io.john.amiscaray.backend.framework.core.di.provider.ProvidedWith;
-import io.john.amiscaray.backend.framework.core.di.provider.Provider;
-import io.john.amiscaray.backend.framework.core.di.stub.pojo.MockUserAccount;
+import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockUserAccount;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provide;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provider;
 
 @Provider
 public class MockStringProvider {
