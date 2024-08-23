@@ -1,5 +1,6 @@
 package io.john.amiscaray;
 
+import io.john.amiscaray.controller.ControllerWriter;
 import io.john.amiscaray.model.GeneratedClass;
 import io.john.amiscaray.stub.model.Employee;
 import io.john.amiscaray.stub.model.Student;
