@@ -1,4 +1,4 @@
-package io.john.amiscaray;
+package io.john.amiscaray.controller;
 
 import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
 import io.john.amiscaray.backend.framework.generator.api.APIQuery;

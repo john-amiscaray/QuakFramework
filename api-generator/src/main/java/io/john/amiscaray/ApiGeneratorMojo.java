@@ -1,6 +1,8 @@
 package io.john.amiscaray;
 
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
+import io.john.amiscaray.controller.ControllerWriter;
+import io.john.amiscaray.jpms.ModuleInfoWriter;
 import io.john.amiscaray.util.ReflectionUtils;
 import lombok.SneakyThrows;
 import org.apache.maven.plugin.AbstractMojo;
@@ -15,7 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-@Mojo(name = "generate-class", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+@Mojo(name = "generate-class", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class ApiGeneratorMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.outputDirectory}")
@@ -34,12 +36,15 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
     @SneakyThrows
     @Override
-    public void execute() throws MojoExecutionException {
+    public void execute() {
 
         getLog().info("Output Directory: " + projectClassOutputDirectory.getAbsolutePath());
         getLog().info("Class scan package: " + classScanPackage);
 
-        var types = ReflectionUtils.loadClassesFromPackage(projectClassOutputDirectory, classScanPackage)
+        var projectClasses = ReflectionUtils.loadClassesFromPackage(projectClassOutputDirectory, classScanPackage);
+        getLog().info("HELLOOOOO:");
+        getLog().info(String.join(" , ", projectClasses.stream().map(Class::getSimpleName).toList()));
+        var types = projectClasses
                 .stream()
                 .filter(clazz -> clazz.isAnnotationPresent(RestModel.class))
                 .toList();
@@ -47,16 +52,16 @@ public class ApiGeneratorMojo extends AbstractMojo {
         var targetPackage = classScanPackage + ".controllers";
         var outputLocation = targetPackage.replace(".", "/");
 
-        File file = new File(generatedClassesDirectory, outputLocation);
-        if (!file.exists()) {
-            file.mkdirs();
+        File controllerOutputFileLocation = new File(generatedClassesDirectory, outputLocation);
+        if (!controllerOutputFileLocation.exists()) {
+            controllerOutputFileLocation.mkdirs();
         }
 
         getLog().info(types.toString());
 
         for(var type : types) {
             var generatedClass = controllerWriter.writeNewController(targetPackage, type);
-            File outputFile = new File(file, generatedClass.name());
+            File outputFile = new File(controllerOutputFileLocation, generatedClass.name());
             try (FileWriter writer = new FileWriter(outputFile)) {
                 writer.write(generatedClass.sourceCode());
             } catch (IOException e) {
@@ -64,7 +69,19 @@ public class ApiGeneratorMojo extends AbstractMojo {
             }
         }
 
-        project.addCompileSourceRoot(generatedClassesDirectory.getAbsolutePath());
+//        var generatedModuleInfo = new ModuleInfoWriter(projectClasses, classScanPackage).writeModuleInfo(getLog());
+//
+//        if (generatedModuleInfo != null) {
+//            File moduleInfoFileLocation = new File(generatedClassesDirectory, "module-info.java");
+//
+//            try (FileWriter writer = new FileWriter(moduleInfoFileLocation)) {
+//                writer.write(generatedModuleInfo);
+//            } catch (IOException e) {
+//                throw new MojoExecutionException("Error writing file " + moduleInfoFileLocation, e);
+//            }
+//        }
+
+        project.addCompileSourceRoot(generatedClassesDirectory.getPath());
 
     }
 
