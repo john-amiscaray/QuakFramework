@@ -17,7 +17,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-@Mojo(name = "generate-class", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_CLASSES)
+@Mojo(name = "generate-class", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class ApiGeneratorMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.outputDirectory}")
@@ -42,6 +42,8 @@ public class ApiGeneratorMojo extends AbstractMojo {
         getLog().info("Class scan package: " + classScanPackage);
 
         var projectClasses = ReflectionUtils.loadClassesFromPackage(projectClassOutputDirectory, classScanPackage);
+        getLog().info("HELLOOOOO:");
+        getLog().info(String.join(" , ", projectClasses.stream().map(Class::getSimpleName).toList()));
         var types = projectClasses
                 .stream()
                 .filter(clazz -> clazz.isAnnotationPresent(RestModel.class))
@@ -67,19 +69,19 @@ public class ApiGeneratorMojo extends AbstractMojo {
             }
         }
 
-        var moduleInfoWriter = new ModuleInfoWriter(projectClasses, classScanPackage);
+//        var generatedModuleInfo = new ModuleInfoWriter(projectClasses, classScanPackage).writeModuleInfo(getLog());
+//
+//        if (generatedModuleInfo != null) {
+//            File moduleInfoFileLocation = new File(generatedClassesDirectory, "module-info.java");
+//
+//            try (FileWriter writer = new FileWriter(moduleInfoFileLocation)) {
+//                writer.write(generatedModuleInfo);
+//            } catch (IOException e) {
+//                throw new MojoExecutionException("Error writing file " + moduleInfoFileLocation, e);
+//            }
+//        }
 
-        File moduleInfoFileLocation = new File(generatedClassesDirectory, "module-info.java");
-
-        try (FileWriter writer = new FileWriter(moduleInfoFileLocation)) {
-            writer.write(moduleInfoWriter.writeModuleInfo());
-        } catch (IOException e) {
-            throw new MojoExecutionException("Error writing file " + moduleInfoWriter, e);
-        }
-
-        moduleInfoWriter.writeModuleInfo();
-
-        project.addCompileSourceRoot(generatedClassesDirectory.getAbsolutePath());
+        project.addCompileSourceRoot(generatedClassesDirectory.getPath());
 
     }
 

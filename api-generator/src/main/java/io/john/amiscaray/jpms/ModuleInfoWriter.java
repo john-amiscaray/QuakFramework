@@ -3,6 +3,7 @@ package io.john.amiscaray.jpms;
 import io.john.amiscaray.backend.framework.generator.api.RestModel;
 import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
+import org.apache.maven.plugin.logging.Log;
 
 import java.util.List;
 
@@ -11,8 +12,18 @@ public class ModuleInfoWriter {
 
     private List<? extends Class<?>> projectClasses;
     private String rootPackage;
+    private String moduleInfoTemplate;
 
-    public String writeModuleInfo() {
+    public ModuleInfoWriter(List<? extends Class<?>> projectClasses, String rootPackage) {
+        this.projectClasses = projectClasses;
+        this.rootPackage = rootPackage;
+    }
+
+    public String writeModuleInfo(Log logger) {
+        if (projectClasses.isEmpty()) {
+            return null;
+        }
+
         var modelPackages = projectClasses.stream()
                 .filter(clazz -> clazz.isAnnotationPresent(RestModel.class))
                 .map(clazz -> clazz.getPackage().getName())
@@ -24,22 +35,37 @@ public class ModuleInfoWriter {
                 .distinct()
                 .toList();
 
+        if (moduleInfoTemplate == null) {
+            return String.format("""
+            module %1$s {
+            %2$s
+            }
+            """, rootPackage, generateModuleInfoContent(modelPackages, ormPackages));
+        } else {
+            // remove the closing curly bracket and add some space to add the generated code
+            moduleInfoTemplate = moduleInfoTemplate.stripTrailing();
+            moduleInfoTemplate = moduleInfoTemplate.substring(0, moduleInfoTemplate.length() - 1) + "\n    // GENERATED SOURCES:\n";
+
+            return moduleInfoTemplate + generateModuleInfoContent(modelPackages, ormPackages) + "}";
+        }
+    }
+
+    private String generateModuleInfoContent(List<String> modelPackages, List<String> ormPackages) {
         return String.format("""
-                module %1$s {
-                    exports %1$s.controllers to backend.framework.core, backend.framework.web;
-                    
-                    %2$s
-                    %3$s
-                    
-                    requires backend.framework.core;
-                    requires backend.framework.data;
-                    requires backend.framework.generator;
-                    requires backend.framework.web;
-                    requires jakarta.persistence;
-                    requires static lombok;
-                    requires org.reflections;
-                }
-                """, rootPackage, generateRulesForModelPackages(modelPackages), generateRulesForORMPackages(ormPackages));
+                exports %1$s.controllers to backend.framework.core, backend.framework.web;
+                
+                %2$s
+                %3$s
+                
+                requires backend.framework.core;
+                requires backend.framework.data;
+                requires backend.framework.generator;
+                requires backend.framework.web;
+                requires jakarta.persistence;
+                requires static lombok;
+                requires org.reflections;
+                """, rootPackage, generateRulesForModelPackages(modelPackages), generateRulesForORMPackages(ormPackages))
+                .indent(4);
     }
 
     public String generateRulesForModelPackages(List<String> modelPackages) {
