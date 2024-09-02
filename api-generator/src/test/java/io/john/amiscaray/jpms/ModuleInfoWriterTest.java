@@ -1,5 +1,6 @@
 package io.john.amiscaray.jpms;
 
+import io.john.amiscaray.model.VisitedSourcesState;
 import io.john.amiscaray.stub.data.EmployeeTableEntry;
 import io.john.amiscaray.stub.data.StudentTableEntry;
 import io.john.amiscaray.stub.model.Employee;
@@ -8,18 +9,31 @@ import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
+import static io.john.amiscaray.assertions.TestSourceUtil.parsedClassOrInterfaceDeclarationOf;
+import static io.john.amiscaray.stub.MockSource.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.mockito.Mockito.mock;
 
 public class ModuleInfoWriterTest {
 
+    public VisitedSourcesState mockFinalVisitedSourcesStatue() {
+        return new VisitedSourcesState(new HashMap<>(), List.of(
+                parsedClassOrInterfaceDeclarationOf(studentRestModelSourceCode()),
+                parsedClassOrInterfaceDeclarationOf(employeeRestModelSourceCode())
+        ), List.of(
+                parsedClassOrInterfaceDeclarationOf(studentTableSourceCode()),
+                parsedClassOrInterfaceDeclarationOf(employeeTableSourceCode())
+        ));
+    }
+
     @Test
     public void testWritesModuleInfoForStudentAndEmployeeStubs() {
         var moduleInfoWriter = new ModuleInfoWriter(
-                List.of(EmployeeTableEntry.class, StudentTableEntry.class, Employee.class, Student.class),
+                mockFinalVisitedSourcesStatue(),
                 "io.john.amiscaray"
         );
 
@@ -47,9 +61,9 @@ public class ModuleInfoWriterTest {
     }
 
     @Test
-    public void testWritesModuleInfoStatementsFromTemplate() throws IOException {
+    public void testWritesModuleInfoStatementsFromTemplate() {
         var moduleInfoWriter = new ModuleInfoWriter(
-                List.of(EmployeeTableEntry.class, StudentTableEntry.class, Employee.class, Student.class),
+                mockFinalVisitedSourcesStatue(),
                 "io.john.amiscaray",
                 """
                         module my.module {

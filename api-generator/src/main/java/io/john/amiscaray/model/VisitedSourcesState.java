@@ -7,12 +7,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public record SourceClassVisitorState(
+public record VisitedSourcesState(
         HashMap<ClassOrInterfaceDeclaration, ClassExpr> restModelClassToEntity,
+        List<ClassOrInterfaceDeclaration> visitedRestModelClasses,
         List<ClassOrInterfaceDeclaration> visitedEntityClasses) {
 
-    public SourceClassVisitorState() {
-        this(new HashMap<>(), new ArrayList<>());
+    public VisitedSourcesState() {
+        this(new HashMap<>(), new ArrayList<>(), new ArrayList<>());
     }
 
 }

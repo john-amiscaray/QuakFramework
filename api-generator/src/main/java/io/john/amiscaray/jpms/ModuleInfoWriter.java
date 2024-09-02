@@ -1,7 +1,6 @@
 package io.john.amiscaray.jpms;
 
-import io.john.amiscaray.backend.framework.generator.api.RestModel;
-import jakarta.persistence.Entity;
+import io.john.amiscaray.model.VisitedSourcesState;
 import lombok.AllArgsConstructor;
 import org.apache.maven.plugin.logging.Log;
 
@@ -10,28 +9,30 @@ import java.util.List;
 @AllArgsConstructor
 public class ModuleInfoWriter {
 
-    private List<? extends Class<?>> projectClasses;
+    private VisitedSourcesState finalSourceVisitorState;
     private String rootPackage;
     private String moduleInfoTemplate;
 
-    public ModuleInfoWriter(List<? extends Class<?>> projectClasses, String rootPackage) {
-        this.projectClasses = projectClasses;
+    public ModuleInfoWriter(VisitedSourcesState finalSourceVisitorState, String rootPackage) {
+        this.finalSourceVisitorState = finalSourceVisitorState;
         this.rootPackage = rootPackage;
     }
 
     public String writeModuleInfo(Log logger) {
-        if (projectClasses.isEmpty()) {
+        if (finalSourceVisitorState.visitedRestModelClasses().isEmpty() && finalSourceVisitorState.visitedEntityClasses().isEmpty()) {
             return null;
         }
 
-        var modelPackages = projectClasses.stream()
-                .filter(clazz -> clazz.isAnnotationPresent(RestModel.class))
-                .map(clazz -> clazz.getPackage().getName())
+        var modelPackages = finalSourceVisitorState.visitedRestModelClasses().stream()
+                .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
+                .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
+                .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))
                 .distinct()
                 .toList();
-        var ormPackages = projectClasses.stream()
-                .filter(clazz -> clazz.isAnnotationPresent(Entity.class))
-                .map(clazz -> clazz.getPackage().getName())
+        var ormPackages = finalSourceVisitorState.visitedEntityClasses().stream()
+                .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
+                .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
+                .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))
                 .distinct()
                 .toList();
 

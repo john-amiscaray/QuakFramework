@@ -5,7 +5,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import io.john.amiscaray.controller.ControllerWriter;
 import io.john.amiscaray.model.GeneratedClass;
-import io.john.amiscaray.model.SourceClassVisitorState;
+import io.john.amiscaray.model.VisitedSourcesState;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -39,7 +39,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
     private final ControllerWriter controllerWriter = ControllerWriter.getInstance();
 
-    private final SourceClassVisitorState sourceClassVisitorState = new SourceClassVisitorState();
+    private final VisitedSourcesState visitedSourcesState = new VisitedSourcesState();
 
     @Override
     public void execute() {
@@ -56,15 +56,15 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
         var restModelClassToEntityClass = new HashMap<ClassOrInterfaceDeclaration, ClassOrInterfaceDeclaration>();
 
-        for (var restModelToEntityEntry : sourceClassVisitorState.restModelClassToEntity().entrySet()) {
+        for (var restModelToEntityEntry : visitedSourcesState.restModelClassToEntity().entrySet()) {
             var entityClassName = restModelToEntityEntry.getValue().getType().asString();
             // TODO make sure exactly one matches
-            if (sourceClassVisitorState.visitedEntityClasses()
+            if (visitedSourcesState.visitedEntityClasses()
                     .stream()
                     .noneMatch(entityClass -> entityClassName.equals(entityClass.getNameAsString()))) {
                 throw new IllegalArgumentException("Missing entity class for " + restModelToEntityEntry.getKey().getNameAsString());
             }
-            var entityClassDeclaration = sourceClassVisitorState.visitedEntityClasses()
+            var entityClassDeclaration = visitedSourcesState.visitedEntityClasses()
                     .stream()
                     .filter(entityClass -> entityClassName.equals(entityClass.getNameAsString()))
                     .findFirst()
@@ -107,15 +107,16 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
         parsedCompilationUnit.ifSuccessful(compilationUnit -> compilationUnit.accept(new VoidVisitorAdapter<>() {
             @Override
-            public void visit(ClassOrInterfaceDeclaration parsedClassOrInterface, SourceClassVisitorState state) {
+            public void visit(ClassOrInterfaceDeclaration parsedClassOrInterface, VisitedSourcesState state) {
                 if (parsedClassOrInterface.getAnnotationByName("RestModel").isPresent()) {
                     var entityClass = getAnnotationMemberValue(parsedClassOrInterface.getAnnotationByName("RestModel").get(), "dataClass").get().asClassExpr();
+                    state.visitedRestModelClasses().add(parsedClassOrInterface);
                     state.restModelClassToEntity().put(parsedClassOrInterface, entityClass);
                 } else if (parsedClassOrInterface.getAnnotationByName("Entity").isPresent()) {
                     state.visitedEntityClasses().add(parsedClassOrInterface);
                 }
             }
-        }, sourceClassVisitorState));
+        }, visitedSourcesState));
     }
 
     private void writeGeneratedSource(GeneratedClass generatedClass) throws IOException {
