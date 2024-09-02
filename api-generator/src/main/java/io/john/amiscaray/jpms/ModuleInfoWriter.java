@@ -9,27 +9,27 @@ import java.util.List;
 @AllArgsConstructor
 public class ModuleInfoWriter {
 
-    private VisitedSourcesState finalSourceVisitorState;
+    private VisitedSourcesState finalVisitedSourcesState;
     private String rootPackage;
     private String moduleInfoTemplate;
 
-    public ModuleInfoWriter(VisitedSourcesState finalSourceVisitorState, String rootPackage) {
-        this.finalSourceVisitorState = finalSourceVisitorState;
+    public ModuleInfoWriter(VisitedSourcesState finalVisitedSourcesState, String rootPackage) {
+        this.finalVisitedSourcesState = finalVisitedSourcesState;
         this.rootPackage = rootPackage;
     }
 
-    public String writeModuleInfo(Log logger) {
-        if (finalSourceVisitorState.visitedRestModelClasses().isEmpty() && finalSourceVisitorState.visitedEntityClasses().isEmpty()) {
+    public String writeModuleInfo() {
+        if (finalVisitedSourcesState.visitedRestModelClasses().isEmpty() && finalVisitedSourcesState.visitedEntityClasses().isEmpty()) {
             return null;
         }
 
-        var modelPackages = finalSourceVisitorState.visitedRestModelClasses().stream()
+        var modelPackages = finalVisitedSourcesState.visitedRestModelClasses().stream()
                 .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
                 .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
                 .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))
                 .distinct()
                 .toList();
-        var ormPackages = finalSourceVisitorState.visitedEntityClasses().stream()
+        var ormPackages = finalVisitedSourcesState.visitedEntityClasses().stream()
                 .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
                 .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
                 .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))

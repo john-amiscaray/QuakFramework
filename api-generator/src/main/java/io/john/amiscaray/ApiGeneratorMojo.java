@@ -4,6 +4,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import io.john.amiscaray.controller.ControllerWriter;
+import io.john.amiscaray.jpms.ModuleInfoWriter;
 import io.john.amiscaray.model.GeneratedClass;
 import io.john.amiscaray.model.VisitedSourcesState;
 import org.apache.maven.plugin.AbstractMojo;
@@ -34,12 +35,17 @@ public class ApiGeneratorMojo extends AbstractMojo {
     @Parameter(required = true)
     private String targetPackage;
 
+    @Parameter(required = true)
+    private String rootPackage;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
     private final ControllerWriter controllerWriter = ControllerWriter.getInstance();
 
     private final VisitedSourcesState visitedSourcesState = new VisitedSourcesState();
+
+    private String moduleInfoTemplateSource = null;
 
     @Override
     public void execute() {
@@ -54,6 +60,29 @@ public class ApiGeneratorMojo extends AbstractMojo {
             getLog().error("Unable to generate sources:\n", e);
         }
 
+        generateControllers();
+        generateModuleInfo();
+
+        project.addCompileSourceRoot(generatedClassesDirectory.getPath());
+    }
+
+    private void generateModuleInfo() {
+        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, moduleInfoTemplateSource);
+        try {
+            writeGeneratedModuleInfo(moduleInfoWriter.writeModuleInfo());
+        } catch (IOException e) {
+            getLog().error("Could not write module-info.java: ", e);
+        }
+    }
+
+    private void writeGeneratedModuleInfo(String moduleInfoSource) throws IOException {
+        var newGeneratedJavaSource = new File(generatedClassesDirectory, "module-info.java");
+        try (var fileWriter = new FileWriter(newGeneratedJavaSource)) {
+            fileWriter.write(moduleInfoSource);
+        }
+    }
+
+    private void generateControllers() {
         var restModelClassToEntityClass = new HashMap<ClassOrInterfaceDeclaration, ClassOrInterfaceDeclaration>();
 
         for (var restModelToEntityEntry : visitedSourcesState.restModelClassToEntity().entrySet()) {
@@ -75,13 +104,23 @@ public class ApiGeneratorMojo extends AbstractMojo {
         for (var restModelToEntityClassEntry : restModelClassToEntityClass.entrySet()) {
             var generatedSource = controllerWriter.writeNewController(targetPackage, restModelToEntityClassEntry.getKey(), restModelToEntityClassEntry.getValue());
             try {
-                writeGeneratedSource(generatedSource);
+                writeGeneratedController(generatedSource);
             } catch (IOException e) {
                 getLog().error("Could not generate source: ", e);
             }
         }
+    }
 
-        project.addCompileSourceRoot(generatedClassesDirectory.getPath());
+    private void writeGeneratedController(GeneratedClass generatedClass) throws IOException {
+        var packageSubFolders = targetPackage.replace(".", "/");
+        var outDirectory = new File(generatedClassesDirectory, "/" + packageSubFolders);
+        if (!outDirectory.exists()) {
+            outDirectory.mkdirs();
+        }
+        var newGeneratedJavaSource = new File(outDirectory, generatedClass.name());
+        try (var fileWriter = new FileWriter(newGeneratedJavaSource)) {
+            fileWriter.write(generatedClass.sourceCode());
+        }
     }
 
     private void inspectSourceFiles(File directory) throws IOException {
@@ -92,6 +131,8 @@ public class ApiGeneratorMojo extends AbstractMojo {
                 inspectSourceFiles(file);
             } else if (file.getName().endsWith(".java")) {
                 parseAndInspectJavaSource(file);
+            } else if (file.getName().equals("module-info.template")) {
+                moduleInfoTemplateSource = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
             }
         }
 
@@ -117,18 +158,6 @@ public class ApiGeneratorMojo extends AbstractMojo {
                 }
             }
         }, visitedSourcesState));
-    }
-
-    private void writeGeneratedSource(GeneratedClass generatedClass) throws IOException {
-        var packageSubFolders = targetPackage.replace(".", "/");
-        var outDirectory = new File(generatedClassesDirectory, "/" + packageSubFolders);
-        if (!outDirectory.exists()) {
-            outDirectory.mkdirs();
-        }
-        var newGeneratedJavaSource = new File(outDirectory, generatedClass.name());
-        try (var fileWriter = new FileWriter(newGeneratedJavaSource)) {
-            fileWriter.write(generatedClass.sourceCode());
-        }
     }
 
 }

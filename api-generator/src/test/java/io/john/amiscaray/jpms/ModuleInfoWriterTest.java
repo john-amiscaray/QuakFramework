@@ -38,7 +38,7 @@ public class ModuleInfoWriterTest {
         );
 
         assertThat(
-                moduleInfoWriter.writeModuleInfo(mock(Log.class)),
+                moduleInfoWriter.writeModuleInfo(),
                 equalToCompressingWhiteSpace("""
                 module io.john.amiscaray {
                 
@@ -75,7 +75,7 @@ public class ModuleInfoWriterTest {
         );
 
         assertThat(
-                moduleInfoWriter.writeModuleInfo(mock(Log.class)),
+                moduleInfoWriter.writeModuleInfo(),
                 equalToCompressingWhiteSpace("""
                         module my.module {
                         
