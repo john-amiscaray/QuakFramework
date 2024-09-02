@@ -2,10 +2,9 @@ package io.john.amiscaray;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.expr.ClassExpr;
-import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import io.john.amiscaray.controller.ControllerWriter;
+import io.john.amiscaray.model.GeneratedClass;
 import io.john.amiscaray.model.SourceClassVisitorState;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -15,11 +14,13 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.PreparedStatement;
 import java.util.HashMap;
+
+import static io.john.amiscaray.util.ParserUtils.getAnnotationMemberValue;
 
 @Mojo(name = "generate-class", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class ApiGeneratorMojo extends AbstractMojo {
@@ -29,6 +30,9 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.directory}/generated-sources", required = true)
     private File generatedClassesDirectory;
+
+    @Parameter(required = true)
+    private String targetPackage;
 
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
@@ -44,18 +48,10 @@ public class ApiGeneratorMojo extends AbstractMojo {
             return;
         }
 
-        project.addCompileSourceRoot(generatedClassesDirectory.getPath());
-    }
-
-    private void inspectSourceFiles(File directory) throws IOException {
-        var files = directory.listFiles();
-
-        for (File file : files) {
-            if (file.isDirectory()) {
-                inspectSourceFiles(directory);
-            } else if (file.getName().endsWith(".java")) {
-                parseAndInspectJavaSource(file);
-            }
+        try {
+            inspectSourceFiles(sourceDirectory);
+        } catch (IOException e) {
+            getLog().error("Unable to generate sources:\n", e);
         }
 
         var restModelClassToEntityClass = new HashMap<ClassOrInterfaceDeclaration, ClassOrInterfaceDeclaration>();
@@ -75,6 +71,30 @@ public class ApiGeneratorMojo extends AbstractMojo {
                     .get();
             restModelClassToEntityClass.put(restModelToEntityEntry.getKey(), entityClassDeclaration);
         }
+
+        for (var restModelToEntityClassEntry : restModelClassToEntityClass.entrySet()) {
+            var generatedSource = controllerWriter.writeNewController(targetPackage, restModelToEntityClassEntry.getKey(), restModelToEntityClassEntry.getValue());
+            try {
+                writeGeneratedSource(generatedSource);
+            } catch (IOException e) {
+                getLog().error("Could not generate source: ", e);
+            }
+        }
+
+        project.addCompileSourceRoot(generatedClassesDirectory.getPath());
+    }
+
+    private void inspectSourceFiles(File directory) throws IOException {
+        var files = directory.listFiles();
+
+        for (File file : files) {
+            if (file.isDirectory()) {
+                inspectSourceFiles(file);
+            } else if (file.getName().endsWith(".java")) {
+                parseAndInspectJavaSource(file);
+            }
+        }
+
     }
 
     private void parseAndInspectJavaSource(File javaFile) throws IOException {
@@ -89,14 +109,25 @@ public class ApiGeneratorMojo extends AbstractMojo {
             @Override
             public void visit(ClassOrInterfaceDeclaration parsedClassOrInterface, SourceClassVisitorState state) {
                 if (parsedClassOrInterface.getAnnotationByName("RestModel").isPresent()) {
-                    var restModelMetaData = (SingleMemberAnnotationExpr) parsedClassOrInterface.getAnnotationByName("RestModel").get();
-                    var entityClass = (ClassExpr) restModelMetaData.getMemberValue();
+                    var entityClass = getAnnotationMemberValue(parsedClassOrInterface.getAnnotationByName("RestModel").get(), "dataClass").get().asClassExpr();
                     state.restModelClassToEntity().put(parsedClassOrInterface, entityClass);
                 } else if (parsedClassOrInterface.getAnnotationByName("Entity").isPresent()) {
                     state.visitedEntityClasses().add(parsedClassOrInterface);
                 }
             }
         }, sourceClassVisitorState));
+    }
+
+    private void writeGeneratedSource(GeneratedClass generatedClass) throws IOException {
+        var packageSubFolders = targetPackage.replace(".", "/");
+        var outDirectory = new File(generatedClassesDirectory, "/" + packageSubFolders);
+        if (!outDirectory.exists()) {
+            outDirectory.mkdirs();
+        }
+        var newGeneratedJavaSource = new File(outDirectory, generatedClass.name());
+        try (var fileWriter = new FileWriter(newGeneratedJavaSource)) {
+            fileWriter.write(generatedClass.sourceCode());
+        }
     }
 
 }

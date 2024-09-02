@@ -16,6 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static io.john.amiscaray.util.ParserUtils.getAnnotationMemberValue;
+
 public class ControllerWriter {
 
     private static ControllerWriter controllerWriterInstance;
@@ -63,7 +65,7 @@ public class ControllerWriter {
                 .orElse(idField.createGetter());
     }
 
-    private MethodDeclaration getIdSetterFromDataClass(ClassOrInterfaceDeclaration entityClass) throws IntrospectionException {
+    private MethodDeclaration getIdSetterFromDataClass(ClassOrInterfaceDeclaration entityClass) {
         var idField = findIDFieldForEntityClass(entityClass);
         return entityClass.getMethodsByName("set" + idField)
                 .stream()
@@ -154,21 +156,6 @@ public class ControllerWriter {
         return annotatedMethods;
     }
 
-    public Optional<Expression> getAnnotationMemberValue(AnnotationExpr annotation, String key) {
-        if (annotation instanceof SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
-            return Optional.of(singleMemberAnnotationExpr.getMemberValue());
-        } else if (annotation instanceof NormalAnnotationExpr normalAnnotationExpr) {
-            return normalAnnotationExpr.getPairs()
-                    .stream()
-                    .filter(keyValuePair -> key.equals(keyValuePair.getNameAsString()))
-                    .map(MemberValuePair::getValue)
-                    .findFirst();
-        } else {
-            // Value cannot be found
-            return Optional.empty();
-        }
-    }
-
     private String generateAPIQueryEndpoints(String rootPathName, ClassOrInterfaceDeclaration entityClass, String restModelName, String restModelMappingMethodName) {
         var queryMethods = getAPIQueryMethods(entityClass);
         var dataClassName = entityClass.getNameAsString();
@@ -196,7 +183,7 @@ public class ControllerWriter {
 
     public GeneratedClass writeNewController(String targetPackage,
                                              ClassOrInterfaceDeclaration restModelClass,
-                                             ClassOrInterfaceDeclaration entityClass) throws IntrospectionException {
+                                             ClassOrInterfaceDeclaration entityClass)  {
 
         var restModelAnnotationOpt = restModelClass.getAnnotationByName("RestModel");
         if (restModelAnnotationOpt.isEmpty()) {
