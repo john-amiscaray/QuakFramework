@@ -1,22 +1,20 @@
 package io.john.amiscaray.controller;
 
-import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.expr.*;
 import io.john.amiscaray.backend.framework.generator.api.APIQuery;
 import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
 import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
-import io.john.amiscaray.backend.framework.generator.api.RestModel;
 import io.john.amiscaray.model.GeneratedClass;
 import jakarta.persistence.Id;
 
 import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public class ControllerWriter {
 
@@ -32,8 +30,9 @@ public class ControllerWriter {
         return controllerWriterInstance;
     }
 
-    private Method getModelGeneratorFromDataClass(Class<?> dataClass) {
-        var annotatedMethods = Arrays.stream(dataClass.getMethods())
+    private MethodDeclaration getModelGeneratorFromDataClass(ClassOrInterfaceDeclaration dataClass) {
+        var annotatedMethods = dataClass.getMethods()
+                .stream()
                 .filter(method -> method.isAnnotationPresent(ModelGenerator.class))
                 .toList();
 
@@ -46,61 +45,71 @@ public class ControllerWriter {
         return annotatedMethods.getFirst();
     }
 
-    private Field findIDFieldForDataClass(Class<?> dataClass) {
-        return Arrays.stream(dataClass.getDeclaredFields())
+    private FieldDeclaration findIDFieldForEntityClass(ClassOrInterfaceDeclaration entityClass) {
+        return entityClass.getFields()
+                .stream()
                 .filter(field -> field.isAnnotationPresent(Id.class))
                 .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Missing an ID attribute for data class: " + dataClass.getName()));
+                .orElseThrow(() -> new IllegalStateException("Missing an ID attribute for data class: " + entityClass.getNameAsString()));
     }
 
-    private Method getIdGetterFromDataClass(Class<?> dataClass) throws IntrospectionException {
-        var idField = findIDFieldForDataClass(dataClass);
+    private MethodDeclaration getIdGetterFromDataClass(ClassOrInterfaceDeclaration entityClass) {
+        var idField = findIDFieldForEntityClass(entityClass);
 
-        return new PropertyDescriptor(idField.getName(), dataClass).getReadMethod();
+        return entityClass.getMethodsByName("get" + idField)
+                .stream()
+                .filter(method -> method.getParameters().isEmpty())
+                .findFirst()
+                .orElse(idField.createGetter());
     }
 
-    private Method getIdSetterFromDataClass(Class<?> dataClass) throws IntrospectionException {
-        var idField = findIDFieldForDataClass(dataClass);
-
-        return new PropertyDescriptor(idField.getName(), dataClass).getWriteMethod();
+    private MethodDeclaration getIdSetterFromDataClass(ClassOrInterfaceDeclaration entityClass) throws IntrospectionException {
+        var idField = findIDFieldForEntityClass(entityClass);
+        return entityClass.getMethodsByName("set" + idField)
+                .stream()
+                .filter(method -> method.getParameters().size() == 1
+                        && method.getParameterByType(idField.getElementType().asString()).isPresent())
+                .findFirst()
+                .orElse(idField.createSetter());
     }
 
-    private String getStringToEntityIDConversionMethodName(Class<?> dataClass) {
-        var idField = findIDFieldForDataClass(dataClass);
+    private String getStringToEntityIDConversionMethodName(ClassOrInterfaceDeclaration entityClass) {
+        var idField = findIDFieldForEntityClass(entityClass);
         String result = "String.valueOf";
 
-        if (idField.getType().equals(Long.class)) {
+        if (idField.getElementType().asString().equals("Long")) {
             result = "Long.parseLong";
-        } else if (idField.getType().equals(Integer.class)) {
+        } else if (idField.getElementType().asString().equals("Integer")) {
             result = "Integer.parseInt";
-        } else if (idField.getType().equals(Double.class)) {
+        } else if (idField.getElementType().asString().equals("Double")) {
             result = "Double.parseDouble";
-        } else if (idField.getType().equals(Float.class)) {
+        } else if (idField.getElementType().asString().equals("Float")) {
             result = "Float.parseFloat";
         }
 
         return result;
     }
 
-    private String getEntityIDTypeString(Class<?> dataClass) {
-        var idField = findIDFieldForDataClass(dataClass);
+    private String getEntityIDTypeString(ClassOrInterfaceDeclaration dataClass) {
+        var idField = findIDFieldForEntityClass(dataClass);
         String result = "String";
 
-        if (idField.getType().equals(Long.class)) {
+        if (idField.getElementType().asString().equals("Long")) {
             result = "Long";
-        } else if (idField.getType().equals(Integer.class)) {
+        } else if (idField.getElementType().asString().equals("Integer")) {
             result = "Integer";
-        } else if (idField.getType().equals(Double.class)) {
+        } else if (idField.getElementType().asString().equals("Double")) {
             result = "Double";
-        } else if (idField.getType().equals(Float.class)) {
+        } else if (idField.getElementType().asString().equals("Float")) {
             result = "Float";
         }
 
         return result;
     }
 
-    private Method getEntityGeneratorFromRestModel(Class<?> dtoClass) {
-        var annotatedMethods = Arrays.stream(dtoClass.getMethods())
+    private MethodDeclaration getEntityGeneratorFromRestModel(ClassOrInterfaceDeclaration restModelClass) {
+        var annotatedMethods = restModelClass.getMethods()
+                .stream()
                 .filter(method -> method.isAnnotationPresent(EntityGenerator.class))
                 .toList();
 
@@ -113,9 +122,10 @@ public class ControllerWriter {
         return annotatedMethods.getFirst();
     }
 
-    private List<Method> getAPIQueryMethods(Class<?> dataClass) {
-        var annotatedMethods = Arrays.stream(dataClass.getMethods())
-                .sorted(Comparator.comparing(Method::getName))
+    private List<MethodDeclaration> getAPIQueryMethods(ClassOrInterfaceDeclaration entityClass) {
+        var annotatedMethods = entityClass.getMethods()
+                .stream()
+                .sorted(Comparator.comparing(MethodDeclaration::getNameAsString))
                 .filter(method -> method.isAnnotationPresent(APIQuery.class))
                 .toList();
 
@@ -123,15 +133,15 @@ public class ControllerWriter {
             var errorMessage = "Method " + method.getName() + " annotated with @APIQuery should: ";
             var errors = new ArrayList<String>();
 
-            if (!method.getReturnType().equals(DatabaseQuery.class)) {
+            if (!method.getTypeAsString().equals("DatabaseQuery")) {
                 errors.add("be annotated with @APIQuery should return a DatabaseQuery");
             }
 
-            if (method.getParameterCount() != 0) {
+            if (!method.getParameters().isEmpty()) {
                 errors.add("be annotated with @APIQuery should not have any parameters");
             }
 
-            if (!Modifier.isStatic(method.getModifiers())) {
+            if (!method.isStatic()) {
                 errors.add("be static");
             }
 
@@ -144,12 +154,27 @@ public class ControllerWriter {
         return annotatedMethods;
     }
 
-    private String generateAPIQueryEndpoints(String rootPathName, Class<?> dataClass, String restModelName, String restModelMappingMethodName) {
-        var queryMethods = getAPIQueryMethods(dataClass);
-        var dataClassName = dataClass.getSimpleName();
+    public Optional<Expression> getAnnotationMemberValue(AnnotationExpr annotation, String key) {
+        if (annotation instanceof SingleMemberAnnotationExpr singleMemberAnnotationExpr) {
+            return Optional.of(singleMemberAnnotationExpr.getMemberValue());
+        } else if (annotation instanceof NormalAnnotationExpr normalAnnotationExpr) {
+            return normalAnnotationExpr.getPairs()
+                    .stream()
+                    .filter(keyValuePair -> key.equals(keyValuePair.getNameAsString()))
+                    .map(MemberValuePair::getValue)
+                    .findFirst();
+        } else {
+            // Value cannot be found
+            return Optional.empty();
+        }
+    }
+
+    private String generateAPIQueryEndpoints(String rootPathName, ClassOrInterfaceDeclaration entityClass, String restModelName, String restModelMappingMethodName) {
+        var queryMethods = getAPIQueryMethods(entityClass);
+        var dataClassName = entityClass.getNameAsString();
         var result = new StringBuilder();
         for (var queryMethod : queryMethods) {
-            var queryPath = queryMethod.getAnnotation(APIQuery.class).path();
+            var queryPath = getAnnotationMemberValue(queryMethod.getAnnotationByName("APIQuery").orElseThrow(), "path").orElseThrow().asStringLiteralExpr().asString();
             if (queryPath.startsWith("/")) {
                 queryPath = queryPath.substring(1);
             }
@@ -169,24 +194,25 @@ public class ControllerWriter {
         return result.toString().stripTrailing();
     }
 
-    public GeneratedClass writeNewController(String targetPackage, Class<?> restModel) throws IntrospectionException {
+    public GeneratedClass writeNewController(String targetPackage,
+                                             ClassOrInterfaceDeclaration restModelClass,
+                                             ClassOrInterfaceDeclaration entityClass) throws IntrospectionException {
 
-        if (!restModel.isAnnotationPresent(RestModel.class)) {
+        var restModelAnnotationOpt = restModelClass.getAnnotationByName("RestModel");
+        if (restModelAnnotationOpt.isEmpty()) {
             throw new IllegalArgumentException("The class passed to write a new controller for must be annotated with @RestModel");
         }
 
-        var restModelName = restModel.getSimpleName();
-        var restModelPackage = restModel.getPackageName();
+        var restModelName = restModelClass.getName().asString();
 
-        var entityClass = restModel.getAnnotation(RestModel.class).dataClass();
         var rootPath = restModelName.toLowerCase();
         var modelGeneratorMethod = getModelGeneratorFromDataClass(entityClass);
-        var entityGeneratorMethod = getEntityGeneratorFromRestModel(restModel);
+        var entityGeneratorMethod = getEntityGeneratorFromRestModel(restModelClass);
         var entityIDGetterMethod = getIdGetterFromDataClass(entityClass);
         var entityIDSetterMethod = getIdSetterFromDataClass(entityClass);
         var stringToEntityIDConversionMethod = getStringToEntityIDConversionMethodName(entityClass);
         var entityIDTypeString = getEntityIDTypeString(entityClass);
-        var queryMethodImpls = generateAPIQueryEndpoints(rootPath, entityClass, restModelName, modelGeneratorMethod.getName()).indent(4);
+        var queryMethodImpls = generateAPIQueryEndpoints(rootPath, entityClass, restModelName, modelGeneratorMethod.getNameAsString()).indent(4);
 
         var sourceCode = String.format("""
                 package %1$s;
@@ -196,8 +222,8 @@ public class ControllerWriter {
                 import io.john.amiscaray.backend.framework.web.handler.request.Request;
                 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
                 import io.john.amiscaray.backend.framework.web.handler.response.Response;
-                import %4$s.%2$s;
-                import %6$s.%5$s;
+                import %4$s;
+                import %6$s;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
                 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
                 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
@@ -316,11 +342,11 @@ public class ControllerWriter {
                 """, targetPackage,
                 restModelName,
                 rootPath,
-                restModelPackage,
-                entityClass.getSimpleName(),
-                entityClass.getPackageName(),
-                modelGeneratorMethod.getName(),
-                entityGeneratorMethod.getName(),
+                restModelClass.getFullyQualifiedName().orElseThrow(),
+                entityClass.getNameAsString(),
+                entityClass.getFullyQualifiedName().orElseThrow(),
+                modelGeneratorMethod.getNameAsString(),
+                entityGeneratorMethod.getNameAsString(),
                 entityIDGetterMethod.getName(),
                 entityIDSetterMethod.getName(),
                 stringToEntityIDConversionMethod,
