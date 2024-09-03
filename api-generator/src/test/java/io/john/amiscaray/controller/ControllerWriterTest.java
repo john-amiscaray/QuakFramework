@@ -1,13 +1,13 @@
 package io.john.amiscaray.controller;
 
 import io.john.amiscaray.model.GeneratedClass;
-import io.john.amiscaray.stub.model.Employee;
-import io.john.amiscaray.stub.model.Student;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.beans.IntrospectionException;
 
+import static io.john.amiscaray.assertions.TestSourceUtil.parsedClassOrInterfaceDeclarationOf;
+import static io.john.amiscaray.stub.MockSource.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerWriterTest {
@@ -21,7 +21,10 @@ public class ControllerWriterTest {
 
     @Test
     public void testWriteControllerFromStudentRestModel() throws IntrospectionException {
-        var actualGenerated = controllerWriter.writeNewController("io.john.amiscaray.controllers", Student.class);
+        var actualGenerated = controllerWriter.writeNewController(
+                "io.john.amiscaray.controllers",
+                parsedClassOrInterfaceDeclarationOf(studentRestModelSourceCode()),
+                parsedClassOrInterfaceDeclarationOf(studentTableSourceCode()));
 
         assertEquals(new GeneratedClass(
                 "StudentController.java",
@@ -156,7 +159,11 @@ public class ControllerWriterTest {
 
     @Test
     public void testWriteControllerFromEmployeeRestModel() throws IntrospectionException {
-        var actualGenerated = controllerWriter.writeNewController("io.john.amiscaray.controllers", Employee.class);
+        var actualGenerated = controllerWriter.writeNewController(
+                "io.john.amiscaray.controllers",
+                parsedClassOrInterfaceDeclarationOf(employeeRestModelSourceCode()),
+                parsedClassOrInterfaceDeclarationOf(employeeTableSourceCode())
+                );
 
         assertEquals(new GeneratedClass(
                 "EmployeeController.java",
