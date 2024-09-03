@@ -128,8 +128,7 @@ public class DatabaseProxyTest {
     void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4() {
         var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery
                 .builder()
-                .withCriteria(new ValueGreaterThanOrEqualTo("id", 2)
-                        .and(new ValueLessThanOrEqualTo("id", 4)))
+                .withCriteria(valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))))
                 .build());
 
         assertEquals(List.of(
