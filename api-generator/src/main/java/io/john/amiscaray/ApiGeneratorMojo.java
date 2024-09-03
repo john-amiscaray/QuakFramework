@@ -56,6 +56,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
         try {
             inspectSourceFiles(sourceDirectory);
+            inspectResourceFiles();
         } catch (IOException e) {
             getLog().error("Unable to generate sources:\n", e);
         }
@@ -126,16 +127,34 @@ public class ApiGeneratorMojo extends AbstractMojo {
     private void inspectSourceFiles(File directory) throws IOException {
         var files = directory.listFiles();
 
-        for (File file : files) {
+        for (var file : files) {
             if (file.isDirectory()) {
                 inspectSourceFiles(file);
             } else if (file.getName().endsWith(".java")) {
                 parseAndInspectJavaSource(file);
-            } else if (file.getName().equals("module-info.template")) {
-                moduleInfoTemplateSource = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
             }
         }
 
+    }
+
+    private void inspectResourceFiles() throws IOException {
+        for (var resource : project.getResources()) {
+            var resourcePath = Paths.get(resource.getDirectory());
+            if (Files.exists(resourcePath) && Files.isDirectory(resourcePath)) {
+                try (var resourcesStream = Files.walk(resourcePath)) {
+                    resourcesStream.forEach(filePath -> {
+                        // TODO Is it possible for there to be multiple resource directories each with module-info templates?
+                        if ("module-info.template".equals(filePath.getFileName().toString())) {
+                            try {
+                                moduleInfoTemplateSource = new String(Files.readAllBytes(filePath));
+                            } catch (IOException e) {
+                                getLog().error("Could not read module info template: ", e);
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
     private void parseAndInspectJavaSource(File javaFile) throws IOException {
