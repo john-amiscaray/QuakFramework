@@ -139,6 +139,23 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testEmployeeCanBeQueriedUsingAllOfIDGreaterThanOrEqualTo2AndLessThanOrEqualTo4() {
+        var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery
+                .builder()
+                .withCriteria(valueOfField("id", matchesAllOf(
+                        isGreaterThanOrEqualTo(2),
+                        isLessThanOrEqualTo(4)
+                )))
+                .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
     void testQueryEmployeeByIdLessThan4() {
         var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(valueOfField("id", isLessThan(4)))

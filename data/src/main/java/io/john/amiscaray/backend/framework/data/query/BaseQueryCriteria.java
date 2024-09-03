@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.data.query;
 
+import io.john.amiscaray.backend.framework.data.query.conjunction.And;
 import io.john.amiscaray.backend.framework.data.query.numeric.*;
 import io.john.amiscaray.backend.framework.data.query.string.ValueContaining;
 import io.john.amiscaray.backend.framework.data.query.string.ValueEndsWith;
@@ -7,13 +8,21 @@ import io.john.amiscaray.backend.framework.data.query.string.ValueLike;
 import io.john.amiscaray.backend.framework.data.query.string.ValueStartsWith;
 import lombok.AllArgsConstructor;
 
+import java.util.Arrays;
+
 @AllArgsConstructor
 public abstract class BaseQueryCriteria implements QueryCriteria{
 
     protected final String fieldName;
 
-    public static BaseQueryCriteria valueOfField(String fieldName, QueryCriteriaProvider queryCriteriaProvider) {
-        return queryCriteriaProvider.provideQueryCriteriaGivenFieldName(fieldName);
+    public static QueryCriteria valueOfField(String fieldName, QueryCriteriaProvider queryCriteriaProvider) {
+        return queryCriteriaProvider.provideQueryCriteria(fieldName);
+    }
+
+    public static QueryCriteriaProvider matchesAllOf(QueryCriteriaProvider... queryCriteriaProviders) {
+        return fieldName -> new And(Arrays.stream(queryCriteriaProviders)
+                .map(queryCriteriaProvider -> queryCriteriaProvider.provideQueryCriteria(fieldName))
+                .toList());
     }
 
     public static QueryCriteriaProvider is(Object value) {
