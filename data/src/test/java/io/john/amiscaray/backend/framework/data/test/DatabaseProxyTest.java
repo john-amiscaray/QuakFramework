@@ -3,7 +3,6 @@ package io.john.amiscaray.backend.framework.data.test;
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
-import io.john.amiscaray.backend.framework.data.query.numeric.*;
 import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.data.test.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.backend.framework.data.update.UpdateExpression;
@@ -17,7 +16,7 @@ import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
 
-import static io.john.amiscaray.backend.framework.data.query.BaseQueryCriteria.*;
+import static io.john.amiscaray.backend.framework.data.query.QueryCriteria.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate.*;
 
