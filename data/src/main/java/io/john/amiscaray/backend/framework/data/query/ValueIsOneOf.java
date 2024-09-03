@@ -4,7 +4,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-public class ValueIsOneOf extends BaseQueryCriteria{
+public class ValueIsOneOf extends SimpleQueryCriteria {
     private final Object[] values;
 
     public ValueIsOneOf(String fieldName, Object... values) {
