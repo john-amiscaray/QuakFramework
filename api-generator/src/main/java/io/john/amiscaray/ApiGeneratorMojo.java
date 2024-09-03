@@ -47,6 +47,8 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
     private String moduleInfoTemplateSource = null;
 
+    private final JavaParser JAVA_PARSER = new JavaParser();
+
     @Override
     public void execute() {
         if (!sourceDirectory.exists()) {
@@ -127,11 +129,13 @@ public class ApiGeneratorMojo extends AbstractMojo {
     private void inspectSourceFiles(File directory) throws IOException {
         var files = directory.listFiles();
 
-        for (var file : files) {
-            if (file.isDirectory()) {
-                inspectSourceFiles(file);
-            } else if (file.getName().endsWith(".java")) {
-                parseAndInspectJavaSource(file);
+        if (files != null) {
+            for (var file : files) {
+                if (file.isDirectory()) {
+                    inspectSourceFiles(file);
+                } else if (file.getName().endsWith(".java")) {
+                    parseAndInspectJavaSource(file);
+                }
             }
         }
 
@@ -160,10 +164,9 @@ public class ApiGeneratorMojo extends AbstractMojo {
     private void parseAndInspectJavaSource(File javaFile) throws IOException {
         // Read the file content
         var fileContent = new String(Files.readAllBytes(Paths.get(javaFile.getAbsolutePath())));
-        var javaParser = new JavaParser();
 
         // Parse the Java file
-        var parsedCompilationUnit = javaParser.parse(fileContent);
+        var parsedCompilationUnit = JAVA_PARSER.parse(fileContent);
 
         parsedCompilationUnit.ifSuccessful(compilationUnit -> compilationUnit.accept(new VoidVisitorAdapter<>() {
             @Override
