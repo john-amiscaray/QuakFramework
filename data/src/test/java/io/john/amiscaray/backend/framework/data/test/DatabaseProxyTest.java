@@ -5,10 +5,7 @@ import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
 import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.data.test.helper.EmployeeTestDBConnector;
-import io.john.amiscaray.backend.framework.data.update.UpdateExpression;
-import io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate;
-import io.john.amiscaray.backend.framework.data.update.numeric.ProductFieldUpdate;
-import io.john.amiscaray.backend.framework.data.update.numeric.QuotientFieldUpdate;
+import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import org.junit.jupiter.api.*;
 
@@ -17,8 +14,8 @@ import java.sql.SQLException;
 import java.util.List;
 
 import static io.john.amiscaray.backend.framework.data.query.QueryCriteria.*;
+import static io.john.amiscaray.backend.framework.data.update.UpdateExpression.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static io.john.amiscaray.backend.framework.data.update.numeric.CompoundNumericFieldUpdate.*;
 
 public class DatabaseProxyTest {
 
@@ -292,9 +289,12 @@ public class DatabaseProxyTest {
 
     @Test
     void testUpdateEmployeeWithDepartmentTechToTechnology() throws SQLException {
-        dbProxy.updateAll(Employee.class, "department", String.class, DatabaseQuery.builder()
-                .withCriteria(valueOfField("department", is("Tech")))
-                .build(), "Technology");
+        dbProxy.updateAll(Employee.class,
+                "department",
+                DatabaseQuery.builder()
+                        .withCriteria(valueOfField("department", is("Tech")))
+                        .build(),
+                "Technology");
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Technology"),
@@ -325,7 +325,10 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Corporate")))
                         .build(),
-                new ProductFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2)));
+                FieldUpdate.<Number>builder()
+                        .fieldName("salary")
+                        .apply(multiply(2))
+                        .build());
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 40000L),
@@ -342,7 +345,10 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Tech")))
                         .build(),
-                new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(2)));
+                FieldUpdate.<Number>builder()
+                        .fieldName("salary")
+                        .apply(divide(2))
+                        .build());
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech", 20000L),
@@ -354,14 +360,12 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000AsCompoundUpdate() throws SQLException {
+    void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                CompoundNumericFieldUpdate
-                        .<Long>builder()
+                FieldUpdate.<Number>builder()
                         .fieldName("salary")
-                        .fieldType(Long.class)
-                        .apply(new SubOperation<>(SubOperationType.PROD, 1.5))
-                        .apply(new SubOperation<>(SubOperationType.SUM, 2000))
+                        .apply(multiply(1.5))
+                        .apply(add(2000))
                         .build()
                 );
 
@@ -377,7 +381,10 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                new QuotientFieldUpdate<>("salary", Long.class, UpdateExpression.literal(9))
+                FieldUpdate.<Number>builder()
+                        .fieldName("salary")
+                        .apply(divide(9))
+                        .build()
         );
 
         assertEquals(List.of(
@@ -418,7 +425,6 @@ public class DatabaseProxyTest {
     public void testUpdateEmployeeWithIdGreaterThan2AndDepartmentIsCorporateToHaveDepartmentAsExecutive() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 "department",
-                String.class,
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("id", isGreaterThan(2)))
                         .withCriteria(valueOfField("department", is("Corporate")))

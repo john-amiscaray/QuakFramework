@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
+import static io.john.amiscaray.backend.framework.data.update.UpdateExpression.setTo;
 
 public class DatabaseProxy {
 
@@ -155,7 +156,7 @@ public class DatabaseProxy {
         CriteriaUpdate<T> update = cb.createCriteriaUpdate(entityType);
         Root<T> root = update.from(entityType);
 
-        update.set(fieldUpdate.fieldName(), fieldUpdate.updateExpression().createExpression(root, cb));
+        applyFieldUpdate(fieldUpdate, cb, update, root);
 
         for (QueryCriteria criteria : updateCriteria.criteria()) {
             update.where(criteria.getTestPredicate(root, cb));
@@ -169,12 +170,24 @@ public class DatabaseProxy {
         updateAll(entityType, DatabaseQuery.builder().build(), fieldUpdate);
     }
 
-    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, Class<V> fieldType, DatabaseQuery updateCriteria, V newValue) {
-        updateAll(entityType, updateCriteria, FieldUpdate.setFieldToValue(fieldToUpdate, newValue, fieldType));
+    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
+        updateAll(entityType, updateCriteria, FieldUpdate.builder().fieldName(fieldToUpdate).apply(setTo(newValue)).build());
     }
 
-    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, Class<V> fieldType, V newValue) {
-        updateAll(entityType, fieldToUpdate, fieldType, DatabaseQuery.builder().build(), newValue);
+    public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, V newValue) {
+        updateAll(entityType, fieldToUpdate, DatabaseQuery.builder().build(), newValue);
+    }
+
+    private <T, F> void applyFieldUpdate(
+            FieldUpdate<F> fieldUpdate,
+            CriteriaBuilder cb,
+            CriteriaUpdate<T> update,
+            Root<T> queryRoot) {
+        Expression<F> currentExpression = queryRoot.get(fieldUpdate.fieldName());
+        for (var updateExpression : fieldUpdate.updates()) {
+            currentExpression = updateExpression.apply(currentExpression, queryRoot, cb);
+        }
+        update.set(fieldUpdate.fieldName(), currentExpression);
     }
 
     private void checkSessionStarted() {
