@@ -325,8 +325,7 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Corporate")))
                         .build(),
-                FieldUpdate.<Number>builder()
-                        .fieldName("salary")
+                FieldUpdate.<Number>builder("salary")
                         .apply(multiply(2))
                         .build());
 
@@ -345,8 +344,7 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Tech")))
                         .build(),
-                FieldUpdate.<Number>builder()
-                        .fieldName("salary")
+                FieldUpdate.<Number>builder("salary")
                         .apply(divide(2))
                         .build());
 
@@ -362,8 +360,7 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Number>builder()
-                        .fieldName("salary")
+                FieldUpdate.<Number>builder("salary")
                         .apply(multiply(1.5))
                         .apply(add(2000))
                         .build()
@@ -381,8 +378,7 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Number>builder()
-                        .fieldName("salary")
+                FieldUpdate.<Number>builder("salary")
                         .apply(divide(9))
                         .build()
         );

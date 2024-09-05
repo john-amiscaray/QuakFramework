@@ -171,7 +171,7 @@ public class DatabaseProxy {
     }
 
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
-        updateAll(entityType, updateCriteria, FieldUpdate.builder().fieldName(fieldToUpdate).apply(setTo(newValue)).build());
+        updateAll(entityType, updateCriteria, FieldUpdate.builder(fieldToUpdate).apply(setTo(newValue)).build());
     }
 
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, V newValue) {
