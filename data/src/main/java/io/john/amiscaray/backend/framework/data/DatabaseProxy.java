@@ -184,10 +184,11 @@ public class DatabaseProxy {
             CriteriaUpdate<T> update,
             Root<T> queryRoot) {
         Expression<F> currentExpression = queryRoot.get(fieldUpdate.fieldName());
+        var fieldType = queryRoot.get(fieldUpdate.fieldName()).getJavaType();
         for (var updateExpression : fieldUpdate.updates()) {
             currentExpression = updateExpression.apply(currentExpression, queryRoot, cb);
         }
-        update.set(fieldUpdate.fieldName(), currentExpression);
+        update.set(fieldUpdate.fieldName(), currentExpression.as(fieldType));
     }
 
     private void checkSessionStarted() {
