@@ -376,6 +376,23 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testUpdateEmployeesToSubtract10000FromSalary() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Number>builder("salary")
+                        .apply(subtract(10000))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 30000L),
+                new Employee(2L, "Elli", "Tech", 30000L),
+                new Employee(3L, "John", "Tech", 30000L),
+                new Employee(4L, "Annie", "Corporate", 30000L),
+                new Employee(5L, "Jeff", "Corporate", 30000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
     void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 FieldUpdate.<Number>builder("salary")
