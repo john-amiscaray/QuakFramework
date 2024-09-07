@@ -452,4 +452,19 @@ public class DatabaseProxyTest {
                 new Employee(5L, "Jeff", "Executive", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
+
+    @Test
+    public void testUpdateAllEmployeesSettingSalaryToZero() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                "salary",
+                0);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 0L),
+                new Employee(2L, "Elli", "Tech", 0L),
+                new Employee(3L, "John", "Tech", 0L),
+                new Employee(4L, "Annie", "Corporate", 0L),
+                new Employee(5L, "Jeff", "Corporate", 0L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
 }
