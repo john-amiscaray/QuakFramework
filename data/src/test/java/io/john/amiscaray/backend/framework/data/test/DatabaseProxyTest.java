@@ -540,4 +540,39 @@ public class DatabaseProxyTest {
                 new Employee(5L, "Jeff", "Corporate", 16L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToSqrtOfCurrentSalary() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Double>builder("salary")
+                        .apply(sqrt())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 200L),
+                new Employee(2L, "Elli", "Tech", 200L),
+                new Employee(3L, "John", "Tech", 200L),
+                new Employee(4L, "Annie", "Corporate", 200L),
+                new Employee(5L, "Jeff", "Corporate", 200L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToMultiplyByNegative2AndAbsoluteValue() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Number>builder("salary")
+                        .apply(multiply(-2L))
+                        .apply(abs())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 80000L),
+                new Employee(2L, "Elli", "Tech", 80000L),
+                new Employee(3L, "John", "Tech", 80000L),
+                new Employee(4L, "Annie", "Corporate", 80000L),
+                new Employee(5L, "Jeff", "Corporate", 80000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
 }

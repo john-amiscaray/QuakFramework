@@ -47,4 +47,12 @@ public interface UpdateExpression<T> {
         return (currentValue, _queryRoot, cb) -> cb.ln(currentValue);
     }
 
+    static UpdateExpression<Double> sqrt() {
+        return (currentValue, _queryRoot, cb) -> cb.sqrt(currentValue);
+    }
+
+    static UpdateExpression<Number> abs() {
+        return (currentValue, _queryRoot, cb) -> cb.abs(currentValue);
+    }
+
 }
