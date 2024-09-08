@@ -7,6 +7,7 @@ import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.data.test.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
+import io.john.amiscaray.backend.framework.data.update.UpdateExpression;
 import org.junit.jupiter.api.*;
 
 import java.io.FileNotFoundException;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static io.john.amiscaray.backend.framework.data.query.QueryCriteria.*;
 import static io.john.amiscaray.backend.framework.data.update.UpdateExpression.*;
+import static java.lang.Math.pow;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class DatabaseProxyTest {
@@ -466,5 +468,122 @@ public class DatabaseProxyTest {
                 new Employee(4L, "Annie", "Corporate", 0L),
                 new Employee(5L, "Jeff", "Corporate", 0L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesRaisingSalaryToThePowerOf2() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Double>builder("salary")
+                        .apply(raiseToThePowerOf(2))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 1600000000L),
+                new Employee(2L, "Elli", "Tech", 1600000000L),
+                new Employee(3L, "John", "Tech", 1600000000L),
+                new Employee(4L, "Annie", "Corporate", 1600000000L),
+                new Employee(5L, "Jeff", "Corporate", 1600000000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesRaisingSalaryToThePowerOf2AndAdd5000() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Double>builder("salary")
+                        .apply(raiseToThePowerOf(2))
+                        .apply(add(5000.0))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 1600005000L),
+                new Employee(2L, "Elli", "Tech", 1600005000L),
+                new Employee(3L, "John", "Tech", 1600005000L),
+                new Employee(4L, "Annie", "Corporate", 1600005000L),
+                new Employee(5L, "Jeff", "Corporate", 1600005000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryTo2ToThePowerOf15AndThenLogBase2() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Double>builder("salary")
+                        .apply(setTo(pow(2.0, 15.0)))
+                        .apply(logBaseN(2.0))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 15L),
+                new Employee(2L, "Elli", "Tech", 15L),
+                new Employee(3L, "John", "Tech", 15L),
+                new Employee(4L, "Annie", "Corporate", 15L),
+                new Employee(5L, "Jeff", "Corporate", 15L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToLnOfCurrentSalaryTimes200() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Double>builder("salary")
+                        .apply(multiply(200.0))
+                        .apply(ln())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 16L),
+                new Employee(2L, "Elli", "Tech", 16L),
+                new Employee(3L, "John", "Tech", 16L),
+                new Employee(4L, "Annie", "Corporate", 16L),
+                new Employee(5L, "Jeff", "Corporate", 16L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToSqrtOfCurrentSalary() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Double>builder("salary")
+                        .apply(sqrt())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 200L),
+                new Employee(2L, "Elli", "Tech", 200L),
+                new Employee(3L, "John", "Tech", 200L),
+                new Employee(4L, "Annie", "Corporate", 200L),
+                new Employee(5L, "Jeff", "Corporate", 200L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToMultiplyByNegative2AndAbsoluteValue() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<Number>builder("salary")
+                        .apply(multiply(-2L))
+                        .apply(abs())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 80000L),
+                new Employee(2L, "Elli", "Tech", 80000L),
+                new Employee(3L, "John", "Tech", 80000L),
+                new Employee(4L, "Annie", "Corporate", 80000L),
+                new Employee(5L, "Jeff", "Corporate", 80000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToLogWithInvalidBase()  {
+        assertThrows(IllegalArgumentException.class, () -> {
+            dbProxy.updateAll(Employee.class,
+                    FieldUpdate.<Double>builder("salary")
+                            .apply(logBaseN(-2.0))
+                            .build()
+            );
+        });
     }
 }
