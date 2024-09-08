@@ -4,6 +4,8 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.Root;
 
+import static java.lang.Math.log;
+
 public interface UpdateExpression<T> {
 
     Expression<T> apply(Expression<T> currentValue,
@@ -28,6 +30,21 @@ public interface UpdateExpression<T> {
 
     static <N extends Number> UpdateExpression<Number> divide(N number) {
         return (currentValue, _queryRoot, cb) -> cb.quot(currentValue, number);
+    }
+
+    static <N extends Number> UpdateExpression<Double> raiseToThePowerOf(N number) {
+        return (currentValue, _queryRoot, cb) -> cb.power(currentValue, number);
+    }
+
+    static UpdateExpression<Double> logBaseN(Double n) {
+        if (n <= 1) {
+            throw new IllegalArgumentException("The base of a logarithm must not be less than or equal to 1.");
+        }
+        return (currentValue, _queryRoot, cb) -> cb.quot(cb.ln(currentValue), log(n)).as(Double.class);
+    }
+
+    static UpdateExpression<Double> ln() {
+        return (currentValue, _queryRoot, cb) -> cb.ln(currentValue);
     }
 
 }
