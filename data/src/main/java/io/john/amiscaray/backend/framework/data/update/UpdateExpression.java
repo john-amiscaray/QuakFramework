@@ -55,4 +55,12 @@ public interface UpdateExpression<T> {
         return (currentValue, _queryRoot, cb) -> cb.abs(currentValue);
     }
 
+    static UpdateExpression<String> prepend(String prefix) {
+        return (currentValue, _queryRoot, cb) -> cb.concat(cb.literal(prefix), currentValue);
+    }
+
+    static UpdateExpression<String> append(String suffix) {
+        return (currentValue, _queryRoot, cb) -> cb.concat(currentValue, cb.literal(suffix));
+    }
+
 }

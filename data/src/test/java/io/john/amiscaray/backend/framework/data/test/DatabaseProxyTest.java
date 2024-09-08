@@ -586,4 +586,38 @@ public class DatabaseProxyTest {
             );
         });
     }
+
+    @Test
+    public void testUpdateAllEmployeesAppendOneToDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(append(" One"))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech One", 40000L),
+                new Employee(2L, "Elli", "Tech One", 40000L),
+                new Employee(3L, "John", "Tech One", 40000L),
+                new Employee(4L, "Annie", "Corporate One", 40000L),
+                new Employee(5L, "Jeff", "Corporate One", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesPrependDeptOfToDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(prepend("Dept of "))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Dept of Tech", 40000L),
+                new Employee(2L, "Elli", "Dept of Tech", 40000L),
+                new Employee(3L, "John", "Dept of Tech", 40000L),
+                new Employee(4L, "Annie", "Dept of Corporate", 40000L),
+                new Employee(5L, "Jeff", "Dept of Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
 }
