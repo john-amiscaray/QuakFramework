@@ -7,7 +7,6 @@ import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.data.test.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
-import io.john.amiscaray.backend.framework.data.update.UpdateExpression;
 import org.junit.jupiter.api.*;
 
 import java.io.FileNotFoundException;
@@ -437,6 +436,20 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    public void testQueryEmployeeByDepartmentIsTechUsingSelectionQuery() {
+        dbProxy.createSelectionQueryThen("FROM Employee WHERE department = 'Tech'", Employee.class, query -> {
+            assertEquals(
+                    List.of(
+                            new Employee(1L, "Billy", "Tech", 40000L),
+                            new Employee(2L, "Elli", "Tech", 40000L),
+                            new Employee(3L, "John", "Tech", 40000L)
+                    ),
+                    query.getResultList()
+            );
+        });
+    }
+
+    @Test
     public void testUpdateEmployeeWithIdGreaterThan2AndDepartmentIsCorporateToHaveDepartmentAsExecutive() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 "department",
@@ -796,6 +809,21 @@ public class DatabaseProxyTest {
                 new Employee(3L, "John", "", 40000L),
                 new Employee(4L, "Annie", "", 40000L),
                 new Employee(5L, "Jeff", "", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeeSetDepartmentToTechUsingMutationQuery() throws SQLException {
+        dbProxy.createMutationQueryThen("UPDATE Employee e SET e.department = :newDepartment",
+                query -> query.setParameter("newDepartment", "Tech")
+                        .executeUpdate());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Tech", 40000L),
+                new Employee(5L, "Jeff", "Tech", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }

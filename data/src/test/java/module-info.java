@@ -7,6 +7,7 @@ module backend.framework.data.test {
     requires java.sql;
     requires static lombok;
     requires org.junit.jupiter.api;
+    requires org.hibernate.orm.core;
 
     opens io.john.amiscaray.backend.framework.data.test.stub to org.hibernate.orm.core;
     opens io.john.amiscaray.backend.framework.data.test to org.junit.platform.commons;

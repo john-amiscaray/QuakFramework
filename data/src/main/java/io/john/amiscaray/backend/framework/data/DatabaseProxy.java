@@ -10,13 +10,16 @@ import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.query.MutationQuery;
 import org.hibernate.query.Query;
+import org.hibernate.query.SelectionQuery;
 import org.hibernate.service.ServiceRegistry;
 import org.reflections.Reflections;
 import org.reflections.scanners.Scanners;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static io.john.amiscaray.backend.framework.core.properties.ApplicationProperty.*;
 import static io.john.amiscaray.backend.framework.data.update.UpdateExpression.setTo;
@@ -189,6 +192,20 @@ public class DatabaseProxy {
             currentExpression = updateExpression.apply(currentExpression, queryRoot, cb);
         }
         update.set(fieldUpdate.fieldName(), currentExpression.as(fieldType));
+    }
+
+    public void createMutationQueryThen(String hql, Consumer<MutationQuery> action) {
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        action.accept(currentSession.createMutationQuery(hql));
+        transaction.commit();
+    }
+
+    public <R> void createSelectionQueryThen(String hql, Class<R> clazz, Consumer<SelectionQuery<R>> action) {
+        checkSessionStarted();
+        var transaction = currentSession.beginTransaction();
+        action.accept(currentSession.createSelectionQuery(hql, clazz));
+        transaction.commit();
     }
 
     private void checkSessionStarted() {
