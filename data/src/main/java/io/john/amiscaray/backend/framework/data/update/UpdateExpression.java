@@ -75,4 +75,12 @@ public interface UpdateExpression<T> {
         return (currentValue, _queryRoot, cb) -> cb.trim(CriteriaBuilder.Trimspec.LEADING, currentValue);
     }
 
+    static UpdateExpression<String> subString(int startIndex) {
+        return (currentValue, _queryRoot, cb) -> cb.substring(currentValue, startIndex + 1);
+    }
+
+    static UpdateExpression<String> subString(int startIndex, int len) {
+        return (currentValue, _queryRoot, cb) -> cb.substring(currentValue, startIndex + 1, len);
+    }
+
 }

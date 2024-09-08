@@ -622,7 +622,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrim() throws SQLException {
+    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 FieldUpdate.<String>builder("department")
                         .apply(append("      "))
@@ -641,7 +641,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    public void testUpdateAllEmployeesAddTrailingWhitespaceAndTrimTrailing() throws SQLException {
+    public void testUpdateAllEmployeesAddTrailingWhitespaceAndTrimTrailingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 FieldUpdate.<String>builder("department")
                         .apply(append("      "))
@@ -659,7 +659,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimTrailing() throws SQLException {
+    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimTrailingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 FieldUpdate.<String>builder("department")
                         .apply(append(" "))
@@ -678,7 +678,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimLeading() throws SQLException {
+    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimLeadingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 FieldUpdate.<String>builder("department")
                         .apply(append(" "))
@@ -697,7 +697,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    public void testUpdateAllEmployeesAddLeadingWhitespaceAndTrimLeading() throws SQLException {
+    public void testUpdateAllEmployeesAddLeadingWhitespaceAndTrimLeadingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 FieldUpdate.<String>builder("department")
                         .apply(prepend("      "))
@@ -711,6 +711,91 @@ public class DatabaseProxyTest {
                 new Employee(3L, "John", "Tech", 40000L),
                 new Employee(4L, "Annie", "Corporate", 40000L),
                 new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSubstringFirstLetterOfDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(subString(0, 1))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "T", 40000L),
+                new Employee(2L, "Elli", "T", 40000L),
+                new Employee(3L, "John", "T", 40000L),
+                new Employee(4L, "Annie", "C", 40000L),
+                new Employee(5L, "Jeff", "C", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSubstringFrom3rdPosWithLen3OfDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(subString(1, 3))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "ech", 40000L),
+                new Employee(2L, "Elli", "ech", 40000L),
+                new Employee(3L, "John", "ech", 40000L),
+                new Employee(4L, "Annie", "orp", 40000L),
+                new Employee(5L, "Jeff", "orp", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSubstringFrom1ToEndOfDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(subString(1))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "ech", 40000L),
+                new Employee(2L, "Elli", "ech", 40000L),
+                new Employee(3L, "John", "ech", 40000L),
+                new Employee(4L, "Annie", "orporate", 40000L),
+                new Employee(5L, "Jeff", "orporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSubstringFrom1To100OfDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(subString(0, 100))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesSubstringFrom100To100OfDepartment() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(subString(100, 100))
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "", 40000L),
+                new Employee(2L, "Elli", "", 40000L),
+                new Employee(3L, "John", "", 40000L),
+                new Employee(4L, "Annie", "", 40000L),
+                new Employee(5L, "Jeff", "", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
 }
