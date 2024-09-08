@@ -575,4 +575,15 @@ public class DatabaseProxyTest {
                 new Employee(5L, "Jeff", "Corporate", 80000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
+
+    @Test
+    public void testUpdateAllEmployeesSetSalaryToLogWithInvalidBase()  {
+        assertThrows(IllegalArgumentException.class, () -> {
+            dbProxy.updateAll(Employee.class,
+                    FieldUpdate.<Double>builder("salary")
+                            .apply(logBaseN(-2.0))
+                            .build()
+            );
+        });
+    }
 }
