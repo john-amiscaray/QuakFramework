@@ -63,4 +63,16 @@ public interface UpdateExpression<T> {
         return (currentValue, _queryRoot, cb) -> cb.concat(currentValue, cb.literal(suffix));
     }
 
+    static UpdateExpression<String> trim() {
+        return (currentValue, _queryRoot, cb) -> cb.trim(currentValue);
+    }
+
+    static UpdateExpression<String> trimTrailing() {
+        return (currentValue, _queryRoot, cb) -> cb.trim(CriteriaBuilder.Trimspec.TRAILING, currentValue);
+    }
+
+    static UpdateExpression<String> trimLeading() {
+        return (currentValue, _queryRoot, cb) -> cb.trim(CriteriaBuilder.Trimspec.LEADING, currentValue);
+    }
+
 }

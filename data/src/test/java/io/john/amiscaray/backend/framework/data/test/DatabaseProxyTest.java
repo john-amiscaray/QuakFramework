@@ -620,4 +620,97 @@ public class DatabaseProxyTest {
                 new Employee(5L, "Jeff", "Dept of Corporate", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
+
+    @Test
+    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrim() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(append("      "))
+                        .apply(prepend("     "))
+                        .apply(trim())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesAddTrailingWhitespaceAndTrimTrailing() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(append("      "))
+                        .apply(trimTrailing())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimTrailing() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(append(" "))
+                        .apply(prepend(" "))
+                        .apply(trimTrailing())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", " Tech", 40000L),
+                new Employee(2L, "Elli", " Tech", 40000L),
+                new Employee(3L, "John", " Tech", 40000L),
+                new Employee(4L, "Annie", " Corporate", 40000L),
+                new Employee(5L, "Jeff", " Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimLeading() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(append(" "))
+                        .apply(prepend(" "))
+                        .apply(trimLeading())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech ", 40000L),
+                new Employee(2L, "Elli", "Tech ", 40000L),
+                new Employee(3L, "John", "Tech ", 40000L),
+                new Employee(4L, "Annie", "Corporate ", 40000L),
+                new Employee(5L, "Jeff", "Corporate ", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateAllEmployeesAddLeadingWhitespaceAndTrimLeading() throws SQLException {
+        dbProxy.updateAll(Employee.class,
+                FieldUpdate.<String>builder("department")
+                        .apply(prepend("      "))
+                        .apply(trimLeading())
+                        .build()
+        );
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
 }
