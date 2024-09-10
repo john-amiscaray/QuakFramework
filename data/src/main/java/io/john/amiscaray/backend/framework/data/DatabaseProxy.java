@@ -201,11 +201,9 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
-    public <R> void createSelectionQueryThen(String hql, Class<R> clazz, Consumer<SelectionQuery<R>> action) {
+    public <R> void createSelectionQueryThen(String hql, Class<R> entityType, Consumer<SelectionQuery<R>> action) {
         checkSessionStarted();
-        var transaction = currentSession.beginTransaction();
-        action.accept(currentSession.createSelectionQuery(hql, clazz));
-        transaction.commit();
+        action.accept(currentSession.createSelectionQuery(hql, entityType));
     }
 
     private void checkSessionStarted() {
