@@ -11,7 +11,6 @@ import org.junit.jupiter.api.*;
 
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static io.john.amiscaray.backend.framework.data.query.QueryCriteria.*;
@@ -827,5 +826,4 @@ public class DatabaseProxyTest {
                 new Employee(5L, "Jeff", "Tech", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
     }
-
 }
