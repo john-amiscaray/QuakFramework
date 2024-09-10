@@ -4,6 +4,7 @@ import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.AggregateTo;
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
@@ -14,6 +15,14 @@ import java.lang.reflect.InvocationTargetException;
 public class ConstructorDependencyProvider<T> implements ReflectiveDependencyProvider<T> {
 
     private Constructor<T> constructorReturningInstance;
+
+    @Override
+    public String aggregateList() {
+        if (constructorReturningInstance.isAnnotationPresent(AggregateTo.class)) {
+            return constructorReturningInstance.getAnnotation(AggregateTo.class).aggregateList();
+        }
+        return "";
+    }
 
     @Override
     public DependencyID<T> getDependencyID() {

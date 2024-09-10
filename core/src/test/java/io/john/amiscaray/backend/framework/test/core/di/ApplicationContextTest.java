@@ -13,6 +13,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockEmployee.mockEmployee;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationContextTest {
@@ -104,6 +107,46 @@ public class ApplicationContextTest {
         Assertions.assertEquals(
                 mockEmployee(),
                 ctx.getInstance(MockEmployee.class)
+        );
+
+    }
+
+    @Test
+    public void testAggregateListOfEmployeeFromEmployeeStartupDependencyProvider() {
+
+        assertThat(
+                ctx.getAggregateDependencies("EmployeeProviders", MockEmployee.class),
+                contains(mockEmployee())
+        );
+
+    }
+
+    @Test
+    public void testProvideAggregateDependencyStrings() {
+
+        assertThat(
+                ctx.getAggregateDependencies("Strings", String.class),
+                containsInAnyOrder(stringProvider.username(), stringProvider.accountName())
+                );
+
+    }
+
+    @Test
+    public void testProvideAggregateDependencyUserAccounts() {
+
+        assertThat(
+                ctx.getAggregateDependencies("userAccounts", MockUserAccount.class),
+                contains(userAccountProvider.userAccount())
+        );
+
+    }
+
+    @Test
+    public void testProvideAggregateDependencyForUserAccountProvidersNamedUserAccounts() {
+
+        assertThat(
+                ctx.getAggregateDependencies("userAccounts", MockUserAccountProvider.class),
+                contains(userAccountProvider)
         );
 
     }

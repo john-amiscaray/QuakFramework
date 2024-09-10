@@ -4,6 +4,7 @@ import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.AggregateTo;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provide;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
@@ -17,6 +18,14 @@ import java.util.List;
 public class MethodDependencyProvider<T> implements ReflectiveDependencyProvider<T>{
 
     private final Method methodReturningInstance;
+
+    @Override
+    public String aggregateList() {
+        if (methodReturningInstance.isAnnotationPresent(AggregateTo.class)) {
+            return methodReturningInstance.getAnnotation(AggregateTo.class).aggregateList();
+        }
+        return "";
+    }
 
     @Override
     public DependencyID<T> getDependencyID() {
