@@ -14,7 +14,6 @@ import io.john.amiscaray.backend.framework.web.test.application.stub.filter.Filt
 import io.john.amiscaray.backend.framework.web.test.application.stub.filter.MockFilter;
 import io.john.amiscaray.backend.framework.web.test.application.stub.filter.UsersFilter;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
-import io.john.amiscaray.backend.framework.web.test.util.MockFilterWasCalled;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import io.john.amiscaray.backend.framework.web.test.util.TestFilterCollector;
 import jakarta.servlet.http.HttpServletResponse;
@@ -440,13 +439,10 @@ public class WebApplicationTest {
                 HttpResponse.BodyHandlers.ofString(),
                 _httpResponse -> {
                     var ctx = ApplicationContext.getInstance();
-                    var mockFilterWasCalled = ctx.getInstance(MockFilterWasCalled.class);
-                    try {
-                        var filter = mockFilterWasCalled.get();
-                        assertInstanceOf(MockFilter.class, filter);
-                    } catch (InterruptedException | ExecutionException e) {
-                        Assertions.fail(e);
-                    }
+                    var filterCollector = ctx.getInstance(TestFilterCollector.class);
+                    assertThat(filterCollector.getAppliedFilters(), hasItem(
+                            instanceOf(MockFilter.class)
+                    ));
                 }
         );
     }
