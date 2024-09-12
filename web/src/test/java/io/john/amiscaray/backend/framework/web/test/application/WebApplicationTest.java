@@ -516,4 +516,46 @@ public class WebApplicationTest {
         );
     }
 
+    @Test
+    public void testUsersFilterIsAppliedToUserByIDEndpoint() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/1"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertThat(filtersCalled, hasItem(
+                            instanceOf(UsersFilter.class)
+                    ));
+                }
+        );
+    }
+
+    @Test
+    public void testUsersFilterIsAppliedToUserAddressesEndpoint() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/addresses"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertThat(filtersCalled, hasItem(
+                            instanceOf(UsersFilter.class)
+                    ));
+                }
+        );
+    }
+
 }
