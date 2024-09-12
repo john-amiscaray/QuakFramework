@@ -8,6 +8,9 @@ import java.beans.IntrospectionException;
 
 import static io.john.amiscaray.assertions.TestSourceUtil.parsedClassOrInterfaceDeclarationOf;
 import static io.john.amiscaray.stub.MockSource.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerWriterTest {
@@ -20,14 +23,14 @@ public class ControllerWriterTest {
     }
 
     @Test
-    public void testWriteControllerFromStudentRestModel() throws IntrospectionException {
+    public void testWriteControllerFromStudentRestModel() {
         var actualGenerated = controllerWriter.writeNewController(
                 "io.john.amiscaray.controllers",
                 parsedClassOrInterfaceDeclarationOf(studentRestModelSourceCode()),
                 parsedClassOrInterfaceDeclarationOf(studentTableSourceCode()));
 
-        assertEquals(new GeneratedClass(
-                "StudentController.java",
+        assertThat(actualGenerated.name(), equalTo("StudentController.java"));
+        assertThat(actualGenerated.sourceCode(), equalToCompressingWhiteSpace(
                 """
                 package io.john.amiscaray.controllers;
                 
@@ -154,7 +157,7 @@ public class ControllerWriterTest {
                 
                 }
                 """
-        ), actualGenerated);
+        ));
     }
 
     @Test
@@ -165,8 +168,8 @@ public class ControllerWriterTest {
                 parsedClassOrInterfaceDeclarationOf(employeeTableSourceCode())
                 );
 
-        assertEquals(new GeneratedClass(
-                "EmployeeController.java",
+        assertThat(actualGenerated.name(), equalTo("EmployeeController.java"));
+        assertThat(actualGenerated.sourceCode(), equalToCompressingWhiteSpace(
                 """
                 package io.john.amiscaray.controllers;
                 
@@ -309,7 +312,7 @@ public class ControllerWriterTest {
                 
                 }
                 """
-        ), actualGenerated);
+        ));
     }
 
 }

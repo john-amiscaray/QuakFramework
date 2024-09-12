@@ -7,8 +7,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-public @interface APIQuery {
+public @interface APINativeQuery {
 
     String path();
+    String hql();
 
 }
