@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.web.test.util;
 
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.ManagedType;
 import jakarta.servlet.Filter;
 import lombok.Getter;

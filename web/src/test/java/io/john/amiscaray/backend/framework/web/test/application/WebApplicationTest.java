@@ -14,7 +14,6 @@ import io.john.amiscaray.backend.framework.web.test.application.stub.filter.Filt
 import io.john.amiscaray.backend.framework.web.test.application.stub.filter.MockFilter;
 import io.john.amiscaray.backend.framework.web.test.application.stub.filter.UsersFilter;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
-import io.john.amiscaray.backend.framework.web.test.util.MockFilterWasCalled;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import io.john.amiscaray.backend.framework.web.test.util.TestFilterCollector;
 import jakarta.servlet.http.HttpServletResponse;
@@ -440,13 +439,10 @@ public class WebApplicationTest {
                 HttpResponse.BodyHandlers.ofString(),
                 _httpResponse -> {
                     var ctx = ApplicationContext.getInstance();
-                    var mockFilterWasCalled = ctx.getInstance(MockFilterWasCalled.class);
-                    try {
-                        var filter = mockFilterWasCalled.get();
-                        assertInstanceOf(MockFilter.class, filter);
-                    } catch (InterruptedException | ExecutionException e) {
-                        Assertions.fail(e);
-                    }
+                    var filterCollector = ctx.getInstance(TestFilterCollector.class);
+                    assertThat(filterCollector.getAppliedFilters(), hasItem(
+                            instanceOf(MockFilter.class)
+                    ));
                 }
         );
     }
@@ -510,6 +506,48 @@ public class WebApplicationTest {
                             instanceOf(FilterOne.class),
                             instanceOf(FilterTwo.class),
                             instanceOf(MockFilter.class),
+                            instanceOf(UsersFilter.class)
+                    ));
+                }
+        );
+    }
+
+    @Test
+    public void testUsersFilterIsAppliedToUserByIDEndpoint() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/1"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertThat(filtersCalled, hasItem(
+                            instanceOf(UsersFilter.class)
+                    ));
+                }
+        );
+    }
+
+    @Test
+    public void testUsersFilterIsAppliedToUserAddressesEndpoint() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "user/addresses"))
+                .GET()
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertThat(filtersCalled, hasItem(
                             instanceOf(UsersFilter.class)
                     ));
                 }

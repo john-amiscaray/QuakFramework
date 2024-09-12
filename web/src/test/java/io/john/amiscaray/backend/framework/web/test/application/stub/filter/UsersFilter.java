@@ -7,7 +7,7 @@ import jakarta.servlet.*;
 
 import java.io.IOException;
 
-@ApplicationFilter(urlPattern = "/users")
+@ApplicationFilter(urlPatterns = { "/users", "/user/*" })
 public class UsersFilter implements Filter {
 
     @Override

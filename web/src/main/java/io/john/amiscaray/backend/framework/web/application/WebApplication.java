@@ -177,7 +177,9 @@ public class WebApplication extends Application {
 
             var filterMap = new FilterMap();
             filterMap.setFilterName(filterName);
-            filterMap.addURLPattern(filterMetaData.urlPattern());
+            for (var urlPattern : filterMetaData.urlPatterns()) {
+                filterMap.addURLPattern(urlPattern);
+            }
 
             context.addFilterMap(filterMap);
         }
