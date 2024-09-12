@@ -9,10 +9,14 @@ import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
+import io.john.amiscaray.backend.framework.web.test.application.stub.filter.FilterOne;
+import io.john.amiscaray.backend.framework.web.test.application.stub.filter.FilterTwo;
 import io.john.amiscaray.backend.framework.web.test.application.stub.filter.MockFilter;
+import io.john.amiscaray.backend.framework.web.test.application.stub.filter.UsersFilter;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import io.john.amiscaray.backend.framework.web.test.util.MockFilterWasCalled;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
+import io.john.amiscaray.backend.framework.web.test.util.TestFilterCollector;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
 import org.junit.jupiter.api.*;
@@ -28,6 +32,8 @@ import java.util.concurrent.ExecutionException;
 
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.*;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class WebApplicationTest {
@@ -184,6 +190,14 @@ public class WebApplicationTest {
                 .build();
         application.init(configuration);
         application.startAsync();
+    }
+
+    @AfterEach
+    public void afterEach() {
+        var ctx = ApplicationContext.getInstance();
+        var filterCollector = ctx.getInstance(TestFilterCollector.class);
+
+        filterCollector.clear();
     }
 
     @AfterAll
@@ -433,6 +447,71 @@ public class WebApplicationTest {
                     } catch (InterruptedException | ExecutionException e) {
                         Assertions.fail(e);
                     }
+                }
+        );
+    }
+
+    @Test
+    public void testFilterOneIsCalledBeforeFilterTwo() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL))
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertInstanceOf(FilterOne.class, filtersCalled.getFirst());
+                    assertInstanceOf(FilterTwo.class, filtersCalled.get(1));
+                }
+        );
+    }
+
+    @Test
+    public void testFilterOneTwoAndMockFiltersAreCalledForRootURL() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL))
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertThat(filtersCalled, containsInRelativeOrder(
+                            instanceOf(FilterOne.class),
+                            instanceOf(FilterTwo.class),
+                            instanceOf(MockFilter.class)
+                    ));
+                }
+        );
+
+    }
+
+    @Test
+    public void testFilterOneTwoAndMockFilterAndUsersFilterAreCalledForUsersURL() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "users"))
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var collectedFilters = ctx.getInstance(TestFilterCollector.class);
+                    var filtersCalled = collectedFilters.getAppliedFilters();
+
+                    assertThat(filtersCalled, containsInRelativeOrder(
+                            instanceOf(FilterOne.class),
+                            instanceOf(FilterTwo.class),
+                            instanceOf(MockFilter.class),
+                            instanceOf(UsersFilter.class)
+                    ));
                 }
         );
     }

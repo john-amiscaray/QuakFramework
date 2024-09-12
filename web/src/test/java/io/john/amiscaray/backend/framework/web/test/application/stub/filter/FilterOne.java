@@ -2,23 +2,20 @@ package io.john.amiscaray.backend.framework.web.test.application.stub.filter;
 
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.web.filter.annotation.ApplicationFilter;
-import io.john.amiscaray.backend.framework.web.test.util.MockFilterWasCalled;
 import io.john.amiscaray.backend.framework.web.test.util.TestFilterCollector;
 import jakarta.servlet.*;
 
 import java.io.IOException;
 
-@ApplicationFilter
-public class MockFilter implements Filter {
+@ApplicationFilter(priority = 1)
+public class FilterOne implements Filter {
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         var ctx = ApplicationContext.getInstance();
-        var future = ctx.getInstance(MockFilterWasCalled.class);
         var filterCollector = ctx.getInstance(TestFilterCollector.class);
 
         filterCollector.addFilter(this);
-        future.complete(this);
         chain.doFilter(request, response);
     }
 

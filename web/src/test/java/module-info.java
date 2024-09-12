@@ -4,6 +4,7 @@ module backend.framework.web.test {
     requires com.fasterxml.jackson.databind;
     requires org.junit.jupiter.api;
     requires org.apache.tomcat.embed.core;
+    requires org.hamcrest;
     requires java.net.http;
     requires backend.framework.core;
 

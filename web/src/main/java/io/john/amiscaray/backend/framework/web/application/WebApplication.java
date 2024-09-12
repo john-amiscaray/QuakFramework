@@ -157,6 +157,7 @@ public class WebApplication extends Application {
         var reflections = new Reflections(classScanPackage, Scanners.TypesAnnotated);
         var applicationFilters = reflections.getTypesAnnotatedWith(ApplicationFilter.class)
                 .stream()
+                .sorted(Comparator.comparingInt(type -> type.getAnnotation(ApplicationFilter.class).priority()))
                 .toList();
         var applicationContext = ApplicationContext.getInstance();
 
