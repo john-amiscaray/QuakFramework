@@ -1,18 +1,26 @@
 package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
+import io.john.amiscaray.backend.framework.web.filter.annotation.ApplicationFilter;
+import io.john.amiscaray.backend.framework.web.filter.exception.InvalidApplicationFilterException;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.servlet.HttpController;
 import io.john.amiscaray.backend.framework.web.servlet.HttpControllerGroup;
+import jakarta.servlet.Filter;
 import lombok.Builder;
 import lombok.Singular;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.descriptor.web.FilterDef;
+import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.javatuples.Pair;
+import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +78,7 @@ public class WebApplication extends Application {
         context = server.addContext(ApplicationProperty.CONTEXT_PATH.getValue(), docBase);
 
         registerServlets();
+        registerFilters();
 
         server.start();
         server.getService().addConnector(connector1);
@@ -137,6 +146,39 @@ public class WebApplication extends Application {
                 context.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
                 controllersToAdd.removeAll(controllersToGroup.entrySet());
             }
+        }
+    }
+
+    private void registerFilters() {
+        if (LOG.isInfoEnabled()) {
+            LOG.info("REGISTERING FILTERS");
+        }
+
+        var reflections = new Reflections(classScanPackage, Scanners.TypesAnnotated);
+        var applicationFilters = reflections.getTypesAnnotatedWith(ApplicationFilter.class)
+                .stream()
+                .toList();
+        var applicationContext = ApplicationContext.getInstance();
+
+        for(var filterClass : applicationFilters) {
+            if (!Filter.class.isAssignableFrom(filterClass)) {
+                throw new InvalidApplicationFilterException(filterClass, "Filter must implement jakarta.servlet.Filter.");
+            }
+            var filterInstance = (Filter) applicationContext.getInstance(filterClass);
+            var filterMetaData = filterClass.getAnnotation(ApplicationFilter.class);
+            var filterName = filterMetaData.name().isEmpty() ? filterClass.getName() : filterMetaData.name();
+
+            var filterDef = new FilterDef();
+            filterDef.setFilterName(filterName);
+            filterDef.setFilter(filterInstance);
+
+            context.addFilterDef(filterDef);
+
+            var filterMap = new FilterMap();
+            filterMap.setFilterName(filterName);
+            filterMap.addURLPattern(filterMetaData.urlPattern());
+
+            context.addFilterMap(filterMap);
         }
     }
 

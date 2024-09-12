@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.web.test.application.stub;
+package io.john.amiscaray.backend.framework.web.test.application.stub.controller;
 
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
@@ -7,6 +7,8 @@ import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
+import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationDetails;
+import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationUIDetails;
 
 @Controller(contextPath = "/application")
 public class MockControllerWithDependencies {

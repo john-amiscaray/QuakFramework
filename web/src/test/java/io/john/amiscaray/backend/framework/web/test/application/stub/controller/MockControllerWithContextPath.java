@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.web.test.application.stub;
+package io.john.amiscaray.backend.framework.web.test.application.stub.controller;
 
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;

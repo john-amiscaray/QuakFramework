@@ -11,6 +11,8 @@ module backend.framework.web {
     requires org.slf4j;
 
     exports io.john.amiscaray.backend.framework.web.application;
+    exports io.john.amiscaray.backend.framework.web.filter.annotation;
+    exports io.john.amiscaray.backend.framework.web.filter.exception;
     exports io.john.amiscaray.backend.framework.web.handler;
     exports io.john.amiscaray.backend.framework.web.handler.request;
     exports io.john.amiscaray.backend.framework.web.handler.response;

@@ -167,11 +167,11 @@ public class ApplicationContext {
         if (!hasInstance(clazz)) {
             try {
                 var clazzConstructorForInstantiation = getManagedInstanceConstructor(clazz);
-                if (clazzConstructorForInstantiation.getParameters().length == 0) {
-                    return (T) clazzConstructorForInstantiation.newInstance();
-                } else {
-                    return (T) clazzConstructorForInstantiation.newInstance(fetchInstancesOfParameters(clazzConstructorForInstantiation.getParameters()));
-                }
+                var instance = clazzConstructorForInstantiation.getParameters().length == 0 ?
+                        (T) clazzConstructorForInstantiation.newInstance() :
+                        (T) clazzConstructorForInstantiation.newInstance(fetchInstancesOfParameters(clazzConstructorForInstantiation.getParameters()));
+                instances.put(new DependencyID<>(clazz), instance);
+                return instance;
             } catch (InvocationTargetException | DependencyInstantiationException | IllegalAccessException | java.lang.InstantiationException e) {
                 throw new DependencyInstantiationException(clazz, e);
             }
