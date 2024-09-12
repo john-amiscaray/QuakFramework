@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 public @interface ApplicationFilter {
 
     String name() default "";
-    String urlPattern() default "/";
+    String urlPattern() default "/*";
+    int priority() default Integer.MAX_VALUE;
 
 }
