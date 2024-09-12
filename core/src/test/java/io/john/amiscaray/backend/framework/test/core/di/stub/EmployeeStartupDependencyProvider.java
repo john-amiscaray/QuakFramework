@@ -13,6 +13,11 @@ import static io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockEmp
 public class EmployeeStartupDependencyProvider implements DependencyProvider<MockEmployee> {
 
     @Override
+    public String aggregateList() {
+        return "EmployeeProviders";
+    }
+
+    @Override
     public DependencyID<MockEmployee> getDependencyID() {
         return new DependencyID<>(
                 "employee",

@@ -3,6 +3,7 @@ package io.john.amiscaray.backend.framework.core.di.provider;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
+import lombok.NonNull;
 
 import java.util.List;
 
@@ -14,6 +15,10 @@ import java.util.List;
  * @param <T> The types of the dependency being provided
  */
 public interface DependencyProvider<T> {
+
+    default String aggregateList() {
+        return "";
+    }
 
     DependencyID<T> getDependencyID();
 

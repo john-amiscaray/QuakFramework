@@ -2,21 +2,20 @@ package io.john.amiscaray.backend.framework.web.test.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.SimplePathController;
-import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
+import io.john.amiscaray.backend.framework.web.test.application.stub.filter.MockFilter;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
+import io.john.amiscaray.backend.framework.web.test.util.MockFilterWasCalled;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.LifecycleException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -25,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.*;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
@@ -413,6 +413,27 @@ public class WebApplicationTest {
                 request,
                 HttpResponse.BodyHandlers.ofString(),
                 httpResponse -> assertEquals("Double: 3.14", httpResponse.body())
+        );
+    }
+
+    @Test
+    public void testMockFilterIsCalledOnRequest() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL))
+                .build();
+        connectionUtil.attemptConnectionAndAssert(
+                request,
+                HttpResponse.BodyHandlers.ofString(),
+                _httpResponse -> {
+                    var ctx = ApplicationContext.getInstance();
+                    var mockFilterWasCalled = ctx.getInstance(MockFilterWasCalled.class);
+                    try {
+                        var filter = mockFilterWasCalled.get();
+                        assertInstanceOf(MockFilter.class, filter);
+                    } catch (InterruptedException | ExecutionException e) {
+                        Assertions.fail(e);
+                    }
+                }
         );
     }
 

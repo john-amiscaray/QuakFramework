@@ -4,7 +4,9 @@ import io.john.amiscaray.backend.framework.test.core.di.stub.EmployeeStartupDepe
 module backend.framework.core.test {
 
     requires org.junit.jupiter.api;
+    requires org.hamcrest;
     requires backend.framework.core;
+    requires static lombok;
 
     opens io.john.amiscaray.backend.framework.test.core to org.junit.platform.commons;
     opens io.john.amiscaray.backend.framework.test.core.di to org.junit.platform.commons;

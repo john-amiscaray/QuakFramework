@@ -23,6 +23,7 @@ public class ApplicationContext {
     private static ApplicationContext applicationContextInstance;
     private static final Logger LOG = LoggerFactory.getLogger(ApplicationContext.class);
     private Map<DependencyID<?>, Object> instances;
+    private Map<DependencyID<?>, List> aggregateDependencies;
     @Getter
     private String classScanPackage;
 
@@ -32,6 +33,7 @@ public class ApplicationContext {
     public void init(String classScanPackage) throws InvocationTargetException, DependencyInstantiationException, IllegalAccessException {
         this.classScanPackage = classScanPackage;
         instances = new HashMap<>();
+        aggregateDependencies = new HashMap<>();
         var reflections = new Reflections(classScanPackage, Scanners.TypesAnnotated);
         var providers = reflections.getTypesAnnotatedWith(Provider.class)
                 .stream()
@@ -90,8 +92,21 @@ public class ApplicationContext {
             dependencyProviders.stream().filter(providerHasItsDependenciesSatisfied)
                     .findFirst()
                     .ifPresent(provider -> {
-                        var providedInstance = provider.provideDependency(this);
-                        instances.put(providedInstance.id(), providedInstance.instance());
+                        var providedDependency = provider.provideDependency(this);
+                        var id = providedDependency.id();
+                        if (provider.aggregateList() != null && !provider.aggregateList().isEmpty()) {
+                            var aggregateID = new DependencyID<>(
+                                    provider.aggregateList(),
+                                    providedDependency.id().type()
+                            );
+                            if (aggregateDependencies.containsKey(aggregateID)) {
+                                aggregateDependencies.get(aggregateID)
+                                        .add(providedDependency.instance());
+                            } else {
+                                aggregateDependencies.put(aggregateID, new ArrayList<>(List.of(providedDependency.instance())));
+                            }
+                        }
+                        instances.put(id, providedDependency.instance());
                         dependencyProviders.remove(provider);
                     });
             canSatisfyDependencies = dependencyProviders.stream()
@@ -152,11 +167,11 @@ public class ApplicationContext {
         if (!hasInstance(clazz)) {
             try {
                 var clazzConstructorForInstantiation = getManagedInstanceConstructor(clazz);
-                if (clazzConstructorForInstantiation.getParameters().length == 0) {
-                    return (T) clazzConstructorForInstantiation.newInstance();
-                } else {
-                    return (T) clazzConstructorForInstantiation.newInstance(fetchInstancesOfParameters(clazzConstructorForInstantiation.getParameters()));
-                }
+                var instance = clazzConstructorForInstantiation.getParameters().length == 0 ?
+                        (T) clazzConstructorForInstantiation.newInstance() :
+                        (T) clazzConstructorForInstantiation.newInstance(fetchInstancesOfParameters(clazzConstructorForInstantiation.getParameters()));
+                instances.put(new DependencyID<>(clazz), instance);
+                return instance;
             } catch (InvocationTargetException | DependencyInstantiationException | IllegalAccessException | java.lang.InstantiationException e) {
                 throw new DependencyInstantiationException(clazz, e);
             }
@@ -175,5 +190,9 @@ public class ApplicationContext {
 
     public <T> T getInstance(DependencyID<T> dependencyID) {
         return (T) instances.get(dependencyID);
+    }
+
+    public <T> List<T> getAggregateDependencies(String aggregateListName, Class<T> dependencyType) {
+        return aggregateDependencies.get(new DependencyID<>(aggregateListName, dependencyType));
     }
 }
