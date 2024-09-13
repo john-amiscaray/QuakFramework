@@ -3,6 +3,7 @@ package io.john.amiscaray.backend.framework.data.test;
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
 import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
+import io.john.amiscaray.backend.framework.data.query.NativeQuery;
 import io.john.amiscaray.backend.framework.data.test.stub.Employee;
 import io.john.amiscaray.backend.framework.data.test.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.*;
 import java.io.FileNotFoundException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import static io.john.amiscaray.backend.framework.data.query.QueryCriteria.*;
 import static io.john.amiscaray.backend.framework.data.update.UpdateExpression.*;
@@ -447,6 +449,28 @@ public class DatabaseProxyTest {
                     query.getResultList()
             );
         });
+    }
+
+    @Test
+    public void testQueryEmployeeByDepartmentUsingNativeSelectionQueryWithArg() {
+        var selectionQuery = dbProxy.createSelectionQuery(new NativeQuery("FROM Employee WHERE department = :name", Map.of("name", "Tech")), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L)
+        ), selectionQuery.getResultList());
+    }
+
+    @Test
+    public void testQueryEmployeeByDepartmentUsingNativeSelectionQuery() {
+        var selectionQuery = dbProxy.createSelectionQuery(new NativeQuery("FROM Employee WHERE department = 'Tech'"), Employee.class);
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L)
+        ), selectionQuery.getResultList());
     }
 
     @Test

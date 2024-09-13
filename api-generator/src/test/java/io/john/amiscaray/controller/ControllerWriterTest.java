@@ -1,6 +1,5 @@
 package io.john.amiscaray.controller;
 
-import io.john.amiscaray.model.GeneratedClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -8,7 +7,9 @@ import java.beans.IntrospectionException;
 
 import static io.john.amiscaray.assertions.TestSourceUtil.parsedClassOrInterfaceDeclarationOf;
 import static io.john.amiscaray.stub.MockSource.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 
 public class ControllerWriterTest {
 
@@ -20,14 +21,14 @@ public class ControllerWriterTest {
     }
 
     @Test
-    public void testWriteControllerFromStudentRestModel() throws IntrospectionException {
+    public void testWriteControllerFromStudentRestModel() {
         var actualGenerated = controllerWriter.writeNewController(
                 "io.john.amiscaray.controllers",
                 parsedClassOrInterfaceDeclarationOf(studentRestModelSourceCode()),
                 parsedClassOrInterfaceDeclarationOf(studentTableSourceCode()));
 
-        assertEquals(new GeneratedClass(
-                "StudentController.java",
+        assertThat(actualGenerated.name(), equalTo("StudentController.java"));
+        assertThat(actualGenerated.sourceCode(), equalToCompressingWhiteSpace(
                 """
                 package io.john.amiscaray.controllers;
                 
@@ -154,19 +155,19 @@ public class ControllerWriterTest {
                 
                 }
                 """
-        ), actualGenerated);
+        ));
     }
 
     @Test
-    public void testWriteControllerFromEmployeeRestModel() throws IntrospectionException {
+    public void testWriteControllerFromEmployeeRestModel() {
         var actualGenerated = controllerWriter.writeNewController(
                 "io.john.amiscaray.controllers",
                 parsedClassOrInterfaceDeclarationOf(employeeRestModelSourceCode()),
                 parsedClassOrInterfaceDeclarationOf(employeeTableSourceCode())
                 );
 
-        assertEquals(new GeneratedClass(
-                "EmployeeController.java",
+        assertThat(actualGenerated.name(), equalTo("EmployeeController.java"));
+        assertThat(actualGenerated.sourceCode(), equalToCompressingWhiteSpace(
                 """
                 package io.john.amiscaray.controllers;
                 
@@ -298,6 +299,7 @@ public class ControllerWriterTest {
                             .map(EmployeeTableEntry::toEmployeeDTO)
                             .toList());
                     }
+                    
                     @Handle(method = RequestMethod.GET, path = "/employee/salary/high")
                     public Response<List<Employee>> queryEmployeesWithHighSalaries(Request<Void> request) {
                         var query = EmployeeTableEntry.queryEmployeesWithHighSalaries();
@@ -307,9 +309,18 @@ public class ControllerWriterTest {
                             .toList());
                     }
                 
+                    @Handle(method = RequestMethod.GET, path = "/employee/salary/low")
+                    public Response<List<Employee>> queryEmployeesWithSalariesLessThan(DynamicPathRequest<Void> request) {
+                        var query = EmployeeTableEntry.queryEmployeesWithSalariesLessThan(request);
+                        return Response.of(databaseProxy.createSelectionQuery(query, EmployeeTableEntry.class)
+                            .getResultList()
+                            .stream()
+                            .map(EmployeeTableEntry::toEmployeeDTO)
+                            .toList());
+                    }
                 }
                 """
-        ), actualGenerated);
+        ));
     }
 
 }

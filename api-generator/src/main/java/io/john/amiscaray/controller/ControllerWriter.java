@@ -3,18 +3,16 @@ package io.john.amiscaray.controller;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.*;
 import io.john.amiscaray.backend.framework.generator.api.APIQuery;
 import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
 import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
+import io.john.amiscaray.backend.framework.generator.api.APINativeQuery;
 import io.john.amiscaray.model.GeneratedClass;
 import jakarta.persistence.Id;
 
-import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import static io.john.amiscaray.util.ParserUtils.getAnnotationMemberValue;
 
@@ -181,6 +179,69 @@ public class ControllerWriter {
         return result.toString().stripTrailing();
     }
 
+    private List<MethodDeclaration> getNativeQueryMethods(ClassOrInterfaceDeclaration entityClass) {
+        var annotatedMethods = entityClass.getMethods()
+                .stream()
+                .sorted(Comparator.comparing(MethodDeclaration::getNameAsString))
+                .filter(method -> method.isAnnotationPresent(APINativeQuery.class))
+                .toList();
+
+        for (var method : annotatedMethods) {
+            var errorMessage = "Method " + method.getName() + " annotated with @APINativeQuery should: ";
+            var errors = new ArrayList<String>();
+
+            if (!method.getTypeAsString().equals("NativeQuery")) {
+                errors.add("be annotated with @APINativeQuery should return a io.john.amiscaray.backend.framework.data.query.NativeQuery");
+            }
+
+            if ((method.getParameters().size() != 1
+                    && method.getParameters().getFirst().isPresent())
+                    || !method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
+            ) {
+                errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
+            }
+
+            if (!method.isStatic()) {
+                errors.add("be static");
+            }
+
+            if (!errors.isEmpty()) {
+                errorMessage += String.join(", ", errors) + ".";
+                throw new IllegalStateException(errorMessage);
+            }
+        }
+
+        return annotatedMethods;
+    }
+
+    private String generateNativeQueryEndpoints(String rootPathName, ClassOrInterfaceDeclaration entityClass, String restModelName, String restModelMappingMethodName) {
+        var queryMethods = getNativeQueryMethods(entityClass);
+        var dataClassName = entityClass.getNameAsString();
+        var result = new StringBuilder();
+        for (var queryMethod : queryMethods) {
+            var queryPath = getAnnotationMemberValue(queryMethod.getAnnotationByName("APINativeQuery").orElseThrow(), "path").orElseThrow().asStringLiteralExpr().asString();
+            if (queryPath.startsWith("/")) {
+                queryPath = queryPath.substring(1);
+            }
+            var methodName = queryMethod.getName();
+            var returnType = queryMethod.getParameter(0).getTypeAsString();
+
+            result.append(String.format("""
+                    @Handle(method = RequestMethod.GET, path = "/%1$s/%2$s")
+                    public Response<List<%6$s>> %3$s(%4$s request) {
+                        var query = %5$s.%3$s(request);
+                        return Response.of(databaseProxy.createSelectionQuery(query, %5$s.class)
+                            .getResultList()
+                            .stream()
+                            .map(%5$s::%7$s)
+                            .toList());
+                    }
+                    """, rootPathName, queryPath, methodName, returnType, dataClassName, restModelName, restModelMappingMethodName));
+        }
+
+        return result.toString().stripTrailing();
+    }
+
     public GeneratedClass writeNewController(String targetPackage,
                                              ClassOrInterfaceDeclaration restModelClass,
                                              ClassOrInterfaceDeclaration entityClass)  {
@@ -200,6 +261,7 @@ public class ControllerWriter {
         var stringToEntityIDConversionMethod = getStringToEntityIDConversionMethodName(entityClass);
         var entityIDTypeString = getEntityIDTypeString(entityClass);
         var queryMethodImpls = generateAPIQueryEndpoints(rootPath, entityClass, restModelName, modelGeneratorMethod.getNameAsString()).indent(4);
+        var nativeQueryMethodImpls = generateNativeQueryEndpoints(rootPath, entityClass, restModelName, modelGeneratorMethod.getNameAsString()).indent(4);
 
         var sourceCode = String.format("""
                 package %1$s;
@@ -325,6 +387,8 @@ public class ControllerWriter {
                     }
                 
                 %13$s
+                
+                %14$s
                 }
                 """, targetPackage,
                 restModelName,
@@ -338,7 +402,8 @@ public class ControllerWriter {
                 entityIDSetterMethod.getName(),
                 stringToEntityIDConversionMethod,
                 entityIDTypeString,
-                queryMethodImpls);
+                queryMethodImpls,
+                nativeQueryMethodImpls);
 
         return new GeneratedClass(restModelName + "Controller.java", sourceCode);
     }

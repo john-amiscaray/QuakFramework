@@ -1,14 +1,8 @@
 package io.john.amiscaray.jpms;
 
 import io.john.amiscaray.model.VisitedSourcesState;
-import io.john.amiscaray.stub.data.EmployeeTableEntry;
-import io.john.amiscaray.stub.data.StudentTableEntry;
-import io.john.amiscaray.stub.model.Employee;
-import io.john.amiscaray.stub.model.Student;
-import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,7 +10,6 @@ import static io.john.amiscaray.assertions.TestSourceUtil.parsedClassOrInterface
 import static io.john.amiscaray.stub.MockSource.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
-import static org.mockito.Mockito.mock;
 
 public class ModuleInfoWriterTest {
 

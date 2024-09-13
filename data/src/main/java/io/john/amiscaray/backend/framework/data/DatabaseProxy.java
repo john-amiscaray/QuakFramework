@@ -1,6 +1,7 @@
 package io.john.amiscaray.backend.framework.data;
 
 import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
+import io.john.amiscaray.backend.framework.data.query.NativeQuery;
 import io.john.amiscaray.backend.framework.data.query.QueryCriteria;
 import io.john.amiscaray.backend.framework.data.update.FieldUpdate;
 import jakarta.persistence.Entity;
@@ -204,6 +205,17 @@ public class DatabaseProxy {
     public <R> void createSelectionQueryThen(String hql, Class<R> entityType, Consumer<SelectionQuery<R>> action) {
         checkSessionStarted();
         action.accept(currentSession.createSelectionQuery(hql, entityType));
+    }
+
+    public <R> SelectionQuery<R> createSelectionQuery(NativeQuery query, Class<R> entityType) {
+        checkSessionStarted();
+        var selectionQuery = currentSession.createSelectionQuery(query.hql(), entityType);
+
+        for (var entry : query.params().entrySet()) {
+            selectionQuery.setParameter(entry.getKey(), entry.getValue());
+        }
+
+        return selectionQuery;
     }
 
     private void checkSessionStarted() {
