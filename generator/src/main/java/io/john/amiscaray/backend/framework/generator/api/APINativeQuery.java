@@ -10,6 +10,5 @@ import java.lang.annotation.Target;
 public @interface APINativeQuery {
 
     String path();
-    String hql();
 
 }

@@ -1,6 +1,5 @@
 package io.john.amiscaray.controller;
 
-import io.john.amiscaray.model.GeneratedClass;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +10,6 @@ import static io.john.amiscaray.stub.MockSource.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ControllerWriterTest {
 
@@ -161,7 +159,7 @@ public class ControllerWriterTest {
     }
 
     @Test
-    public void testWriteControllerFromEmployeeRestModel() throws IntrospectionException {
+    public void testWriteControllerFromEmployeeRestModel() {
         var actualGenerated = controllerWriter.writeNewController(
                 "io.john.amiscaray.controllers",
                 parsedClassOrInterfaceDeclarationOf(employeeRestModelSourceCode()),
@@ -301,6 +299,7 @@ public class ControllerWriterTest {
                             .map(EmployeeTableEntry::toEmployeeDTO)
                             .toList());
                     }
+                    
                     @Handle(method = RequestMethod.GET, path = "/employee/salary/high")
                     public Response<List<Employee>> queryEmployeesWithHighSalaries(Request<Void> request) {
                         var query = EmployeeTableEntry.queryEmployeesWithHighSalaries();
@@ -310,6 +309,15 @@ public class ControllerWriterTest {
                             .toList());
                     }
                 
+                    @Handle(method = RequestMethod.GET, path = "/employee/salary/low")
+                    public Response<List<Employee>> queryEmployeesWithSalariesLessThan(Request<Void> request) {
+                        var query = EmployeeTableEntry.queryEmployeesWithSalariesLessThan(request);
+                        return Response.of(databaseProxy.createSelectionQuery(query, EmployeeTableEntry.class)
+                            .getResultList()
+                            .stream()
+                            .map(EmployeeTableEntry::toEmployeeDTO)
+                            .toList());
+                    }
                 }
                 """
         ));

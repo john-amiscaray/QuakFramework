@@ -196,7 +196,7 @@ public class ControllerWriter {
 
             if (method.getParameters().size() != 1
                     && method.getParameters().getFirst().isPresent()
-                    && method.getParameters().getFirst().get().getTypeAsString().equals("Request")
+                    && method.getParameters().getFirst().get().getTypeAsString().matches("Request(<.*>)?")
             ) {
                 errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.Request parameter");
             }
@@ -219,22 +219,24 @@ public class ControllerWriter {
         var dataClassName = entityClass.getNameAsString();
         var result = new StringBuilder();
         for (var queryMethod : queryMethods) {
-            var queryPath = getAnnotationMemberValue(queryMethod.getAnnotationByName("NativeQuery").orElseThrow(), "path").orElseThrow().asStringLiteralExpr().asString();
+            var queryPath = getAnnotationMemberValue(queryMethod.getAnnotationByName("APINativeQuery").orElseThrow(), "path").orElseThrow().asStringLiteralExpr().asString();
             if (queryPath.startsWith("/")) {
                 queryPath = queryPath.substring(1);
             }
             var methodName = queryMethod.getName();
+            var returnType = queryMethod.getParameter(0).getTypeAsString();
+
             result.append(String.format("""
                     @Handle(method = RequestMethod.GET, path = "/%1$s/%2$s")
-                    public Response<List<%5$s>> %3$s(Request<Void> request) {
-                        var query = %4$s.%3$s(request);
-                        return Response.of(databaseProxy.createSelectionQuery(query, %4$s.class)
+                    public Response<List<%6$s>> %3$s(%4$s request) {
+                        var query = %5$s.%3$s(request);
+                        return Response.of(databaseProxy.createSelectionQuery(query, %5$s.class)
                             .getResultList()
                             .stream()
-                            .map(%4$s::%6$s)
+                            .map(%5$s::%7$s)
                             .toList());
                     }
-                    """, rootPathName, queryPath, methodName, dataClassName, restModelName, restModelMappingMethodName));
+                    """, rootPathName, queryPath, methodName, returnType, dataClassName, restModelName, restModelMappingMethodName));
         }
 
         return result.toString().stripTrailing();
