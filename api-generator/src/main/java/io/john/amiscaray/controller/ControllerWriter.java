@@ -196,9 +196,9 @@ public class ControllerWriter {
 
             if (method.getParameters().size() != 1
                     && method.getParameters().getFirst().isPresent()
-                    && method.getParameters().getFirst().get().getTypeAsString().matches("Request(<.*>)?")
+                    && method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
             ) {
-                errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.Request parameter");
+                errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
             }
 
             if (!method.isStatic()) {
