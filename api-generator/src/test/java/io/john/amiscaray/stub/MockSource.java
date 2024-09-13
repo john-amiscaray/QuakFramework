@@ -144,7 +144,7 @@ public class MockSource {
                     }
                                 
                     @APIQuery(path = "sales")
-                    public static DatabaseQuery queryEmployeesInSalesDepartment() {
+                    public static DatabaseQuery queryEmployeesInSalesDepartment(DynamicPathRequest<Void> request) {
                         return DatabaseQuery.builder()
                                 .withCriteria(new ValueIs("department", "sales"))
                                 .build();
@@ -152,7 +152,7 @@ public class MockSource {
                     }
                                 
                     @APIQuery(path = "salary/high")
-                    public static DatabaseQuery queryEmployeesWithHighSalaries() {
+                    public static DatabaseQuery queryEmployeesWithHighSalaries(DynamicPathRequest<Void> request) {
                         return DatabaseQuery.builder()
                                 .withCriteria(new ValueGreaterThan("salary", 100000))
                                 .build();
