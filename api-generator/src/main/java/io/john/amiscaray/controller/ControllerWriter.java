@@ -137,8 +137,11 @@ public class ControllerWriter {
                 errors.add("be annotated with @APIQuery should return a DatabaseQuery");
             }
 
-            if (!method.getParameters().isEmpty()) {
-                errors.add("be annotated with @APIQuery should not have any parameters");
+            if (method.getParameters().size() != 1
+                    || method.getParameters().getFirst().isEmpty()
+                    || !method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
+            ) {
+                errors.add("be annotated with @APIQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
             }
 
             if (!method.isStatic()) {
@@ -160,20 +163,21 @@ public class ControllerWriter {
         var result = new StringBuilder();
         for (var queryMethod : queryMethods) {
             var queryPath = getAnnotationMemberValue(queryMethod.getAnnotationByName("APIQuery").orElseThrow(), "path").orElseThrow().asStringLiteralExpr().asString();
+            var parameterType = queryMethod.getParameter(0).getTypeAsString();
             if (queryPath.startsWith("/")) {
                 queryPath = queryPath.substring(1);
             }
             var methodName = queryMethod.getName();
             result.append(String.format("""
                     @Handle(method = RequestMethod.GET, path = "/%1$s/%2$s")
-                    public Response<List<%5$s>> %3$s(Request<Void> request) {
-                        var query = %4$s.%3$s();
-                        return Response.of(databaseProxy.queryAll(%4$s.class, query)
+                    public Response<List<%6$s>> %3$s(%4$s request) {
+                        var query = %5$s.%3$s(request);
+                        return Response.of(databaseProxy.queryAll(%5$s.class, query)
                             .stream()
-                            .map(%4$s::%6$s)
+                            .map(%5$s::%7$s)
                             .toList());
                     }
-                    """, rootPathName, queryPath, methodName, dataClassName, restModelName, restModelMappingMethodName));
+                    """, rootPathName, queryPath, methodName, parameterType, dataClassName, restModelName, restModelMappingMethodName));
         }
 
         return result.toString().stripTrailing();
@@ -194,8 +198,8 @@ public class ControllerWriter {
                 errors.add("be annotated with @APINativeQuery should return a io.john.amiscaray.backend.framework.data.query.NativeQuery");
             }
 
-            if ((method.getParameters().size() != 1
-                    && method.getParameters().getFirst().isPresent())
+            if (method.getParameters().size() != 1
+                    || method.getParameters().getFirst().isEmpty()
                     || !method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
             ) {
                 errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
@@ -224,7 +228,7 @@ public class ControllerWriter {
                 queryPath = queryPath.substring(1);
             }
             var methodName = queryMethod.getName();
-            var returnType = queryMethod.getParameter(0).getTypeAsString();
+            var parameterType = queryMethod.getParameter(0).getTypeAsString();
 
             result.append(String.format("""
                     @Handle(method = RequestMethod.GET, path = "/%1$s/%2$s")
@@ -236,7 +240,7 @@ public class ControllerWriter {
                             .map(%5$s::%7$s)
                             .toList());
                     }
-                    """, rootPathName, queryPath, methodName, returnType, dataClassName, restModelName, restModelMappingMethodName));
+                    """, rootPathName, queryPath, methodName, parameterType, dataClassName, restModelName, restModelMappingMethodName));
         }
 
         return result.toString().stripTrailing();
