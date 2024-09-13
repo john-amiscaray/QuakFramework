@@ -310,7 +310,7 @@ public class ControllerWriterTest {
                     }
                 
                     @Handle(method = RequestMethod.GET, path = "/employee/salary/low")
-                    public Response<List<Employee>> queryEmployeesWithSalariesLessThan(Request<Void> request) {
+                    public Response<List<Employee>> queryEmployeesWithSalariesLessThan(DynamicPathRequest<Void> request) {
                         var query = EmployeeTableEntry.queryEmployeesWithSalariesLessThan(request);
                         return Response.of(databaseProxy.createSelectionQuery(query, EmployeeTableEntry.class)
                             .getResultList()

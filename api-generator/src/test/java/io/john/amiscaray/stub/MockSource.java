@@ -159,7 +159,7 @@ public class MockSource {
                     }
                     
                     @APINativeQuery(path = "salary/low")
-                    public static NativeQuery queryEmployeesWithSalariesLessThan(Request<Void> request) {
+                    public static NativeQuery queryEmployeesWithSalariesLessThan(DynamicPathRequest<Void> request) {
                         return new NativeQuery("FROM Employee WHERE salary <= :salary", Map.of("salary", request.queryParams().get("income")));
                     }
                                 

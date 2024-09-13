@@ -194,9 +194,9 @@ public class ControllerWriter {
                 errors.add("be annotated with @APINativeQuery should return a io.john.amiscaray.backend.framework.data.query.NativeQuery");
             }
 
-            if (method.getParameters().size() != 1
-                    && method.getParameters().getFirst().isPresent()
-                    && method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
+            if ((method.getParameters().size() != 1
+                    && method.getParameters().getFirst().isPresent())
+                    || !method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
             ) {
                 errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
             }
