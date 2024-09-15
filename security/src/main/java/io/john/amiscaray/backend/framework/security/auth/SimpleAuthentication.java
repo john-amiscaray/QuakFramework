@@ -1,6 +1,6 @@
-package io.john.amiscaray.auth;
+package io.john.amiscaray.backend.framework.security.auth;
 
-import io.john.amiscaray.auth.principal.Principal;
+import io.john.amiscaray.backend.framework.security.auth.principal.Principal;
 import lombok.AllArgsConstructor;
 
 import java.util.Date;

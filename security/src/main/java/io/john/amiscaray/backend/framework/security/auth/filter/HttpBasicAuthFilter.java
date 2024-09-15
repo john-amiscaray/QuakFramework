@@ -1,32 +1,28 @@
-package io.john.amiscaray.auth.filter;
+package io.john.amiscaray.backend.framework.security.auth.filter;
 
-import io.john.amiscaray.auth.Authenticator;
-import io.john.amiscaray.auth.credentials.SimpleCredentials;
-import io.john.amiscaray.auth.exception.InvalidCredentialsException;
-import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
-import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
-import io.john.amiscaray.config.SecurityConfiguration;
+import io.john.amiscaray.backend.framework.security.auth.Authenticator;
+import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCredentials;
+import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 import java.util.Base64;
 
+@AllArgsConstructor
 public class HttpBasicAuthFilter implements Filter {
+
+    private Authenticator authenticator;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        var applicationContext = ApplicationContext.getInstance();
-        var authenticator = applicationContext.getInstance(new DependencyID<>(
-                  SecurityConfiguration.AUTHENTICATOR_DEPENDENCY,
-                  Authenticator.class
-        ));
         var response = (HttpServletResponse) servletResponse;
 
         var authorizationHeaderValue = ((HttpServletRequest) servletRequest).getHeader("Authorization");
         if (authorizationHeaderValue == null || !authorizationHeaderValue.startsWith("Basic ")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid Authorization header");
             return;
         }
 
@@ -34,7 +30,7 @@ public class HttpBasicAuthFilter implements Filter {
                 .split(":", 2);
 
         if (plainTextCredentials.length != 2) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed credentials");
             return;
         }
 
@@ -44,7 +40,7 @@ public class HttpBasicAuthFilter implements Filter {
             servletRequest.setAttribute("authentication", authenticator.authenticate(credentials));
             filterChain.doFilter(servletRequest, servletResponse);
         } catch (InvalidCredentialsException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
     }
 

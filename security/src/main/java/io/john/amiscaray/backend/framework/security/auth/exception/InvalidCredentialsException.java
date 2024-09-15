@@ -1,4 +1,4 @@
-package io.john.amiscaray.auth.exception;
+package io.john.amiscaray.backend.framework.security.auth.exception;
 
 public class InvalidCredentialsException extends Exception{
 

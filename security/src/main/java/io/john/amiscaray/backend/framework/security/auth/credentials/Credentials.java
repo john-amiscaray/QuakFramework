@@ -1,4 +1,4 @@
-package io.john.amiscaray.auth.credentials;
+package io.john.amiscaray.backend.framework.security.auth.credentials;
 
 public interface Credentials {
 

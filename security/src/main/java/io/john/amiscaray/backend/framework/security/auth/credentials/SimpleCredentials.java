@@ -1,8 +1,10 @@
-package io.john.amiscaray.auth.credentials;
+package io.john.amiscaray.backend.framework.security.auth.credentials;
 
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @AllArgsConstructor
+@EqualsAndHashCode
 public class SimpleCredentials implements Credentials{
 
     private String username;
