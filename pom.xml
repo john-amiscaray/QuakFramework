@@ -29,6 +29,7 @@
         <module>aggregate-report</module>
         <module>generator</module>
         <module>api-generator</module>
+        <module>security</module>
     </modules>
 
     <dependencies>
