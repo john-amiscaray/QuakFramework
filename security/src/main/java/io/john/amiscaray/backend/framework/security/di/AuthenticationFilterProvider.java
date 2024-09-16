@@ -5,13 +5,13 @@ import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
 import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
-import jakarta.servlet.Filter;
+import io.john.amiscaray.backend.framework.security.auth.filter.SecurityFilter;
 
 import java.util.List;
 
 import static io.john.amiscaray.backend.framework.security.di.SecurityDependencyIDs.*;
 
-public class AuthenticationFilterProvider implements DependencyProvider<Filter> {
+public class AuthenticationFilterProvider implements DependencyProvider<SecurityFilter> {
 
     @Override
     public boolean isDependencyOptional() {
@@ -19,12 +19,12 @@ public class AuthenticationFilterProvider implements DependencyProvider<Filter> 
     }
 
     @Override
-    public DependencyID<Filter> getDependencyID() {
+    public DependencyID<SecurityFilter> getDependencyID() {
         return SECURITY_FILTER_DEPENDENCY;
     }
 
     @Override
-    public ProvidedDependency<Filter> provideDependency(ApplicationContext context) {
+    public ProvidedDependency<SecurityFilter> provideDependency(ApplicationContext context) {
         var authenticator = context.getInstance(AUTHENTICATOR_DEPENDENCY);
         var securityConfig = context.getInstance(SECURITY_CONFIG_DEPENDENCY);
         return new ProvidedDependency<>(getDependencyID(), new HttpBasicAuthFilter(authenticator, securityConfig));
