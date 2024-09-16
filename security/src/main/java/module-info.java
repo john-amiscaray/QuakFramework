@@ -7,9 +7,13 @@ module backend.framework.security {
     exports io.john.amiscaray.backend.framework.security.auth.credentials;
     exports io.john.amiscaray.backend.framework.security.auth.exception;
     exports io.john.amiscaray.backend.framework.security.auth.principal;
+    exports io.john.amiscaray.backend.framework.security.auth.principal.role;
+    exports io.john.amiscaray.backend.framework.security.config;
+    exports io.john.amiscaray.backend.framework.security.di;
     requires static lombok;
-    requires jakarta.servlet;
     requires backend.framework.core;
+    requires org.slf4j;
+    requires org.apache.tomcat.embed.core;
 
     provides DependencyProvider with AuthenticationFilterProvider;
 }

@@ -20,13 +20,15 @@ public class AuthenticationFilterProvider implements DependencyProvider<Filter> 
 
     @Override
     public ProvidedDependency<Filter> provideDependency(ApplicationContext context) {
-        return new ProvidedDependency<>(getDependencyID(), new HttpBasicAuthFilter(context.getInstance(AUTHENTICATOR_DEPENDENCY)));
+        var authenticator = context.getInstance(AUTHENTICATOR_DEPENDENCY);
+        var securityConfig = context.getInstance(SECURITY_CONFIG_DEPENDENCY);
+        return new ProvidedDependency<>(getDependencyID(), new HttpBasicAuthFilter(authenticator, securityConfig));
     }
 
     @Override
     public List<DependencyID<?>> getDependencies() {
         return List.of(
-                SECURITY_STRATEGY_DEPENDENCY,
+                SECURITY_CONFIG_DEPENDENCY,
                 AUTHENTICATOR_DEPENDENCY
         );
     }

@@ -3,6 +3,7 @@ package io.john.amiscaray.backend.framework.web.application;
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
+import io.john.amiscaray.backend.framework.security.di.SecurityDependencyIDs;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.filter.annotation.ApplicationFilter;
 import io.john.amiscaray.backend.framework.web.filter.exception.InvalidApplicationFilterException;
@@ -30,7 +31,8 @@ import java.util.stream.Collectors;
 
 public class WebApplication extends Application {
     protected Tomcat server;
-    protected Context context;
+    protected Context servletContext;
+    private final ApplicationContext applicationContext = ApplicationContext.getInstance();
     private final Map<RequestMapping, PathController<?, ?>> pathControllers = new HashMap<>();
     private static final Logger LOG = LoggerFactory.getLogger(WebApplication.class);
     private static WebApplication instance = null;
@@ -75,10 +77,11 @@ public class WebApplication extends Application {
 
         var docBase = new File(ApplicationProperty.DOCUMENT_BASE.getValue()).getAbsolutePath();
 
-        context = server.addContext(ApplicationProperty.CONTEXT_PATH.getValue(), docBase);
+        servletContext = server.addContext(ApplicationProperty.CONTEXT_PATH.getValue(), docBase);
 
         registerServlets();
         registerFilters();
+        addSecurityFilter();
 
         server.start();
         server.getService().addConnector(connector1);
@@ -137,16 +140,39 @@ public class WebApplication extends Application {
                 var controller = new HttpControllerGroup(Map.ofEntries(currentControllerMapping));
                 var url = cleanURLPath(currentControllerMapping.getKey());
                 server.addServlet(ApplicationProperty.CONTEXT_PATH.getValue(), controller.toString(), controller);
-                context.addServletMappingDecoded(url, controller.toString());
+                servletContext.addServletMappingDecoded(url, controller.toString());
                 controllersToAdd.remove(currentControllerMapping);
             } else {
                 controllersToGroup.put(currentControllerMapping.getKey(), currentControllerMapping.getValue());
                 var httpController = new HttpControllerGroup(controllersToGroup);
                 server.addServlet(ApplicationProperty.CONTEXT_PATH.getValue(), httpController.toString(), httpController);
-                context.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
+                servletContext.addServletMappingDecoded(currentControllerMapping.getKey() + "/*", httpController.toString());
                 controllersToAdd.removeAll(controllersToGroup.entrySet());
             }
         }
+    }
+
+    private void addSecurityFilter() {
+        var securityFilterDependencyID = SecurityDependencyIDs.SECURITY_FILTER_DEPENDENCY;
+        var securityFilter = applicationContext.getInstance(securityFilterDependencyID);
+        var securityConfig = applicationContext.getInstance(SecurityDependencyIDs.SECURITY_CONFIG_DEPENDENCY);
+        if (securityFilter == null) {
+            return;
+        }
+
+        var filterDef = new FilterDef();
+        filterDef.setFilterName(securityFilterDependencyID.name());
+        filterDef.setFilter(securityFilter);
+
+        servletContext.addFilterDef(filterDef);
+
+        var filterMap = new FilterMap();
+        filterMap.setFilterName(securityFilterDependencyID.name());
+        for (var securityPathMapping : securityConfig.securedEndpointRoles().entrySet()) {
+            filterMap.addURLPattern(securityPathMapping.getKey());
+        }
+
+        servletContext.addFilterMap(filterMap);
     }
 
     private void registerFilters() {
@@ -159,7 +185,6 @@ public class WebApplication extends Application {
                 .stream()
                 .sorted(Comparator.comparingInt(type -> type.getAnnotation(ApplicationFilter.class).priority()))
                 .toList();
-        var applicationContext = ApplicationContext.getInstance();
 
         for(var filterClass : applicationFilters) {
             if (!Filter.class.isAssignableFrom(filterClass)) {
@@ -173,7 +198,7 @@ public class WebApplication extends Application {
             filterDef.setFilterName(filterName);
             filterDef.setFilter(filterInstance);
 
-            context.addFilterDef(filterDef);
+            servletContext.addFilterDef(filterDef);
 
             var filterMap = new FilterMap();
             filterMap.setFilterName(filterName);
@@ -181,7 +206,7 @@ public class WebApplication extends Application {
                 filterMap.addURLPattern(urlPattern);
             }
 
-            context.addFilterMap(filterMap);
+            servletContext.addFilterMap(filterMap);
         }
     }
 

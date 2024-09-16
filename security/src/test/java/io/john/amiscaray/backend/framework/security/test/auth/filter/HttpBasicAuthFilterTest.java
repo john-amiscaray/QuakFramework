@@ -6,6 +6,9 @@ import io.john.amiscaray.backend.framework.security.auth.credentials.Credentials
 import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCredentials;
 import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
 import io.john.amiscaray.backend.framework.security.auth.filter.HttpBasicAuthFilter;
+import io.john.amiscaray.backend.framework.security.auth.principal.role.Role;
+import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
+import io.john.amiscaray.backend.framework.security.di.SecurityStrategy;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +17,9 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -25,7 +31,7 @@ public class HttpBasicAuthFilterTest {
         var token = createTokenForCredentials(userCredentials);
         var authenticator = mockAuthenticator(userCredentials);
         var request = mockHttpServletRequest(token);
-        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator);
+        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
 
         httpBasicAuthFilter.doFilter(request, mock(HttpServletResponse.class), mock(FilterChain.class));
         verify(authenticator, times(1)).authenticate(userCredentials);
@@ -37,7 +43,7 @@ public class HttpBasicAuthFilterTest {
         var token = createTokenForCredentials(userCredentials);
         var authenticator = mock(Authenticator.class);
         when(authenticator.authenticate(any(Credentials.class))).thenThrow(new InvalidCredentialsException());
-        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator);
+        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
         var request = mockHttpServletRequest(token);
         var response = mock(HttpServletResponse.class);
 
@@ -50,7 +56,7 @@ public class HttpBasicAuthFilterTest {
     public void testHTTPBasicAuthWithAuthorizationHeaderMissingBasicPrefix() throws ServletException, IOException {
         var token = "Something";
         var authenticator = mock(Authenticator.class);
-        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator);
+        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
         var request = mockHttpServletRequest(token);
         when(request.getHeader("Authorization")).thenReturn(token);
         var response = mock(HttpServletResponse.class);
@@ -63,7 +69,7 @@ public class HttpBasicAuthFilterTest {
     public void testHTTPBasicAuthWithAuthorizationHeaderWithMalformedCredentialString() throws ServletException, IOException {
         var token = "Basic " + Base64.getEncoder().encodeToString("user pass".getBytes());
         var authenticator = mock(Authenticator.class);
-        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator);
+        var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
         var request = mockHttpServletRequest(token);
         when(request.getHeader("Authorization")).thenReturn(token);
         var response = mock(HttpServletResponse.class);
@@ -87,6 +93,10 @@ public class HttpBasicAuthFilterTest {
         var result = mock(HttpServletRequest.class);
         when(result.getHeader("Authorization")).thenReturn("Basic " + token);
         return result;
+    }
+
+    private SecurityConfig simpleSecurityConfig() {
+        return new SecurityConfig(SecurityStrategy.BASIC, new HashMap<>(Map.of("/", List.of(Role.any()))));
     }
 
 }
