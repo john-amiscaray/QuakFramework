@@ -41,6 +41,8 @@ public interface Authenticator {
 
     Optional<Principal> lookupPrincipal(Credentials credentials);
 
-    Duration getAuthenticationValidDuration();
+    default Duration getAuthenticationValidDuration() {
+        return Duration.ofHours(12);
+    }
 
 }

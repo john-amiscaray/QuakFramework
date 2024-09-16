@@ -3,25 +3,19 @@ package io.john.amiscaray.backend.framework.security.auth.filter;
 import io.john.amiscaray.backend.framework.security.auth.Authenticator;
 import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCredentials;
 import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
-import io.john.amiscaray.backend.framework.security.auth.principal.RoleAttachedPrincipal;
-import io.john.amiscaray.backend.framework.security.auth.principal.role.Role;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Base64;
 
-@AllArgsConstructor
-public class HttpBasicAuthFilter implements Filter {
+public class HttpBasicAuthFilter extends SecurityFilter {
 
-    private Authenticator authenticator;
-    private SecurityConfig config;
-    private static final Logger LOG = LoggerFactory.getLogger(HttpBasicAuthFilter.class);
+    public HttpBasicAuthFilter(Authenticator authenticator, SecurityConfig securityConfig) {
+        super(authenticator, securityConfig);
+    }
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -51,33 +45,9 @@ public class HttpBasicAuthFilter implements Filter {
             var authentication = authenticator.authenticate(credentials);
             servletRequest.setAttribute("authentication", authentication);
 
-            // TODO extract this into a method of a generic SecurityFilter class/interface
-            if (config.securedEndpointRoles().containsKey(request.getRequestURI())){
-                var validRoles = config.securedEndpointRoles().get(request.getRequestURI());
-                var principal = authentication.getIssuedTo();
-                if (validRoles.contains(Role.any())) {
-                    return;
-                }
-                if (!(principal instanceof RoleAttachedPrincipal roleAttachedPrincipal)) {
-                    response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                    LOG.warn("Path is role secured but authenticator gave principal without any roles. Use a RoleAttachedPrincipal to represent the user principal.");
-                    return;
-                } else {
-                    var roles = roleAttachedPrincipal.getRoles();
-                    var hasValidRole = false;
-                    for (var role : roles) {
-                        if (validRoles.contains(role)) {
-                            hasValidRole = true;
-                            break;
-                        }
-                    }
-                    if (!hasValidRole) {
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN);
-                        return;
-                    }
-                }
+            if (validateUserRoles(request, response, authentication)) {
+                filterChain.doFilter(servletRequest, servletResponse);
             }
-            filterChain.doFilter(servletRequest, servletResponse);
         } catch (InvalidCredentialsException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
         }
