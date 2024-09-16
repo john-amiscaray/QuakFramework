@@ -156,7 +156,7 @@ public class WebApplication extends Application {
         var securityFilterDependencyID = SecurityDependencyIDs.SECURITY_FILTER_DEPENDENCY;
         var securityFilter = applicationContext.getInstance(securityFilterDependencyID);
         var securityConfig = applicationContext.getInstance(SecurityDependencyIDs.SECURITY_CONFIG_DEPENDENCY);
-        if (securityFilter == null) {
+        if (securityFilter == null || securityConfig == null) {
             return;
         }
 

@@ -113,9 +113,12 @@ public class ApplicationContext {
                     .anyMatch(providerHasItsDependenciesSatisfied);
         } while (canSatisfyDependencies);
 
-        if (!dependencyProviders.isEmpty()) {
+        if (!dependencyProviders.isEmpty() && !dependencyProviders.stream().allMatch(DependencyProvider::isDependencyOptional)) {
             var missingDependencies = new HashSet<Class<?>>();
             for (var provider : dependencyProviders) {
+                if (provider.isDependencyOptional()) {
+                    continue;
+                }
                 missingDependencies.addAll(provider.getDependencies().stream()
                         .map(DependencyID::type)
                         .filter(type -> !hasInstance(type)).toList());

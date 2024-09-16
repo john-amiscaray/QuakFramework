@@ -20,6 +20,10 @@ public interface DependencyProvider<T> {
         return "";
     }
 
+    default boolean isDependencyOptional() {
+        return false;
+    }
+
     DependencyID<T> getDependencyID();
 
     ProvidedDependency<T> provideDependency(ApplicationContext context);

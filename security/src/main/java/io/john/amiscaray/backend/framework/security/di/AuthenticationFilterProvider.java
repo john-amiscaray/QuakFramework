@@ -14,6 +14,11 @@ import static io.john.amiscaray.backend.framework.security.di.SecurityDependency
 public class AuthenticationFilterProvider implements DependencyProvider<Filter> {
 
     @Override
+    public boolean isDependencyOptional() {
+        return true;
+    }
+
+    @Override
     public DependencyID<Filter> getDependencyID() {
         return SECURITY_FILTER_DEPENDENCY;
     }
