@@ -29,7 +29,10 @@ public class HttpBasicAuthFilter implements Filter {
         var request = (HttpServletRequest) servletRequest;
 
         var authorizationHeaderValue = request.getHeader("Authorization");
-        if (authorizationHeaderValue == null || !authorizationHeaderValue.startsWith("Basic ")) {
+        if (authorizationHeaderValue == null) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        } else if (!authorizationHeaderValue.startsWith("Basic ")) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid Authorization header");
             return;
         }
