@@ -24,10 +24,11 @@ public class HttpBasicAuthFilter extends SecurityFilter {
 
         var authorizationHeaderValue = request.getHeader("Authorization");
         if (authorizationHeaderValue == null) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         } else if (!authorizationHeaderValue.startsWith("Basic ")) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid Authorization header");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("Missing or invalid Authorization header");
             return;
         }
 
@@ -35,7 +36,8 @@ public class HttpBasicAuthFilter extends SecurityFilter {
                 .split(":", 2);
 
         if (plainTextCredentials.length != 2) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed credentials");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().print("Malformed credentials");
             return;
         }
 
@@ -49,7 +51,8 @@ public class HttpBasicAuthFilter extends SecurityFilter {
                 filterChain.doFilter(servletRequest, servletResponse);
             }
         } catch (InvalidCredentialsException e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().print(e.getMessage());
         }
     }
 

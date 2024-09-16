@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,7 @@ public class HttpBasicAuthFilterTest {
         var request = mockHttpServletRequest(token);
         var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
 
-        httpBasicAuthFilter.doFilter(request, mock(HttpServletResponse.class), mock(FilterChain.class));
+        httpBasicAuthFilter.doFilter(request, mockResponse(), mock(FilterChain.class));
         verify(authenticator, times(1)).authenticate(userCredentials);
     }
 
@@ -45,11 +46,11 @@ public class HttpBasicAuthFilterTest {
         when(authenticator.authenticate(any(Credentials.class))).thenThrow(new InvalidCredentialsException());
         var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
         var request = mockHttpServletRequest(token);
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
 
         httpBasicAuthFilter.doFilter(request, response, mock(FilterChain.class));
         // TODO find a way to make the string in these test not necessarily rely on the implementation
-        verify(response, times(1)).sendError(HttpServletResponse.SC_UNAUTHORIZED, "The given credentials are invalid.");
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -59,10 +60,10 @@ public class HttpBasicAuthFilterTest {
         var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
         var request = mockHttpServletRequest(token);
         when(request.getHeader("Authorization")).thenReturn(token);
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
 
         httpBasicAuthFilter.doFilter(request, response, mock(FilterChain.class));
-        verify(response, times(1)).sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing or invalid Authorization header");
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 
     @Test
@@ -72,10 +73,10 @@ public class HttpBasicAuthFilterTest {
         var httpBasicAuthFilter = new HttpBasicAuthFilter(authenticator, simpleSecurityConfig());
         var request = mockHttpServletRequest(token);
         when(request.getHeader("Authorization")).thenReturn(token);
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
 
         httpBasicAuthFilter.doFilter(request, response, mock(FilterChain.class));
-        verify(response, times(1)).sendError(HttpServletResponse.SC_BAD_REQUEST, "Malformed credentials");
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_BAD_REQUEST);
     }
 
     private Authenticator mockAuthenticator(Credentials credentials) throws InvalidCredentialsException {
@@ -97,6 +98,12 @@ public class HttpBasicAuthFilterTest {
 
     private SecurityConfig simpleSecurityConfig() {
         return new SecurityConfig(SecurityStrategy.BASIC, new HashMap<>(Map.of("/", List.of(Role.any()))));
+    }
+    
+    private HttpServletResponse mockResponse() throws IOException {
+        var result = mock(HttpServletResponse.class);
+        when(result.getWriter()).thenReturn(mock(PrintWriter.class));
+        return result;
     }
 
 }
