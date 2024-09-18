@@ -14,17 +14,17 @@ public class SimpleAuthentication implements Authentication{
 
     @Override
     public Principal getIssuedTo() {
-        return null;
+        return principal;
     }
 
     @Override
     public Date getIssueTime() {
-        return null;
+        return issueTime;
     }
 
     @Override
     public Date getExpirationTime() {
-        return null;
+        return expirationTime;
     }
 
 }

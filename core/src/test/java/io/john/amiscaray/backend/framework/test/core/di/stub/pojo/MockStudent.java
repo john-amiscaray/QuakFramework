@@ -1,5 +1,6 @@
 package io.john.amiscaray.backend.framework.test.core.di.stub.pojo;
 
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.ManagedType;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
@@ -12,7 +13,7 @@ public record MockStudent(
 
     @Instantiate
     public MockStudent {
-
+        var applicationContext = ApplicationContext.getInstance();
     }
 
 }

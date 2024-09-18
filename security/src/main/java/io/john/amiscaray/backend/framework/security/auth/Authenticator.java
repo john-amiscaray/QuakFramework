@@ -23,8 +23,8 @@ public interface Authenticator {
         );
     }
 
-    default Authentication authenticate(String token) throws InvalidCredentialsException {
-        var principal = lookupPrincipal(token);
+    default Authentication authenticate(String securityID) throws InvalidCredentialsException {
+        var principal = lookupPrincipal(securityID);
         if (principal.isEmpty()) {
             throw new InvalidCredentialsException();
         }
@@ -35,9 +35,7 @@ public interface Authenticator {
         );
     }
 
-    default Optional<Principal> lookupPrincipal(String token) {
-        return Optional.empty(); // Optional Implementation
-    }
+    Optional<Principal> lookupPrincipal(String securityID);
 
     Optional<Principal> lookupPrincipal(Credentials credentials);
 

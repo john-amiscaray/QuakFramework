@@ -20,6 +20,9 @@ public abstract class SecurityFilter implements Filter {
     protected Authenticator authenticator;
     protected SecurityConfig securityConfig;
 
+    public static final String VERIFIED_JWT_ATTRIBUTE = "jwt";
+    public static final String AUTHENTICATION_ATTRIBUTE = "authentication";
+
     private static final Logger LOG = LoggerFactory.getLogger(HttpBasicAuthFilter.class);
 
     protected boolean validateUserRoles(HttpServletRequest request,

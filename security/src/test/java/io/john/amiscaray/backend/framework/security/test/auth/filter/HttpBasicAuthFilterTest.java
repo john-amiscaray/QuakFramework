@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -97,7 +98,11 @@ public class HttpBasicAuthFilterTest {
     }
 
     private SecurityConfig simpleSecurityConfig() {
-        return new SecurityConfig(SecurityStrategy.BASIC, new HashMap<>(Map.of("/", List.of(Role.any()))));
+        return new SecurityConfig(SecurityStrategy.BASIC,
+                new HashMap<>(Map.of("/", List.of(Role.any()))),
+                "",
+                Duration.ofHours(10).toMillis()
+                );
     }
     
     private HttpServletResponse mockResponse() throws IOException {

@@ -6,6 +6,7 @@ module backend.framework.security {
     exports io.john.amiscaray.backend.framework.security.auth;
     exports io.john.amiscaray.backend.framework.security.auth.credentials;
     exports io.john.amiscaray.backend.framework.security.auth.exception;
+    exports io.john.amiscaray.backend.framework.security.auth.jwt;
     exports io.john.amiscaray.backend.framework.security.auth.principal;
     exports io.john.amiscaray.backend.framework.security.auth.principal.role;
     exports io.john.amiscaray.backend.framework.security.config;
@@ -14,6 +15,7 @@ module backend.framework.security {
     requires backend.framework.core;
     requires org.slf4j;
     requires org.apache.tomcat.embed.core;
+    requires com.auth0.jwt;
 
     provides DependencyProvider with AuthenticationFilterProvider;
 }
