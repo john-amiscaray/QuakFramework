@@ -28,9 +28,9 @@ public abstract class SecurityFilter implements Filter {
     protected boolean validateUserRoles(HttpServletRequest request,
                                         HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-
-        if (securityConfig.securedEndpointRoles().containsKey(request.getRequestURI())) {
-            var validRoles = securityConfig.securedEndpointRoles().get(request.getRequestURI());
+        var securedURLPattern = getMatchingSecuredURLPattern(request.getRequestURI());
+        if (securedURLPattern != null) {
+            var validRoles = securityConfig.securedEndpointRoles().get(securedURLPattern);
             var principal = authentication.getIssuedTo();
             if (validRoles.contains(Role.any())) {
                 return true;
@@ -55,6 +55,27 @@ public abstract class SecurityFilter implements Filter {
             }
         }
         return true;
+    }
+
+    private String getMatchingSecuredURLPattern(String url) {
+        for (var entry : securityConfig.securedEndpointRoles().entrySet()) {
+            if (urlMatchesPathPattern(url, entry.getKey())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    private boolean urlMatchesPathPattern(String url, String pattern) {
+        if (pattern.endsWith("/*")) {
+            String basePattern = pattern.substring(0, pattern.length() - 2);
+            return url.startsWith(basePattern);
+        } else if (pattern.startsWith("*.")) {
+            String extension = pattern.substring(1); // Remove the '*'
+            return url.endsWith(extension);
+        } else {
+            return url.equals(pattern);
+        }
     }
 
 

@@ -93,6 +93,7 @@ public class HttpBasicAuthFilterTest {
 
     private HttpServletRequest mockHttpServletRequest(String token) {
         var result = mock(HttpServletRequest.class);
+        when(result.getRequestURI()).thenReturn("/");
         when(result.getHeader("Authorization")).thenReturn("Basic " + token);
         return result;
     }

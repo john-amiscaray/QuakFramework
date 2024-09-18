@@ -45,8 +45,10 @@ public class JWTAuthFilter extends SecurityFilter{
             var verifiedToken = jwtUtil.validateTokenAndGetDecoded(rawToken);
             var authentication = authenticator.authenticate(verifiedToken.getSubject());
 
-            httpRequest.setAttribute(VERIFIED_JWT_ATTRIBUTE, verifiedToken);
-            httpRequest.setAttribute(AUTHENTICATION_ATTRIBUTE, authentication);
+            if (validateUserRoles(httpRequest, httpResponse, authentication)) {
+                httpRequest.setAttribute(VERIFIED_JWT_ATTRIBUTE, verifiedToken);
+                httpRequest.setAttribute(AUTHENTICATION_ATTRIBUTE, authentication);
+            }
         } catch (JWTVerificationException | InvalidCredentialsException ex) {
             httpResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
             httpResponse.getWriter().write("Invalid token");
