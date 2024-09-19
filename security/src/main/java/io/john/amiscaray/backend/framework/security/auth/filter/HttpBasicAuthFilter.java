@@ -21,10 +21,16 @@ public class HttpBasicAuthFilter extends SecurityFilter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         var response = (HttpServletResponse) servletResponse;
         var request = (HttpServletRequest) servletRequest;
+        var securedURLPattern = getMatchingSecuredEndpoint(request.getRequestURI(), request.getMethod());
+
+        if (securedURLPattern == null) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         var authorizationHeaderValue = request.getHeader("Authorization");
         if (authorizationHeaderValue == null) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         } else if (!authorizationHeaderValue.startsWith("Basic ")) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

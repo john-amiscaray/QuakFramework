@@ -1,6 +1,6 @@
 package io.john.amiscaray.backend.framework.security.di;
 
-public enum SecurityStrategy {
+public enum AuthenticationStrategy {
     BASIC,
     JWT
 }

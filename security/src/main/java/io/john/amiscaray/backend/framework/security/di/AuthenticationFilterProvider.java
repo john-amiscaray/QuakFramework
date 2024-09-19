@@ -31,7 +31,7 @@ public class AuthenticationFilterProvider implements DependencyProvider<Security
         var securityConfig = context.getInstance(SECURITY_CONFIG_DEPENDENCY);
         var jwtUtil = new JwtUtil(securityConfig);
 
-        if (SecurityStrategy.JWT.equals(securityConfig.strategy())) {
+        if (AuthenticationStrategy.JWT.equals(securityConfig.authenticationStrategy())) {
             return new ProvidedDependency<>(
                     getDependencyID(),
                     new JWTAuthFilter(authenticator, securityConfig, jwtUtil)

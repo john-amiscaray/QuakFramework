@@ -169,7 +169,7 @@ public class WebApplication extends Application {
         var filterMap = new FilterMap();
         filterMap.setFilterName(securityFilterDependencyID.name());
         for (var securityPathMapping : securityConfig.securedEndpointRoles().entrySet()) {
-            filterMap.addURLPattern(securityPathMapping.getKey());
+            filterMap.addURLPattern(securityPathMapping.getKey().url());
         }
 
         servletContext.addFilterMap(filterMap);

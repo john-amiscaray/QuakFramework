@@ -7,8 +7,9 @@ import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCrede
 import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
 import io.john.amiscaray.backend.framework.security.auth.filter.HttpBasicAuthFilter;
 import io.john.amiscaray.backend.framework.security.auth.principal.role.Role;
+import io.john.amiscaray.backend.framework.security.config.EndpointMapping;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
-import io.john.amiscaray.backend.framework.security.di.SecurityStrategy;
+import io.john.amiscaray.backend.framework.security.di.AuthenticationStrategy;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -94,13 +95,14 @@ public class HttpBasicAuthFilterTest {
     private HttpServletRequest mockHttpServletRequest(String token) {
         var result = mock(HttpServletRequest.class);
         when(result.getRequestURI()).thenReturn("/");
+        when(result.getMethod()).thenReturn("GET");
         when(result.getHeader("Authorization")).thenReturn("Basic " + token);
         return result;
     }
 
     private SecurityConfig simpleSecurityConfig() {
-        return new SecurityConfig(SecurityStrategy.BASIC,
-                new HashMap<>(Map.of("/", List.of(Role.any()))),
+        return new SecurityConfig(AuthenticationStrategy.BASIC,
+                new HashMap<>(Map.of(new EndpointMapping("/"), List.of(Role.any()))),
                 "",
                 Duration.ofHours(10).toMillis()
                 );
