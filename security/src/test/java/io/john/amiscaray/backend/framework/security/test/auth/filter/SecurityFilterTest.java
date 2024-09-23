@@ -32,32 +32,6 @@ public abstract class SecurityFilterTest {
     public abstract SecurityFilter initFilter(Authenticator authenticator, SecurityConfig config);
 
     @Test
-    public void testAuthFilterGivenValidCredentialsCallsAuthenticator() throws InvalidCredentialsException, ServletException, IOException {
-        var userCredentials = new SimpleCredentials("user", "pass");
-        var token = createAuthorizationHeaderForCredentials(userCredentials);
-        var authenticator = mockAuthenticator(userCredentials);
-        var request = mockHttpServletRequest(token);
-        var authFilter = initFilter(authenticator, simpleSecurityConfig());
-
-        authFilter.doFilter(request, mockResponse(), mock(FilterChain.class));
-        verify(authenticator, times(1)).authenticate(userCredentials);
-    }
-
-    @Test
-    public void testAuthFilterGivenInValidCredentialsYieldsUnauthorizedResponse() throws InvalidCredentialsException, ServletException, IOException {
-        var userCredentials = new SimpleCredentials("user", "pass");
-        var token = createAuthorizationHeaderForCredentials(userCredentials);
-        var authenticator = mock(Authenticator.class);
-        when(authenticator.authenticate(any(Credentials.class))).thenThrow(new InvalidCredentialsException());
-        var authFilter = initFilter(authenticator, simpleSecurityConfig());
-        var request = mockHttpServletRequest(token);
-        var response = mockResponse();
-
-        authFilter.doFilter(request, response, mock(FilterChain.class));
-        verify(response, times(1)).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    }
-
-    @Test
     public void testAuthFilterGivenAuthorizationHeaderMissingPrefixYieldsBadRequest() throws ServletException, IOException {
         var token = "Something";
         var authenticator = mock(Authenticator.class);
@@ -71,25 +45,12 @@ public abstract class SecurityFilterTest {
     }
 
     @Test
-    public void testAuthFilterGivenAuthorizationHeaderWithMalformedCredentialStringYieldBadRequest() throws ServletException, IOException {
-        var token = malformedCredentials();
-        var authenticator = mock(Authenticator.class);
-        var authFilter = initFilter(authenticator, simpleSecurityConfig());
-        var request = mockHttpServletRequest(token);
-        when(request.getHeader("Authorization")).thenReturn(token);
-        var response = mockResponse();
-
-        authFilter.doFilter(request, response, mock(FilterChain.class));
-        verify(response, times(1)).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    }
-
-    @Test
     public void testAuthFilterForbidsUserFromAdminEndpoint() throws ServletException, IOException, InvalidCredentialsException {
         var userCredentials = new SimpleCredentials("user", "pass");
-        var token = createAuthorizationHeaderForCredentials(userCredentials);
         var authenticator = mockAuthenticator(userCredentials, mockAuthenticationWithRoles(new Role[] { user() }));
+        var token = createAuthorizationHeaderForCredentials(userCredentials, authenticator);
 
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
         var request = mockHttpServletRequest(token, "/secret", "POST");
         var authFilter = initFilter(authenticator, simpleSecurityConfig());
 
@@ -100,10 +61,10 @@ public abstract class SecurityFilterTest {
     @Test
     public void testAuthFilterAllowsAdminAccessToAdminEndpoint() throws ServletException, IOException, InvalidCredentialsException {
         var userCredentials = new SimpleCredentials("user", "pass");
-        var token = createAuthorizationHeaderForCredentials(userCredentials);
         var authenticator = mockAuthenticator(userCredentials, mockAuthenticationWithRoles(new Role[] { admin() }));
+        var token = createAuthorizationHeaderForCredentials(userCredentials, authenticator);
 
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
         var request = mockHttpServletRequest(token, "/secret", "POST");
         var authFilter = initFilter(authenticator, simpleSecurityConfig());
         var filterChain = mock(FilterChain.class);
@@ -115,10 +76,10 @@ public abstract class SecurityFilterTest {
     @Test
     public void testAuthFilterAllowsUserWithUserAndAdminRolesAccessToAdminEndpoint() throws ServletException, IOException, InvalidCredentialsException {
         var userCredentials = new SimpleCredentials("user", "pass");
-        var token = createAuthorizationHeaderForCredentials(userCredentials);
         var authenticator = mockAuthenticator(userCredentials, mockAuthenticationWithRoles(new Role[] { user(), admin() }));
+        var token = createAuthorizationHeaderForCredentials(userCredentials, authenticator);
 
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
         var request = mockHttpServletRequest(token, "/secret", "POST");
         var authFilter = initFilter(authenticator, simpleSecurityConfig());
         var filterChain = mock(FilterChain.class);
@@ -130,10 +91,10 @@ public abstract class SecurityFilterTest {
     @Test
     public void testAuthFilterAllowsAdminToAccessEndpointWithAnyRole() throws ServletException, IOException, InvalidCredentialsException {
         var userCredentials = new SimpleCredentials("user", "pass");
-        var token = createAuthorizationHeaderForCredentials(userCredentials);
         var authenticator = mockAuthenticator(userCredentials, mockAuthenticationWithRoles(new Role[] { admin() }));
+        var token = createAuthorizationHeaderForCredentials(userCredentials, authenticator);
 
-        var response = mock(HttpServletResponse.class);
+        var response = mockResponse();
         var request = mockHttpServletRequest(token);
         var authFilter = initFilter(authenticator, simpleSecurityConfig());
         var filterChain = mock(FilterChain.class);
@@ -144,15 +105,18 @@ public abstract class SecurityFilterTest {
 
     protected abstract String malformedCredentials();
 
-    protected abstract String createAuthorizationHeaderForCredentials(Credentials credentials);
+    protected abstract String createAuthorizationHeaderForCredentials(Credentials credentials, Authenticator authenticator);
 
-    private Authenticator mockAuthenticator(Credentials credentials) throws InvalidCredentialsException {
+    protected Authenticator mockAuthenticator(Credentials credentials) throws InvalidCredentialsException {
         return mockAuthenticator(credentials, mock(Authentication.class));
     }
 
     private Authenticator mockAuthenticator(Credentials credentials, Authentication mockAuthentication)  throws InvalidCredentialsException{
         var authenticator = mock(Authenticator.class);
+        var principal = mockAuthentication.getIssuedTo() != null ? mockAuthentication.getIssuedTo() : (Principal) () -> credentials.getUsername();
         when(authenticator.authenticate(credentials)).thenReturn(mockAuthentication);
+        when(authenticator.authenticate(anyString())).thenReturn(mockAuthentication);
+        when(authenticator.lookupPrincipal(credentials)).thenReturn(Optional.ofNullable(principal));
         return authenticator;
     }
 
@@ -162,6 +126,7 @@ public abstract class SecurityFilterTest {
             public Principal getIssuedTo() {
                 var issuedTo = mock(RoleAttachedPrincipal.class);
                 when(issuedTo.getRoles()).thenReturn(roles);
+                when(issuedTo.getSecurityID()).thenReturn("John");
                 return issuedTo;
             }
 
@@ -177,7 +142,7 @@ public abstract class SecurityFilterTest {
         };
     }
 
-    private HttpServletRequest mockHttpServletRequest(String token) {
+    protected HttpServletRequest mockHttpServletRequest(String token) {
         return mockHttpServletRequest(token, "/", "GET");
     }
 
@@ -191,13 +156,13 @@ public abstract class SecurityFilterTest {
 
     protected abstract AuthenticationStrategy authenticationStrategy();
 
-    private SecurityConfig simpleSecurityConfig() {
+    protected SecurityConfig simpleSecurityConfig() {
         return new SecurityConfig(authenticationStrategy(),
                 new HashMap<>(Map.of(
                         new EndpointMapping("/"), List.of(Role.any()),
                         new EndpointMapping("/secret", List.of(EndpointMapping.RequestMethodMatcher.POST)), List.of(admin())
                 )),
-                "",
+                "Something Secure",
                 Duration.ofHours(10).toMillis()
         );
     }
@@ -210,7 +175,7 @@ public abstract class SecurityFilterTest {
         return () -> "admin";
     }
 
-    private HttpServletResponse mockResponse() throws IOException {
+    protected HttpServletResponse mockResponse() throws IOException {
         var result = mock(HttpServletResponse.class);
         when(result.getWriter()).thenReturn(mock(PrintWriter.class));
         return result;
