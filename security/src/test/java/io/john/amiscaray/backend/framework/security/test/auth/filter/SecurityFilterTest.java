@@ -24,7 +24,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public abstract class SecurityFilterTest {
@@ -42,6 +41,17 @@ public abstract class SecurityFilterTest {
 
         authFilter.doFilter(request, response, mock(FilterChain.class));
         verify(response, times(1)).setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
+
+    @Test
+    public void testAuthFilterGivenRequestWithNoAuthorizationHeaderYieldsUnauthorized() throws ServletException, IOException {
+        var authenticator = mock(Authenticator.class);
+        var authFilter = initFilter(authenticator, simpleSecurityConfig());
+        var request = mockHttpServletRequestWithoutHeader();
+        var response = mockResponse();
+
+        authFilter.doFilter(request, response, mock(FilterChain.class));
+        verify(response, times(1)).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     @Test
@@ -140,6 +150,13 @@ public abstract class SecurityFilterTest {
                 return Date.from(Instant.ofEpochMilli(System.currentTimeMillis() + Duration.ofHours(10).toMillis()));
             }
         };
+    }
+
+    protected HttpServletRequest mockHttpServletRequestWithoutHeader() {
+        var result = mock(HttpServletRequest.class);
+        when(result.getRequestURI()).thenReturn("/");
+        when(result.getMethod()).thenReturn("GET");
+        return result;
     }
 
     protected HttpServletRequest mockHttpServletRequest(String token) {
