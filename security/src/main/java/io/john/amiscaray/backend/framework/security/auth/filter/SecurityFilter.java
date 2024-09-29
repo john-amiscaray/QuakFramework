@@ -1,5 +1,7 @@
 package io.john.amiscaray.backend.framework.security.auth.filter;
 
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
 import io.john.amiscaray.backend.framework.security.auth.Authentication;
 import io.john.amiscaray.backend.framework.security.auth.Authenticator;
 import io.john.amiscaray.backend.framework.security.auth.principal.RoleAttachedPrincipal;
@@ -60,8 +62,9 @@ public abstract class SecurityFilter implements Filter {
     }
 
     protected EndpointMapping getMatchingSecuredEndpoint(String url, String method) {
+        var servletContextPath = ApplicationProperties.getInstance().getOrElse(ApplicationProperty.CONTEXT_PATH, "");
         for (var entry : securityConfig.securedEndpointRoles().entrySet()) {
-            if (urlMatchesPathPattern(url, entry.getKey().url()) && requestMethodMatchesMatchers(method, entry.getKey().methods())) {
+            if (urlMatchesPathPattern(url, servletContextPath + entry.getKey().url()) && requestMethodMatchesMatchers(method, entry.getKey().methods())) {
                 return entry.getKey();
             }
         }

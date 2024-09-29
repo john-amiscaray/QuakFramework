@@ -54,6 +54,18 @@ public class HttpBasicAuthFilterTest extends SecurityFilterTest{
     }
 
     @Test
+    public void testAuthFilterGivenValidCredentialsAddsAuthenticationAsRequestAttribute() throws InvalidCredentialsException, ServletException, IOException {
+        var userCredentials = new SimpleCredentials("user", "pass");
+        var authenticator = mockAuthenticator(userCredentials);
+        var token = createAuthorizationHeaderForCredentials(userCredentials, authenticator);
+        var request = mockHttpServletRequest(token);
+        var authFilter = initFilter(authenticator, simpleSecurityConfig());
+
+        authFilter.doFilter(request, mockResponse(), mock(FilterChain.class));
+        verify(request, times(1)).setAttribute(SecurityFilter.AUTHENTICATION_ATTRIBUTE, authenticator.authenticate(userCredentials));
+    }
+
+    @Test
     public void testAuthFilterGivenInValidCredentialsYieldsUnauthorizedResponse() throws InvalidCredentialsException, ServletException, IOException {
         var userCredentials = new SimpleCredentials("user", "pass");
         var authenticator = mock(Authenticator.class);

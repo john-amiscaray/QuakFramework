@@ -63,6 +63,19 @@ public class JWTAuthFilterTest extends SecurityFilterTest{
     }
 
     @Test
+    public void testAuthFilterGivenValidCredentialsAddsAuthenticationAsRequestAttribute() throws InvalidCredentialsException, ServletException, IOException {
+        var userCredentials = new SimpleCredentials("user", "pass");
+        var authenticator = mockAuthenticator(userCredentials);
+        var token = createAuthorizationHeaderForCredentials(userCredentials, authenticator);
+        var request = mockHttpServletRequest(token);
+        var authFilter = initFilter(authenticator, simpleSecurityConfig());
+        var principal = authenticator.lookupPrincipal(userCredentials).orElseThrow();
+
+        authFilter.doFilter(request, mockResponse(), mock(FilterChain.class));
+        verify(request, times(1)).setAttribute(SecurityFilter.AUTHENTICATION_ATTRIBUTE, authenticator.authenticate(principal.getSecurityID()));
+    }
+
+    @Test
     public void testAuthFilterGivenAuthorizationHeaderWithMalformedCredentialStringYieldUnauthorized() throws ServletException, IOException {
         var token = malformedCredentials();
         var authenticator = mock(Authenticator.class);

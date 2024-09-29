@@ -40,4 +40,13 @@ public class MockController {
 
     }
 
+    @Handle(path="/secured", method=RequestMethod.GET)
+    public Response<String> secured(Request<Void> request) {
+
+        var userAuthentication = request.getUserAuthentication();
+
+        return Response.of(userAuthentication.getIssuedTo().getSecurityID());
+
+    }
+
 }
