@@ -3,7 +3,7 @@ package io.john.amiscaray.backend.framework.core.di;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyResolutionException;
-import io.john.amiscaray.backend.framework.core.di.exception.ProviderMissingConstructorException;
+import io.john.amiscaray.backend.framework.core.di.exception.AccessibleConstructorException;
 import io.john.amiscaray.backend.framework.core.di.provider.*;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.*;
 import lombok.Getter;
@@ -66,7 +66,7 @@ public class ApplicationContext {
 
         return Arrays.stream(constructors)
                 .filter(constructor -> constructor.getParameters().length == 0)
-                .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(classToInstantiate));
+                .findFirst().orElseThrow(() -> new AccessibleConstructorException(classToInstantiate));
     }
 
     private void buildDependencyGraph(List<DependencyProvider<?>> dependencyProviders) {
