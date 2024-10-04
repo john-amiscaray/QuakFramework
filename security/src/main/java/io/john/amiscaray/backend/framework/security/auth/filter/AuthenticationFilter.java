@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @AllArgsConstructor
-public abstract class SecurityFilter implements Filter {
+public abstract class AuthenticationFilter implements Filter {
 
     protected Authenticator authenticator;
     protected SecurityConfig securityConfig;

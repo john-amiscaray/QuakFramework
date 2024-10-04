@@ -5,7 +5,7 @@ import io.john.amiscaray.backend.framework.security.auth.credentials.Credentials
 import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCredentials;
 import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
 import io.john.amiscaray.backend.framework.security.auth.filter.HttpBasicAuthFilter;
-import io.john.amiscaray.backend.framework.security.auth.filter.SecurityFilter;
+import io.john.amiscaray.backend.framework.security.auth.filter.AuthenticationFilter;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 import io.john.amiscaray.backend.framework.security.di.AuthenticationStrategy;
 import jakarta.servlet.FilterChain;
@@ -18,10 +18,10 @@ import java.util.Base64;
 
 import static org.mockito.Mockito.*;
 
-public class HttpBasicAuthFilterTest extends SecurityFilterTest{
+public class HttpBasicAuthFilterTest extends AuthenticationFilterTest {
 
     @Override
-    public SecurityFilter initFilter(Authenticator authenticator, SecurityConfig config) {
+    public AuthenticationFilter initFilter(Authenticator authenticator, SecurityConfig config) {
         return new HttpBasicAuthFilter(authenticator, config);
     }
 
@@ -62,7 +62,7 @@ public class HttpBasicAuthFilterTest extends SecurityFilterTest{
         var authFilter = initFilter(authenticator, simpleSecurityConfig());
 
         authFilter.doFilter(request, mockResponse(), mock(FilterChain.class));
-        verify(request, times(1)).setAttribute(SecurityFilter.AUTHENTICATION_ATTRIBUTE, authenticator.authenticate(userCredentials));
+        verify(request, times(1)).setAttribute(AuthenticationFilter.AUTHENTICATION_ATTRIBUTE, authenticator.authenticate(userCredentials));
     }
 
     @Test

@@ -13,6 +13,7 @@ import java.util.Map;
 public record SecurityConfig(AuthenticationStrategy authenticationStrategy,
                              @Singular("securePathWithRole")
                              Map<EndpointMapping, List<Role>> securedEndpointRoles,
+                             CORSConfig corsConfig,
                              String jwtSecretKey,
                              Long jwtSecretExpiryTime) {
 
@@ -25,6 +26,7 @@ public record SecurityConfig(AuthenticationStrategy authenticationStrategy,
 
     public SecurityConfig (AuthenticationStrategy strategy, Map<EndpointMapping, List<Role>> securedEndpointRoles) {
         this(strategy, securedEndpointRoles,
+                CORSConfig.allowAll(),
                 APPLICATION_PROPERTIES.get(ApplicationProperty.JWT_SECRET_KEY),
                 Long.parseLong(APPLICATION_PROPERTIES.get(ApplicationProperty.JWT_EXPIRY_TIME)));
     }

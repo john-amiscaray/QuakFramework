@@ -5,7 +5,7 @@ import io.john.amiscaray.backend.framework.security.auth.credentials.Credentials
 import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCredentials;
 import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
 import io.john.amiscaray.backend.framework.security.auth.filter.JWTAuthFilter;
-import io.john.amiscaray.backend.framework.security.auth.filter.SecurityFilter;
+import io.john.amiscaray.backend.framework.security.auth.filter.AuthenticationFilter;
 import io.john.amiscaray.backend.framework.security.auth.jwt.JwtUtil;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 import io.john.amiscaray.backend.framework.security.di.AuthenticationStrategy;
@@ -20,7 +20,7 @@ import java.io.IOException;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
-public class JWTAuthFilterTest extends SecurityFilterTest{
+public class JWTAuthFilterTest extends AuthenticationFilterTest {
 
     private JwtUtil jwtUtil;
 
@@ -30,7 +30,7 @@ public class JWTAuthFilterTest extends SecurityFilterTest{
     }
 
     @Override
-    public SecurityFilter initFilter(Authenticator authenticator, SecurityConfig config) {
+    public AuthenticationFilter initFilter(Authenticator authenticator, SecurityConfig config) {
         return new JWTAuthFilter(authenticator, config, new JwtUtil(config));
     }
 
@@ -72,7 +72,7 @@ public class JWTAuthFilterTest extends SecurityFilterTest{
         var principal = authenticator.lookupPrincipal(userCredentials).orElseThrow();
 
         authFilter.doFilter(request, mockResponse(), mock(FilterChain.class));
-        verify(request, times(1)).setAttribute(SecurityFilter.AUTHENTICATION_ATTRIBUTE, authenticator.authenticate(principal.getSecurityID()));
+        verify(request, times(1)).setAttribute(AuthenticationFilter.AUTHENTICATION_ATTRIBUTE, authenticator.authenticate(principal.getSecurityID()));
     }
 
     @Test

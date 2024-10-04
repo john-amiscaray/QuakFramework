@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Base64;
 
-public class HttpBasicAuthFilter extends SecurityFilter {
+public class HttpBasicAuthFilter extends AuthenticationFilter {
 
     public HttpBasicAuthFilter(Authenticator authenticator, SecurityConfig securityConfig) {
         super(authenticator, securityConfig);

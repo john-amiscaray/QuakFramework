@@ -81,7 +81,7 @@ public class WebApplication extends Application {
 
         registerServlets();
         registerFilters();
-        addSecurityFilter();
+        addAuthenticationFilter();
 
         server.start();
         server.getService().addConnector(connector1);
@@ -152,7 +152,11 @@ public class WebApplication extends Application {
         }
     }
 
-    private void addSecurityFilter() {
+    private void addCORSFilter() {
+
+    }
+
+    private void addAuthenticationFilter() {
         var securityFilterDependencyID = SecurityDependencyIDs.SECURITY_FILTER_DEPENDENCY;
         var securityFilter = applicationContext.getInstance(securityFilterDependencyID);
         var securityConfig = applicationContext.getInstance(SecurityDependencyIDs.SECURITY_CONFIG_DEPENDENCY);

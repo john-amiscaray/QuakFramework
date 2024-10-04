@@ -14,7 +14,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-public class JWTAuthFilter extends SecurityFilter{
+public class JWTAuthFilter extends AuthenticationFilter {
 
     private final JwtUtil jwtUtil;
 

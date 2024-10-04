@@ -7,10 +7,11 @@ import io.john.amiscaray.backend.framework.security.auth.Authenticator;
 import io.john.amiscaray.backend.framework.security.auth.credentials.Credentials;
 import io.john.amiscaray.backend.framework.security.auth.credentials.SimpleCredentials;
 import io.john.amiscaray.backend.framework.security.auth.exception.InvalidCredentialsException;
-import io.john.amiscaray.backend.framework.security.auth.filter.SecurityFilter;
+import io.john.amiscaray.backend.framework.security.auth.filter.AuthenticationFilter;
 import io.john.amiscaray.backend.framework.security.auth.principal.Principal;
 import io.john.amiscaray.backend.framework.security.auth.principal.RoleAttachedPrincipal;
 import io.john.amiscaray.backend.framework.security.auth.principal.role.Role;
+import io.john.amiscaray.backend.framework.security.config.CORSConfig;
 import io.john.amiscaray.backend.framework.security.config.EndpointMapping;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 import io.john.amiscaray.backend.framework.security.di.AuthenticationStrategy;
@@ -29,9 +30,9 @@ import java.util.*;
 
 import static org.mockito.Mockito.*;
 
-public abstract class SecurityFilterTest {
+public abstract class AuthenticationFilterTest {
 
-    public abstract SecurityFilter initFilter(Authenticator authenticator, SecurityConfig config);
+    public abstract AuthenticationFilter initFilter(Authenticator authenticator, SecurityConfig config);
 
     @BeforeAll
     public static void setUp() {
@@ -190,6 +191,7 @@ public abstract class SecurityFilterTest {
                         new EndpointMapping("/"), List.of(Role.any()),
                         new EndpointMapping("/secret", List.of(EndpointMapping.RequestMethodMatcher.POST)), List.of(admin())
                 )),
+                CORSConfig.allowAll(),
                 "Something Secure",
                 Duration.ofHours(10).toMillis()
         );

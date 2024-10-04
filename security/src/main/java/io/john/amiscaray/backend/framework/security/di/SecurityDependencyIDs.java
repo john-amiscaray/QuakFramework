@@ -2,8 +2,7 @@ package io.john.amiscaray.backend.framework.security.di;
 
 import io.john.amiscaray.backend.framework.security.auth.Authenticator;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
-import io.john.amiscaray.backend.framework.security.auth.filter.SecurityFilter;
-import io.john.amiscaray.backend.framework.security.auth.jwt.JwtUtil;
+import io.john.amiscaray.backend.framework.security.auth.filter.AuthenticationFilter;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 
 public class SecurityDependencyIDs {
@@ -13,7 +12,7 @@ public class SecurityDependencyIDs {
     public static final String AUTHENTICATOR_DEPENDENCY_NAME = "applicationAuthenticator";
 
     public static final DependencyID<SecurityConfig> SECURITY_CONFIG_DEPENDENCY = new DependencyID<>(SECURITY_CONFIG_DEPENDENCY_NAME, SecurityConfig.class);
-    public static final DependencyID<SecurityFilter> SECURITY_FILTER_DEPENDENCY = new DependencyID<>(SECURITY_FILTER_DEPENDENCY_NAME, SecurityFilter.class);
+    public static final DependencyID<AuthenticationFilter> SECURITY_FILTER_DEPENDENCY = new DependencyID<>(SECURITY_FILTER_DEPENDENCY_NAME, AuthenticationFilter.class);
     public static final DependencyID<Authenticator> AUTHENTICATOR_DEPENDENCY = new DependencyID<>(AUTHENTICATOR_DEPENDENCY_NAME, Authenticator.class);
 
 }
