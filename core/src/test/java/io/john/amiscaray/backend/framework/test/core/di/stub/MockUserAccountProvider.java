@@ -1,11 +1,8 @@
 package io.john.amiscaray.backend.framework.test.core.di.stub;
 
-import io.john.amiscaray.backend.framework.core.di.provider.annotation.AggregateTo;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.*;
 import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockUser;
 import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockUserAccount;
-import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provide;
-import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
-import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provider;
 import lombok.EqualsAndHashCode;
 
 import java.util.Date;
@@ -19,7 +16,7 @@ public class MockUserAccountProvider {
     private Long balance;
     private String accountName;
 
-    @Provide
+    @Instantiate
     @AggregateTo(aggregateList = "userAccounts")
     public MockUserAccountProvider(MockUser user,
                                    Date createdOn,

@@ -42,7 +42,7 @@ public class ApplicationContext {
                 .stream()
                 .toList();
         var dependencyProviders = new ArrayList<DependencyProvider<?>>(providers.stream()
-                .map(this::getProviderConstructor)
+                .map(this::getConstructorMarkedForInstantiation)
                 .map(ConstructorDependencyProvider::new)
                 .toList());
         dependencyProviders.addAll(providers.stream()
@@ -51,14 +51,14 @@ public class ApplicationContext {
                 .map(MethodDependencyProvider::new)
                 .toList()
         );
-        dependencyProviders.addAll(managedInstances.stream().map(this::getManagedInstanceConstructor).map(ConstructorDependencyProvider::new).toList());
+        dependencyProviders.addAll(managedInstances.stream().map(this::getConstructorMarkedForInstantiation).map(ConstructorDependencyProvider::new).toList());
         dependencyProviders.addAll(ServiceLoader.load(DependencyProvider.class).stream().map(ServiceLoader.Provider::get).map(provider -> (DependencyProvider<?>) provider).toList());
 
         buildDependencyGraph(dependencyProviders);
     }
 
-    private Constructor<?> getManagedInstanceConstructor(Class<?> managedInstanceClass) {
-        var constructors = managedInstanceClass.getDeclaredConstructors();
+    private Constructor<?> getConstructorMarkedForInstantiation(Class<?> classToInstantiate) {
+        var constructors = classToInstantiate.getDeclaredConstructors();
         if (Arrays.stream(constructors).anyMatch(constructor -> constructor.isAnnotationPresent(Instantiate.class))) {
             return Arrays.stream(constructors).filter(constructor -> constructor.isAnnotationPresent(Instantiate.class))
                     .findFirst().orElseThrow();
@@ -66,19 +66,7 @@ public class ApplicationContext {
 
         return Arrays.stream(constructors)
                 .filter(constructor -> constructor.getParameters().length == 0)
-                .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(managedInstanceClass));
-    }
-
-    private Constructor<?> getProviderConstructor(Class<?> providerClass) {
-        var constructors = providerClass.getConstructors();
-        if (Arrays.stream(constructors).anyMatch(constructor -> constructor.isAnnotationPresent(Provide.class))) {
-            return Arrays.stream(constructors).filter(constructor -> constructor.isAnnotationPresent(Provide.class))
-                    .findFirst().orElseThrow();
-        }
-
-        return Arrays.stream(constructors)
-                .filter(constructor -> constructor.getParameters().length == 0)
-                .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(providerClass));
+                .findFirst().orElseThrow(() -> new ProviderMissingConstructorException(classToInstantiate));
     }
 
     private void buildDependencyGraph(List<DependencyProvider<?>> dependencyProviders) {
@@ -166,7 +154,7 @@ public class ApplicationContext {
     public <T> T getInstance(Class<T> clazz) {
         if (!hasInstance(clazz)) {
             try {
-                var clazzConstructorForInstantiation = getManagedInstanceConstructor(clazz);
+                var clazzConstructorForInstantiation = getConstructorMarkedForInstantiation(clazz);
                 var instance = clazzConstructorForInstantiation.getParameters().length == 0 ?
                         (T) clazzConstructorForInstantiation.newInstance() :
                         (T) clazzConstructorForInstantiation.newInstance(fetchInstancesOfParameters(clazzConstructorForInstantiation.getParameters()));
