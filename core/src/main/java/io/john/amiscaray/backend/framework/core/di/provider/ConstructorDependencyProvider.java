@@ -5,6 +5,8 @@ import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
 import io.john.amiscaray.backend.framework.core.di.exception.DependencyInstantiationException;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.AggregateTo;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.ManagedType;
+import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provider;
 import lombok.AllArgsConstructor;
 
 import java.lang.reflect.Constructor;
@@ -26,6 +28,16 @@ public class ConstructorDependencyProvider<T> implements ReflectiveDependencyPro
 
     @Override
     public DependencyID<T> getDependencyID() {
+        var declaringClass = constructorReturningInstance.getDeclaringClass();
+        var dependencyName = "";
+        if (declaringClass.isAnnotationPresent(ManagedType.class)) {
+            dependencyName = declaringClass.getAnnotation(ManagedType.class).dependencyName();
+        } else if (declaringClass.isAnnotationPresent(Provider.class)) {
+            dependencyName = declaringClass.getAnnotation(Provider.class).dependencyName();
+        }
+        if (dependencyName != null && !dependencyName.isEmpty()) {
+            return new DependencyID<>(dependencyName, constructorReturningInstance.getDeclaringClass());
+        }
         return new DependencyID<>(constructorReturningInstance.getDeclaringClass());
     }
 

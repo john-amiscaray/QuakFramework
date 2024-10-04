@@ -2,10 +2,7 @@ package io.john.amiscaray.backend.framework.test.core.di;
 
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.test.core.di.stub.*;
-import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockEmployee;
-import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockStudent;
-import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockUser;
-import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockUserAccount;
+import io.john.amiscaray.backend.framework.test.core.di.stub.pojo.*;
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import org.junit.jupiter.api.Assertions;
@@ -14,8 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import static io.john.amiscaray.backend.framework.test.core.di.stub.pojo.MockEmployee.mockEmployee;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ApplicationContextTest {
@@ -33,6 +29,7 @@ public class ApplicationContextTest {
     };
     private static final MockStringProvider stringProvider = new MockStringProvider();
     private static final MockUserProvider userProvider = new MockUserProvider(stringProvider.username());
+    private static final MockProfessorDetailsProvider professorDetailsProvider = new MockProfessorDetailsProvider();
     private static final MockUserAccountDetailsProvider accountDetailsProvider = new MockUserAccountDetailsProvider();
     private static final MockUserAccountProvider userAccountProvider = new MockUserAccountProvider(
             userProvider.getUser(),
@@ -149,6 +146,22 @@ public class ApplicationContextTest {
                 contains(userAccountProvider)
         );
 
+    }
+
+    @Test
+    public void testGetNamedManagedTypeForProfessor() {
+        assertThat(
+                ctx.getInstance(new DependencyID<>(Professor.DEPENDENCY_NAME, Professor.class)),
+                equalTo(new Professor(professorDetailsProvider.name(), professorDetailsProvider.department(), professorDetailsProvider.courses()))
+        );
+    }
+
+    @Test
+    public void testGetNamedProviderForProfessorDetailsProvider() {
+        assertThat(
+                ctx.hasInstance(new DependencyID<>(MockProfessorDetailsProvider.DEPENDENCY_NAME, MockProfessorDetailsProvider.class)),
+                is(true)
+        );
     }
 
 }
