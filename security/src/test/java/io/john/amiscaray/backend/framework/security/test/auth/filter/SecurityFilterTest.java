@@ -1,5 +1,7 @@
 package io.john.amiscaray.backend.framework.security.test.auth.filter;
 
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
+import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
 import io.john.amiscaray.backend.framework.security.auth.Authentication;
 import io.john.amiscaray.backend.framework.security.auth.Authenticator;
 import io.john.amiscaray.backend.framework.security.auth.credentials.Credentials;
@@ -16,6 +18,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -29,6 +32,14 @@ import static org.mockito.Mockito.*;
 public abstract class SecurityFilterTest {
 
     public abstract SecurityFilter initFilter(Authenticator authenticator, SecurityConfig config);
+
+    @BeforeAll
+    public static void setUp() {
+        var properties = ApplicationProperties.getInstance();
+        var mockFileProperties = mock(Properties.class);
+        when(mockFileProperties.getProperty(ApplicationProperty.CONTEXT_PATH.getName(), "")).thenReturn("");
+        properties.init(mockFileProperties, "io.john.amiscaray.backend.framework.security.test.auth.filter");
+    }
 
     @Test
     public void testAuthFilterGivenAuthorizationHeaderMissingPrefixYieldsBadRequest() throws ServletException, IOException {
