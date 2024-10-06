@@ -18,7 +18,9 @@ public enum ApplicationProperty {
     DB_CONNECTION_URL("hibernate.connection.url", "jdbc:mysql://localhost:3306/test"),
     DB_CONNECTION_USERNAME("hibernate.connection.username", "root"),
     DB_CONNECTION_PASSWORD("hibernate.connection.password", ""),
-    HBM2DDL("hibernate.hbm2ddl.auto", "none");
+    HBM2DDL("hibernate.hbm2ddl.auto", "none"),
+    JWT_SECRET_KEY("jwt.secret.key", ""),
+    JWT_EXPIRY_TIME("jwt.expiry.time", "36000000");
 
     private String name;
     private String defaultValue;

@@ -282,4 +282,21 @@ public class WebStarterTest {
                 });
     }
 
+    @Test
+    public void testGetRequestToSecuredEndpointGivesResponseWithSecurityID() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "secured"))
+                .header("Authorization", "Basic RWxsaTpwYXNzd29yZA==")
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_OK, status);
+                    assertEquals("Elli", httpResponse.body());
+                });
+    }
+
 }

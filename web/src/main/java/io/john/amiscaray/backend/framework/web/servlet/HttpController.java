@@ -58,6 +58,7 @@ public class HttpController extends HttpServlet {
 
         var requestHeaders = extractHeaders(servletRequest);
         var bodyRaw = readBody(servletRequest);
+        var requestAttributes = extractAttributes(servletRequest);
         Request<?> request;
         if (controller.requestBodyType().equals(String.class)) {
             request = new DynamicPathRequest<>(
@@ -65,21 +66,24 @@ public class HttpController extends HttpServlet {
                     queryParams,
                     method,
                     pathParameters,
-                    bodyRaw);
+                    bodyRaw,
+                    requestAttributes);
         } else if (controller.requestBodyType().equals(Void.class)) {
             request = new DynamicPathRequest<>(
                     requestHeaders,
                     queryParams,
                     method,
                     pathParameters,
-                    null);
+                    null,
+                    requestAttributes);
         } else {
             request = new DynamicPathRequest<>(
                     requestHeaders,
                     queryParams,
                     method,
                     pathParameters,
-                    MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw));
+                    MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw),
+                    requestAttributes);
         }
 
         var response = controller.requestHandler().handleRequest((Request) request);
@@ -108,6 +112,16 @@ public class HttpController extends HttpServlet {
             result.put(headerName, req.getHeader(headerName));
         }
 
+        return result;
+    }
+
+    private Map<String, Object> extractAttributes(HttpServletRequest req) {
+        var attributeIter = req.getAttributeNames();
+        var result = new HashMap<String, Object>();
+        while (attributeIter.hasMoreElements()) {
+            var attrName = attributeIter.nextElement();
+            result.put(attrName, req.getAttribute(attrName));
+        }
         return result;
     }
 

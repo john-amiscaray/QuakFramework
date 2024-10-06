@@ -1,5 +1,6 @@
 module backend.framework.web {
     requires backend.framework.core;
+    requires backend.framework.security;
     requires com.fasterxml.jackson.databind;
     requires java.net.http;
     requires javatuples;

@@ -20,6 +20,7 @@
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
         <jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
         <maven-deploy-plugin.version>3.1.2</maven-deploy-plugin.version>
+        <jwt.version>4.4.0</jwt.version>
     </properties>
 
     <modules>
@@ -29,6 +30,7 @@
         <module>aggregate-report</module>
         <module>generator</module>
         <module>api-generator</module>
+        <module>security</module>
     </modules>
 
     <dependencies>
@@ -79,7 +81,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>4.8.1</version>
+            <version>5.12.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>

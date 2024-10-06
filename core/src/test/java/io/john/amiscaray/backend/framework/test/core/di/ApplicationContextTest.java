@@ -164,4 +164,12 @@ public class ApplicationContextTest {
         );
     }
 
+    @Test
+    public void testProgramAsOptionalDependencyIsNotLoadedIntoContext() {
+        assertThat(
+                ctx.hasInstance(new DependencyID<>(Program.class)),
+                is(false)
+        );
+    }
+
 }
