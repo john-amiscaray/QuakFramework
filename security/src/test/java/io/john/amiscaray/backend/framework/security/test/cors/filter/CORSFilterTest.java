@@ -19,7 +19,7 @@ public class CORSFilterTest {
 
     private static SecurityConfig securityConfigAllowingOneOriginAndGETAndPOSTMethods() {
         return SecurityConfig.builder()
-                .corsConfig(CORSConfig.builder()
+                .securePathWithCorsConfig("/*", CORSConfig.builder()
                         .allowedOrigins(List.of("https://mysite.org"))
                         .allowedMethods(List.of("GET", "POST"))
                         .allowAllHeaders(true)
@@ -29,7 +29,7 @@ public class CORSFilterTest {
 
     private static SecurityConfig securityConfigAllowingMultipleOriginsAndGETAndPOSTMethods() {
         return SecurityConfig.builder()
-                .corsConfig(CORSConfig.builder()
+                .securePathWithCorsConfig("/*", CORSConfig.builder()
                         .allowedOrigins(List.of("https://mysite.org", "https://myothersite.com"))
                         .allowedMethods(List.of("GET", "POST"))
                         .allowAllHeaders(true)
@@ -39,7 +39,7 @@ public class CORSFilterTest {
 
     private static SecurityConfig securityConfigAllowingOnlyThreeHeadersAndGETAndPOSTMethods() {
         return SecurityConfig.builder()
-                .corsConfig(CORSConfig.builder()
+                .securePathWithCorsConfig("/*", CORSConfig.builder()
                         .allowedOrigins(List.of("https://mysite.org"))
                         .allowedMethods(List.of("GET", "POST"))
                         .allowHeader("Authorization")
@@ -51,7 +51,7 @@ public class CORSFilterTest {
 
     private static SecurityConfig securityConfigAllowingAllOrigins() {
         return SecurityConfig.builder()
-                .corsConfig(CORSConfig.allowAll())
+                .securePathWithCorsConfig("/*", CORSConfig.allowAll())
                 .build();
     }
 
@@ -62,6 +62,7 @@ public class CORSFilterTest {
         var mockResponse = mock(HttpServletResponse.class);
         var mockFilterChain = mock(FilterChain.class);
         when(mockRequest.getHeader("Origin")).thenReturn("https://mysite.org");
+        when(mockRequest.getRequestURI()).thenReturn("/");
         when(mockRequest.getHeader("Access-Control-Request-Method")).thenReturn("GET");
         when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(List.of("Authorization", "Origin")));
 
@@ -80,6 +81,7 @@ public class CORSFilterTest {
         var mockResponse = mock(HttpServletResponse.class);
         var mockFilterChain = mock(FilterChain.class);
         when(mockRequest.getHeader("Origin")).thenReturn("https://myothersite.com");
+        when(mockRequest.getRequestURI()).thenReturn("/");
         when(mockRequest.getHeader("Access-Control-Request-Method")).thenReturn("GET");
         when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(List.of("Authorization", "Origin")));
 
@@ -98,6 +100,7 @@ public class CORSFilterTest {
         var mockResponse = mock(HttpServletResponse.class);
         var mockFilterChain = mock(FilterChain.class);
         when(mockRequest.getHeader("Origin")).thenReturn("https://mysite.org");
+        when(mockRequest.getRequestURI()).thenReturn("/");
         when(mockRequest.getHeader("Access-Control-Request-Method")).thenReturn("GET");
         when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(List.of("Authorization", "Origin")));
 
@@ -114,6 +117,7 @@ public class CORSFilterTest {
         var mockResponse = mock(HttpServletResponse.class);
         var mockFilterChain = mock(FilterChain.class);
         when(mockRequest.getHeader("Origin")).thenReturn("https://mysite.org");
+        when(mockRequest.getRequestURI()).thenReturn("/");
         when(mockRequest.getHeader("Access-Control-Request-Method")).thenReturn("GET");
         when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(List.of("Authorization", "Origin", "Accept", "Accept-Language")));
 

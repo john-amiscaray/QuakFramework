@@ -1,16 +1,17 @@
 package io.john.amiscaray.backend.framework.security.cors.filter;
 
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
+import io.john.amiscaray.backend.framework.security.config.CORSConfig;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
+import io.john.amiscaray.backend.framework.security.filter.SecurityFilter;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
-public class CORSFilter implements Filter {
+public class CORSFilter extends SecurityFilter {
 
     private SecurityConfig securityConfig;
 
@@ -24,10 +25,18 @@ public class CORSFilter implements Filter {
         var httpRequest = (HttpServletRequest) request;
         var httpResponse = (HttpServletResponse) response;
         var origin = httpRequest.getHeader("Origin");
-        var allowedOrigins = securityConfig.corsConfig().allowedOrigins();
-        var allowedMethods = securityConfig.corsConfig().allowedMethods();
-        var allowedHeaders = securityConfig.corsConfig().allowedHeaders();
-        var allowAllHeaders = securityConfig.corsConfig().allowAllHeaders();
+        var optionalCORSConfig = getApplicableCorsConfig(httpRequest.getRequestURI(), securityConfig);
+
+        if (optionalCORSConfig.isEmpty()) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        var corsConfig = optionalCORSConfig.get();
+        var allowedOrigins = corsConfig.allowedOrigins();
+        var allowedMethods = corsConfig.allowedMethods();
+        var allowedHeaders = corsConfig.allowedHeaders();
+        var allowAllHeaders = corsConfig.allowAllHeaders();
 
         if (allowAllHeaders) {
             httpResponse.setHeader("Access-Control-Allow-Headers", String.join(", ", getHeaderNames(httpRequest)));
@@ -57,6 +66,24 @@ public class CORSFilter implements Filter {
         }
 
         return result;
+    }
+
+    private Optional<CORSConfig> getApplicableCorsConfig(String url, SecurityConfig securityConfig) {
+        if (securityConfig.pathCorsConfigMap().containsKey(url)) {
+            return Optional.of(securityConfig.pathCorsConfigMap().get(url));
+        }
+
+        CORSConfig result = null;
+        var sortedCorsConfigs = new TreeMap<String, CORSConfig>(Comparator.comparingInt(String::length));
+        sortedCorsConfigs.putAll(securityConfig.pathCorsConfigMap());
+
+        for (var entry : sortedCorsConfigs.entrySet()) {
+            if (urlMatchesPathPattern(url, entry.getKey())) {
+                result = entry.getValue();
+            }
+        }
+
+        return Optional.ofNullable(result);
     }
 
 }

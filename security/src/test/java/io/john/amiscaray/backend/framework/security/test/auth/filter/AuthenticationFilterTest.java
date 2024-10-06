@@ -191,7 +191,7 @@ public abstract class AuthenticationFilterTest {
                         new EndpointMapping("/"), List.of(Role.any()),
                         new EndpointMapping("/secret", List.of(EndpointMapping.RequestMethodMatcher.POST)), List.of(admin())
                 )),
-                CORSConfig.allowAll(),
+                Map.of("/*", CORSConfig.allowAll()),
                 "Something Secure",
                 Duration.ofHours(10).toMillis()
         );

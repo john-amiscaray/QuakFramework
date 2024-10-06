@@ -8,7 +8,7 @@ import io.john.amiscaray.backend.framework.security.auth.principal.RoleAttachedP
 import io.john.amiscaray.backend.framework.security.auth.principal.role.Role;
 import io.john.amiscaray.backend.framework.security.config.EndpointMapping;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
-import jakarta.servlet.Filter;
+import io.john.amiscaray.backend.framework.security.filter.SecurityFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.List;
 
 @AllArgsConstructor
-public abstract class AuthenticationFilter implements Filter {
+public abstract class AuthenticationFilter extends SecurityFilter {
 
     protected Authenticator authenticator;
     protected SecurityConfig securityConfig;
@@ -83,18 +83,6 @@ public abstract class AuthenticationFilter implements Filter {
                     EndpointMapping.RequestMethodMatcher.PATCH,
                     EndpointMapping.RequestMethodMatcher.PUT
             ).contains(EndpointMapping.RequestMethodMatcher.valueOf(method)) && matchers.contains(EndpointMapping.RequestMethodMatcher.ANY_MODIFYING);
-        }
-    }
-
-    private boolean urlMatchesPathPattern(String url, String pattern) {
-        if (pattern.endsWith("/*")) {
-            String basePattern = pattern.substring(0, pattern.length() - 2);
-            return url.startsWith(basePattern);
-        } else if (pattern.startsWith("*.")) {
-            String extension = pattern.substring(1); // Remove the '*'
-            return url.endsWith(extension);
-        } else {
-            return url.equals(pattern);
         }
     }
 
