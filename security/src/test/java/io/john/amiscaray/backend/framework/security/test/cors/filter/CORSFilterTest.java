@@ -49,6 +49,33 @@ public class CORSFilterTest {
                 .build();
     }
 
+    private static SecurityConfig securityConfigConfiguringCORSForOnlyOnePath() {
+        return SecurityConfig.builder()
+                .securePathWithCorsConfig("/student/john", CORSConfig.builder()
+                        .allowedOrigins(List.of("https://mysite.org"))
+                        .allowedMethods(List.of("GET", "POST"))
+                        .allowHeader("Authorization")
+                        .allowHeader("Origin")
+                        .allowHeader("Accept")
+                        .build())
+                .build();
+    }
+
+    private static SecurityConfig securityConfigConfiguringCORSForAllPathsAndOneSpecificPath() {
+        return SecurityConfig.builder()
+                .securePathWithCorsConfig("/*", CORSConfig.builder()
+                        .allowOrigin("https://someothersite.ca")
+                        .allowMethod("GET")
+                        .allowHeader("Authorization")
+                        .build())
+                .securePathWithCorsConfig("/student/john", CORSConfig.builder()
+                        .allowedOrigins(List.of("https://mysite.org"))
+                        .allowedMethods(List.of("GET", "POST"))
+                        .allowAllHeaders(true)
+                        .build())
+                .build();
+    }
+
     private static SecurityConfig securityConfigAllowingAllOrigins() {
         return SecurityConfig.builder()
                 .securePathWithCorsConfig("/*", CORSConfig.allowAll())
@@ -125,6 +152,40 @@ public class CORSFilterTest {
 
         verify(mockResponse, times(1)).setHeader("Access-Control-Allow-Origin", "*");
         verify(mockResponse, times(1)).setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD, CONNECT, TRACE");
+        verify(mockResponse, times(1)).setHeader("Access-Control-Allow-Headers", "Authorization, Origin, Accept, Accept-Language");
+        verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
+    }
+
+    @Test
+    public void testCORSFilterSkipsRequestForPathWithoutCORSConfig() throws ServletException, IOException {
+        var filter = new CORSFilter(securityConfigConfiguringCORSForOnlyOnePath());
+        var mockRequest = mock(HttpServletRequest.class);
+        var mockResponse = mock(HttpServletResponse.class);
+        var mockFilterChain = mock(FilterChain.class);
+        when(mockRequest.getHeader("Origin")).thenReturn("https://mysite.org");
+        when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(List.of()));
+        when(mockRequest.getRequestURI()).thenReturn("/");
+
+        filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+
+        verify(mockResponse, times(0)).setHeader(anyString(), anyString());
+        verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
+    }
+
+    @Test
+    public void testCORSFilterSelectsMoreSpecificPathForCORSConfigWithWildCardPathAndOneSpecificPath() throws ServletException, IOException {
+        var filter = new CORSFilter(securityConfigConfiguringCORSForAllPathsAndOneSpecificPath());
+        var mockRequest = mock(HttpServletRequest.class);
+        var mockResponse = mock(HttpServletResponse.class);
+        var mockFilterChain = mock(FilterChain.class);
+        when(mockRequest.getHeader("Origin")).thenReturn("https://mysite.org");
+        when(mockRequest.getHeaderNames()).thenReturn(Collections.enumeration(List.of("Authorization", "Origin", "Accept", "Accept-Language")));
+        when(mockRequest.getRequestURI()).thenReturn("/student/john");
+
+        filter.doFilter(mockRequest, mockResponse, mockFilterChain);
+
+        verify(mockResponse, times(1)).setHeader("Access-Control-Allow-Origin", "https://mysite.org");
+        verify(mockResponse, times(1)).setHeader("Access-Control-Allow-Methods", "GET, POST");
         verify(mockResponse, times(1)).setHeader("Access-Control-Allow-Headers", "Authorization, Origin, Accept, Accept-Language");
         verify(mockFilterChain, times(1)).doFilter(mockRequest, mockResponse);
     }
