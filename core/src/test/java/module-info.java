@@ -1,4 +1,5 @@
 import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
+import io.john.amiscaray.backend.framework.test.core.di.stub.MockProgramProvider;
 import io.john.amiscaray.backend.framework.test.core.di.stub.EmployeeStartupDependencyProvider;
 
 module backend.framework.core.test {
@@ -12,7 +13,8 @@ module backend.framework.core.test {
     opens io.john.amiscaray.backend.framework.test.core.di to org.junit.platform.commons;
     exports io.john.amiscaray.backend.framework.test.core.di.stub;
     exports io.john.amiscaray.backend.framework.test.core.di.stub.pojo;
+    opens io.john.amiscaray.backend.framework.test.core.di.stub to org.junit.platform.commons;
 
-    provides DependencyProvider with EmployeeStartupDependencyProvider;
+    provides DependencyProvider with EmployeeStartupDependencyProvider, MockProgramProvider;
 
 }
