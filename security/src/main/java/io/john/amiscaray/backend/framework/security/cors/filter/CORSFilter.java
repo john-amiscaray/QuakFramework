@@ -1,15 +1,15 @@
-package io.john.amiscaray.backend.framework.security.auth.filter;
+package io.john.amiscaray.backend.framework.security.cors.filter;
 
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-import io.john.amiscaray.backend.framework.core.di.provider.annotation.ManagedType;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-@ManagedType
 public class CORSFilter implements Filter {
 
     private SecurityConfig securityConfig;
@@ -27,8 +27,11 @@ public class CORSFilter implements Filter {
         var allowedOrigins = securityConfig.corsConfig().allowedOrigins();
         var allowedMethods = securityConfig.corsConfig().allowedMethods();
         var allowedHeaders = securityConfig.corsConfig().allowedHeaders();
+        var allowAllHeaders = securityConfig.corsConfig().allowAllHeaders();
 
-        if (allowedHeaders != null && !allowedHeaders.isEmpty()) {
+        if (allowAllHeaders) {
+            httpResponse.setHeader("Access-Control-Allow-Headers", String.join(", ", getHeaderNames(httpRequest)));
+        } else if (allowedHeaders != null && !allowedHeaders.isEmpty()) {
             httpResponse.setHeader("Access-Control-Allow-Headers", String.join(", ", allowedHeaders));
         }
 
@@ -36,14 +39,24 @@ public class CORSFilter implements Filter {
             httpResponse.setHeader("Access-Control-Allow-Methods", String.join(", ", allowedMethods));
         }
 
-        if (allowedOrigins == null) {
-            return;
-        }
         if (allowedOrigins.contains("*")) {
             httpResponse.setHeader("Access-Control-Allow-Origin", "*");
         } else if (origin != null && allowedOrigins.contains(origin)) {
-            httpResponse.addHeader("Access-Control-Allow-Origin", origin);
+            httpResponse.setHeader("Access-Control-Allow-Origin", origin);
         }
+
+        chain.doFilter(request, response);
+    }
+
+    private List<String> getHeaderNames(HttpServletRequest request) {
+        var result = new ArrayList<String>();
+        var iter = request.getHeaderNames();
+
+        while (iter.hasMoreElements()) {
+            result.add(iter.nextElement());
+        }
+
+        return result;
     }
 
 }

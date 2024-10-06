@@ -2,7 +2,9 @@ package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
+import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperty;
+import io.john.amiscaray.backend.framework.security.cors.filter.CORSFilter;
 import io.john.amiscaray.backend.framework.security.di.SecurityDependencyIDs;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.filter.annotation.ApplicationFilter;
@@ -82,6 +84,7 @@ public class WebApplication extends Application {
         registerServlets();
         registerFilters();
         addAuthenticationFilter();
+        addCORSFilter();
 
         server.start();
         server.getService().addConnector(connector1);
@@ -153,7 +156,19 @@ public class WebApplication extends Application {
     }
 
     private void addCORSFilter() {
+        var corsFilter = applicationContext.getInstance(new DependencyID<>(SecurityDependencyIDs.CORS_FILTER_DEPENDENCY_NAME, CORSFilter.class));
 
+        var filterDef = new FilterDef();
+        filterDef.setFilterName(SecurityDependencyIDs.CORS_FILTER_DEPENDENCY_NAME);
+        filterDef.setFilter(corsFilter);
+
+        servletContext.addFilterDef(filterDef);
+
+        var filterMap = new FilterMap();
+        filterMap.setFilterName(SecurityDependencyIDs.CORS_FILTER_DEPENDENCY_NAME);
+        filterMap.addURLPattern("*");
+
+        servletContext.addFilterMap(filterMap);
     }
 
     private void addAuthenticationFilter() {

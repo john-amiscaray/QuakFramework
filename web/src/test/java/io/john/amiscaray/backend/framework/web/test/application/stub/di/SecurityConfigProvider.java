@@ -3,6 +3,7 @@ package io.john.amiscaray.backend.framework.web.test.application.stub.di;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provide;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Provider;
 import io.john.amiscaray.backend.framework.security.auth.principal.role.Role;
+import io.john.amiscaray.backend.framework.security.config.CORSConfig;
 import io.john.amiscaray.backend.framework.security.config.EndpointMapping;
 import io.john.amiscaray.backend.framework.security.config.SecurityConfig;
 import io.john.amiscaray.backend.framework.security.di.AuthenticationStrategy;
@@ -20,6 +21,7 @@ public class SecurityConfigProvider {
         return SecurityConfig.builder()
                 .authenticationStrategy(AuthenticationStrategy.BASIC)
                 .securedEndpointRoles(Map.of(new EndpointMapping("/secured", List.of(EndpointMapping.RequestMethodMatcher.ALL)), List.of(Role.any())))
+                .corsConfig(CORSConfig.allowAll())
                 .jwtSecretExpiryTime(Duration.ofHours(10).toMillis())
                 .jwtSecretKey("Something Secret")
                 .build();

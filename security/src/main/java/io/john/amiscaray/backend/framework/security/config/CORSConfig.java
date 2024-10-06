@@ -9,15 +9,17 @@ import java.util.List;
 public record CORSConfig(
         @Singular("allowOrigin")
         List<String> allowedOrigins,
-        @Singular("allowHeaders")
+        boolean allowAllHeaders,
+        @Singular("allowHeader")
         List<String> allowedHeaders,
-        @Singular("allowMethods")
+        @Singular("allowMethod")
         List<String> allowedMethods) {
 
     public CORSConfig(List<String> allowedOrigins) {
         this(allowedOrigins,
-                List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"),
-                List.of("Authorization"));
+                true,
+                List.of(),
+                List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD", "CONNECT", "TRACE"));
     }
 
     public static CORSConfig allowAll() {

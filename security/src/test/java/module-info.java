@@ -8,4 +8,5 @@ module backend.framework.security.test {
     requires backend.framework.core;
 
     exports io.john.amiscaray.backend.framework.security.test.auth.filter to org.junit.platform.commons;
+    exports io.john.amiscaray.backend.framework.security.test.cors.filter to org.junit.platform.commons;
 }
