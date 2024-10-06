@@ -299,4 +299,19 @@ public class WebStarterTest {
                 });
     }
 
+    @Test
+    public void testGetRequestToDummyEndpointGivesBadRequestResponse() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "dummy"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_BAD_REQUEST, status);
+                });
+    }
+
 }

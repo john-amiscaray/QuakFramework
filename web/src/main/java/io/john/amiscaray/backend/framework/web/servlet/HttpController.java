@@ -1,6 +1,8 @@
 package io.john.amiscaray.backend.framework.web.servlet;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
+import io.john.amiscaray.backend.framework.web.cfg.WebConfig;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
@@ -86,16 +88,47 @@ public class HttpController extends HttpServlet {
                     requestAttributes);
         }
 
-        var response = controller.requestHandler().handleRequest((Request) request);
-        servletResponse.setStatus(response.status());
-        writeResponseHeaders(response.headers(), servletResponse);
+        try {
+            var response = controller.requestHandler().handleRequest((Request) request);
+            servletResponse.setStatus(response.status());
+            writeResponseHeaders(response.headers(), servletResponse);
 
-        if (response.status() >= 200 && response.status() < 300) {
-            if (controller.responseBodyType().equals(String.class)) {
-                servletResponse.getWriter().print(response.body());
-            } else if (!controller.responseBodyType().equals(Void.class)) {
-                MAPPER.writerFor(controller.responseBodyType()).writeValue(servletResponse.getWriter(), controller.responseBodyType().cast(response.body()));
+            if (response.status() >= 200 && response.status() < 300) {
+                if (controller.responseBodyType().equals(String.class)) {
+                    servletResponse.getWriter().print(response.body());
+                } else if (!controller.responseBodyType().equals(Void.class)) {
+                    MAPPER.writerFor(controller.responseBodyType()).writeValue(servletResponse.getWriter(), controller.responseBodyType().cast(response.body()));
+                }
             }
+        } catch (Exception ex) {
+            var applicationContext = ApplicationContext.getInstance();
+            if (applicationContext.hasInstance(WebConfig.APPLICATION_WEB_CFG_DEPENDENCY_ID)) {
+                var statusCode = backTraceToFirstExceptionStatusCode(applicationContext.getInstance(WebConfig.APPLICATION_WEB_CFG_DEPENDENCY_ID), ex);
+                if (statusCode != null) {
+                    servletResponse.setStatus(statusCode);
+                    servletResponse.getWriter().write(ex.getMessage());
+                } else {
+                    servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
+            } else {
+                servletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
+        }
+    }
+
+    private Integer backTraceToFirstExceptionStatusCode(WebConfig cfg, Exception ex) {
+        if (ex == null) {
+            return null;
+        }
+        var exceptionToStatusCode = cfg.exceptionHttpStatusMapping();
+        if (exceptionToStatusCode.containsKey(ex.getClass())) {
+            return exceptionToStatusCode.get(ex.getClass());
+        }
+
+        if (ex.getCause() instanceof Exception cause) {
+            return backTraceToFirstExceptionStatusCode(cfg, cause);
+        } else {
+            return null;
         }
     }
 

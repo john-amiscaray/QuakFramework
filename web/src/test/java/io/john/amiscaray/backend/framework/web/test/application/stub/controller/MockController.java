@@ -7,6 +7,7 @@ import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
+import io.john.amiscaray.backend.framework.web.test.stub.exception.DummyException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
@@ -47,6 +48,11 @@ public class MockController {
 
         return Response.of(userAuthentication.getIssuedTo().getSecurityID());
 
+    }
+
+    @Handle(path="/dummy", method=RequestMethod.GET)
+    public Response<String> dummy(Request<Void> request) {
+        throw new DummyException();
     }
 
 }
