@@ -21,7 +21,7 @@ public class SecurityConfigProvider {
         return SecurityConfig.builder()
                 .authenticationStrategy(AuthenticationStrategy.BASIC)
                 .securedEndpointRoles(Map.of(new EndpointMapping("/secured", List.of(EndpointMapping.RequestMethodMatcher.ALL)), List.of(Role.any())))
-                .corsConfig(CORSConfig.allowAll())
+                .securePathWithCorsConfig("/*", CORSConfig.allowAll())
                 .jwtSecretExpiryTime(Duration.ofHours(10).toMillis())
                 .jwtSecretKey("Something Secret")
                 .build();
