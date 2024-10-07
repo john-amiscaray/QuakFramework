@@ -9,6 +9,7 @@ import io.john.amiscaray.backend.framework.web.handler.response.Response;
 import io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo;
 import io.john.amiscaray.backend.framework.web.test.stub.exception.DummyException;
 import io.john.amiscaray.backend.framework.web.test.stub.exception.BadGatewayException;
+import io.john.amiscaray.backend.framework.web.test.stub.exception.UnmappedException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.List;
@@ -59,6 +60,11 @@ public class MockController {
     @Handle(path="/bad", method=RequestMethod.GET)
     public Response<String> badGateway(Request<Void> request) {
         throw new BadGatewayException();
+    }
+
+    @Handle(path="/unmapped", method=RequestMethod.GET)
+    public Response<String> unmappedError(Request<Void> request) {
+        throw new UnmappedException();
     }
 
 }

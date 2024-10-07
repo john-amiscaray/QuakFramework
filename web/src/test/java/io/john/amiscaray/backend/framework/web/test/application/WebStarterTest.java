@@ -10,6 +10,7 @@ import io.john.amiscaray.backend.framework.web.test.application.stub.Application
 import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationDetailsProvider;
 import io.john.amiscaray.backend.framework.web.test.stub.exception.BadGatewayException;
 import io.john.amiscaray.backend.framework.web.test.stub.exception.DummyException;
+import io.john.amiscaray.backend.framework.web.test.stub.exception.UnmappedException;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterAll;
@@ -29,6 +30,7 @@ import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dum
 import static io.john.amiscaray.backend.framework.web.test.stub.MockUserInfo.dummyUsers;
 import static io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil.ROOT_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class WebStarterTest {
 
@@ -330,6 +332,22 @@ public class WebStarterTest {
                     var status = httpResponse.statusCode();
                     assertEquals(HttpServletResponse.SC_BAD_GATEWAY, status);
                     assertEquals(BadGatewayException.MESSAGE, httpResponse.body());
+                });
+    }
+
+    @Test
+    public void testGetRequestToUnmappedEndpointGivesInternalServerErrorResponse() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "unmapped"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, status);
+                    assertNotEquals(UnmappedException.MESSAGE, httpResponse.body());
                 });
     }
 
