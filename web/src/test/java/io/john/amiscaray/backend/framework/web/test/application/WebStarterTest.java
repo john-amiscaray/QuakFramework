@@ -8,6 +8,8 @@ import io.john.amiscaray.backend.framework.web.application.WebStarter;
 import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationDetails;
 import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationUIDetails;
 import io.john.amiscaray.backend.framework.web.test.application.stub.MockApplicationDetailsProvider;
+import io.john.amiscaray.backend.framework.web.test.stub.exception.BadGatewayException;
+import io.john.amiscaray.backend.framework.web.test.stub.exception.DummyException;
 import io.john.amiscaray.backend.framework.web.test.util.TestConnectionUtil;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.AfterAll;
@@ -311,6 +313,23 @@ public class WebStarterTest {
                 httpResponse -> {
                     var status = httpResponse.statusCode();
                     assertEquals(HttpServletResponse.SC_BAD_REQUEST, status);
+                    assertEquals(DummyException.MESSAGE, httpResponse.body());
+                });
+    }
+
+    @Test
+    public void testGetRequestToBadEndpointGivesBadGatewayResponse() {
+        var request = HttpRequest.newBuilder()
+                .uri(URI.create(ROOT_URL + "bad"))
+                .GET()
+                .build();
+
+        connectionUtil.attemptConnectionAndAssert(request,
+                HttpResponse.BodyHandlers.ofString(),
+                httpResponse -> {
+                    var status = httpResponse.statusCode();
+                    assertEquals(HttpServletResponse.SC_BAD_GATEWAY, status);
+                    assertEquals(BadGatewayException.MESSAGE, httpResponse.body());
                 });
     }
 

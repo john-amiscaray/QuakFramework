@@ -21,4 +21,5 @@ module backend.framework.web {
     exports io.john.amiscaray.backend.framework.web.controller.annotation;
     exports io.john.amiscaray.backend.framework.web.handler.annotation;
     exports io.john.amiscaray.backend.framework.web.cfg;
+    exports io.john.amiscaray.backend.framework.web.annotation;
 }
