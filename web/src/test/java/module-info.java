@@ -1,5 +1,6 @@
 import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 import io.john.amiscaray.backend.framework.web.test.application.stub.di.SimpleAuthenticatorProvider;
+import io.john.amiscaray.backend.framework.web.test.stub.WebConfigProvider;
 
 module backend.framework.web.test {
     requires static lombok;
@@ -13,7 +14,7 @@ module backend.framework.web.test {
     requires backend.framework.security;
     requires com.auth0.jwt;
 
-    provides DependencyProvider with SimpleAuthenticatorProvider;
+    provides DependencyProvider with SimpleAuthenticatorProvider, WebConfigProvider;
 
     opens io.john.amiscaray.backend.framework.web.test.application to org.junit.platform.commons;
     opens io.john.amiscaray.backend.framework.web.test.application.stub;
