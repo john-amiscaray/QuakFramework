@@ -21,6 +21,12 @@ module backend.framework.web.test {
     opens io.john.amiscaray.backend.framework.web.test.application.stub.controller;
     opens io.john.amiscaray.backend.framework.web.test.application.stub.filter;
     opens io.john.amiscaray.backend.framework.web.test.application.stub.di;
+    opens io.john.amiscaray.backend.framework.web.test.controller.exception;
+    opens io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.badreturn;
+    opens io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.nohandlers;
+    opens io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.noparams;
+    opens io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.stringparam;
+    opens io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.voidreturn;
     opens io.john.amiscaray.backend.framework.web.test.stub;
     opens io.john.amiscaray.backend.framework.web.test.util;
 }

@@ -2,7 +2,6 @@ package io.john.amiscaray.backend.framework.web.handler.response;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.net.http.HttpResponse;
 import java.util.HashMap;
 import java.util.Map;
 
