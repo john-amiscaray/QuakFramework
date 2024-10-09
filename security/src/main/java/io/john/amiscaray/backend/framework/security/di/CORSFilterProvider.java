@@ -9,6 +9,12 @@ import io.john.amiscaray.backend.framework.security.cors.filter.CORSFilter;
 import java.util.List;
 
 public class CORSFilterProvider implements DependencyProvider<CORSFilter> {
+
+    @Override
+    public boolean isDependencyOptional() {
+        return true;
+    }
+
     @Override
     public DependencyID<CORSFilter> getDependencyID() {
         return new DependencyID<>(SecurityDependencyIDs.CORS_FILTER_DEPENDENCY_NAME, CORSFilter.class);

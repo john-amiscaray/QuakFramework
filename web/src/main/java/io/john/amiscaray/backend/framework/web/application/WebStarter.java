@@ -5,6 +5,7 @@ import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
+import io.john.amiscaray.backend.framework.web.controller.exception.InvalidRequestHandlerException;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
 import io.john.amiscaray.backend.framework.web.handler.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.request.RequestMapping;
@@ -53,13 +54,16 @@ public class WebStarter {
                     var instance = ctx.getInstance(controller);
                     var handlerMethods = Arrays.stream(controller.getMethods())
                             .filter(method -> method.isAnnotationPresent(Handle.class))
-                            .filter(method -> method.getReturnType().equals(Response.class))
-                            .filter(method -> method.getParameterCount() == 1)
-                            .filter(method -> Request.class.isAssignableFrom(method.getParameters()[0].getType()))
                             .toList();
                     var contextPath = controller.getAnnotation(Controller.class).contextPath();
 
                     for (var handlerMethod : handlerMethods) {
+                        if (!(handlerMethod.getReturnType().equals(Response.class) &&
+                                handlerMethod.getParameterCount() == 1 &&
+                                Request.class.isAssignableFrom(handlerMethod.getParameters()[0].getType()))) {
+                            result.completeExceptionally(new InvalidRequestHandlerException(controller, handlerMethod));
+                            return;
+                        }
                         var handlerInfo = handlerMethod.getAnnotation(Handle.class);
                         var requestArgument = handlerMethod.getParameters()[0];
                         var responseReturnType = (ParameterizedType) handlerMethod.getGenericReturnType();
@@ -88,7 +92,7 @@ public class WebStarter {
                         );
                     }
                 } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
+                    result.completeExceptionally(e);
                 }
             }
 
