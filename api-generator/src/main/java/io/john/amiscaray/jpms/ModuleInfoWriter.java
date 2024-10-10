@@ -1,8 +1,8 @@
 package io.john.amiscaray.jpms;
 
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import io.john.amiscaray.model.VisitedSourcesState;
 import lombok.AllArgsConstructor;
-import org.apache.maven.plugin.logging.Log;
 
 import java.util.List;
 
@@ -23,40 +23,45 @@ public class ModuleInfoWriter {
             return null;
         }
 
-        var modelPackages = finalVisitedSourcesState.visitedRestModelClasses().stream()
-                .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
-                .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
-                .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))
-                .distinct()
-                .toList();
-        var ormPackages = finalVisitedSourcesState.visitedEntityClasses().stream()
-                .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
-                .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
-                .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))
-                .distinct()
-                .toList();
+        var modelPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedRestModelClasses());
+        var ormPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedEntityClasses());
+        var diComponentPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedDIComponents());
 
         if (moduleInfoTemplate == null) {
             return String.format("""
             module %1$s {
             %2$s
             }
-            """, rootPackage, generateModuleInfoContent(modelPackages, ormPackages));
+            """, rootPackage, generateModuleInfoContent(modelPackages, ormPackages, diComponentPackages));
         } else {
             // remove the closing curly bracket and add some space to add the generated code
             moduleInfoTemplate = moduleInfoTemplate.stripTrailing();
             moduleInfoTemplate = moduleInfoTemplate.substring(0, moduleInfoTemplate.length() - 1) + "\n    // GENERATED SOURCES:\n";
 
-            return moduleInfoTemplate + generateModuleInfoContent(modelPackages, ormPackages) + "}";
+            return moduleInfoTemplate + generateModuleInfoContent(modelPackages, ormPackages, diComponentPackages) + "}";
         }
     }
 
-    private String generateModuleInfoContent(List<String> modelPackages, List<String> ormPackages) {
+    private List<String> extractPackagesFromClasses(List<ClassOrInterfaceDeclaration> classes) {
+        return classes.stream()
+                .filter(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().isPresent())
+                .map(classOrInterfaceDeclaration -> classOrInterfaceDeclaration.getFullyQualifiedName().get())
+                .map(fullyQualifiedClassName -> fullyQualifiedClassName.substring(0, fullyQualifiedClassName.lastIndexOf(".")))
+                .distinct()
+                .sorted()
+                .toList();
+    }
+
+    private String generateModuleInfoContent(List<String> modelPackages, List<String> ormPackages, List<String> diComponentPackages) {
         return String.format("""
                 exports %1$s.controllers to backend.framework.core, backend.framework.web;
                 
+                // Rules for RestModels
                 %2$s
+                // Rules for Entities
                 %3$s
+                // Rules for DI Components
+                %4$s
                 
                 requires backend.framework.core;
                 requires backend.framework.data;
@@ -65,11 +70,13 @@ public class ModuleInfoWriter {
                 requires jakarta.persistence;
                 requires static lombok;
                 requires org.reflections;
-                """, rootPackage, generateRulesForModelPackages(modelPackages), generateRulesForORMPackages(ormPackages))
+                """, rootPackage, generateRulesForModelPackages(modelPackages),
+                        generateRulesForORMPackages(ormPackages),
+                        generateRulesForPackagesWithDIComponents(diComponentPackages))
                 .indent(4);
     }
 
-    public String generateRulesForModelPackages(List<String> modelPackages) {
+    private String generateRulesForModelPackages(List<String> modelPackages) {
         var result = new StringBuilder();
         for (var modelPackage : modelPackages) {
             result.append("opens ").append(modelPackage).append(" to ").append("com.fasterxml.jackson.databind;\n");
@@ -77,10 +84,18 @@ public class ModuleInfoWriter {
         return result.toString().trim();
     }
 
-    public String generateRulesForORMPackages(List<String> ormPackages) {
+    private String generateRulesForORMPackages(List<String> ormPackages) {
         var result = new StringBuilder();
         for (var ormPackage : ormPackages) {
             result.append("opens ").append(ormPackage).append(" to ").append("org.hibernate.orm.core;\n");
+        }
+        return result.toString().trim();
+    }
+
+    private String generateRulesForPackagesWithDIComponents(List<String> packagesWithDIComponents) {
+        var result = new StringBuilder();
+        for (var diPackage : packagesWithDIComponents) {
+            result.append("opens ").append(diPackage).append(" to ").append("backend.framework.core;\n");
         }
         return result.toString().trim();
     }

@@ -20,6 +20,9 @@ public class ModuleInfoWriterTest {
         ), List.of(
                 parsedClassOrInterfaceDeclarationOf(studentTableSourceCode()),
                 parsedClassOrInterfaceDeclarationOf(employeeTableSourceCode())
+        ), List.of(
+                parsedClassOrInterfaceDeclarationOf(managedTypeSourceCode()),
+                parsedClassOrInterfaceDeclarationOf(dependencyProviderSourceCode())
         ));
     }
 
@@ -37,8 +40,13 @@ public class ModuleInfoWriterTest {
                 
                     exports io.john.amiscaray.controllers to backend.framework.core, backend.framework.web;
                     
+                    // Rules for RestModels
                     opens io.john.amiscaray.stub.model to com.fasterxml.jackson.databind;
+                    // Rules for Entities
                     opens io.john.amiscaray.stub.data to org.hibernate.orm.core;
+                    // Rules for DI Components
+                    opens io.john.amiscaray.backend.framework.data.di to backend.framework.core;
+                    opens io.john.amiscaray.domain to backend.framework.core;
                     
                     requires backend.framework.core;
                     requires backend.framework.data;
@@ -76,8 +84,13 @@ public class ModuleInfoWriterTest {
                             // GENERATED SOURCES:
                             exports io.john.amiscaray.controllers to backend.framework.core, backend.framework.web;
                     
+                            // Rules for RestModels
                             opens io.john.amiscaray.stub.model to com.fasterxml.jackson.databind;
+                            // Rules for Entities
                             opens io.john.amiscaray.stub.data to org.hibernate.orm.core;
+                            // Rules for DI Components
+                            opens io.john.amiscaray.backend.framework.data.di to backend.framework.core;
+                            opens io.john.amiscaray.domain to backend.framework.core;
                             
                             requires backend.framework.core;
                             requires backend.framework.data;

@@ -177,9 +177,23 @@ public class ApiGeneratorMojo extends AbstractMojo {
                     state.restModelClassToEntity().put(parsedClassOrInterface, entityClass);
                 } else if (parsedClassOrInterface.getAnnotationByName("Entity").isPresent()) {
                     state.visitedEntityClasses().add(parsedClassOrInterface);
+                } else if (isParsedClassOrInterfaceDIComponent(parsedClassOrInterface)) {
+                    state.visitedDIComponents().add(parsedClassOrInterface);
                 }
             }
         }, visitedSourcesState));
+    }
+
+    private boolean isParsedClassOrInterfaceDIComponent(ClassOrInterfaceDeclaration parsedClassOrInterface) {
+        var implementsDependencyProvider = parsedClassOrInterface.getImplementedTypes()
+                .stream()
+                .anyMatch(interfaceImplemented ->
+                        interfaceImplemented.getNameAsString().equals("DependencyProvider")
+                );
+        var isManagedType = parsedClassOrInterface.getAnnotationByName("ManagedType").isPresent();
+        var isProvider = parsedClassOrInterface.getAnnotationByName("Provider").isPresent();
+
+        return implementsDependencyProvider || isManagedType || isProvider;
     }
 
 }

@@ -10,10 +10,11 @@ import java.util.List;
 public record VisitedSourcesState(
         HashMap<ClassOrInterfaceDeclaration, ClassExpr> restModelClassToEntity,
         List<ClassOrInterfaceDeclaration> visitedRestModelClasses,
-        List<ClassOrInterfaceDeclaration> visitedEntityClasses) {
+        List<ClassOrInterfaceDeclaration> visitedEntityClasses,
+        List<ClassOrInterfaceDeclaration> visitedDIComponents) {
 
     public VisitedSourcesState() {
-        this(new HashMap<>(), new ArrayList<>(), new ArrayList<>());
+        this(new HashMap<>(), new ArrayList<>(), new ArrayList<>(), new ArrayList<>());
     }
 
 }
