@@ -32,6 +32,7 @@
         <module>generator</module>
         <module>api-generator</module>
         <module>security</module>
+        <module>web-model</module>
     </modules>
 
     <dependencies>

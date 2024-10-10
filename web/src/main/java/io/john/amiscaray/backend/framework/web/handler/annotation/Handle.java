@@ -1,6 +1,6 @@
 package io.john.amiscaray.backend.framework.web.handler.annotation;
 
-import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
+import io.john.amiscaray.backend.framework.http.request.RequestMethod;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

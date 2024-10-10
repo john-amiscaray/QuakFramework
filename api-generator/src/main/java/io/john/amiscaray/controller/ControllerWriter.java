@@ -271,10 +271,10 @@ public class ControllerWriter {
                 package %1$s;
                 
                 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-                import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
-                import io.john.amiscaray.backend.framework.web.handler.request.Request;
-                import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
-                import io.john.amiscaray.backend.framework.web.handler.response.Response;
+                import io.john.amiscaray.backend.framework.http.request.DynamicPathRequest;
+                import io.john.amiscaray.backend.framework.http.request.Request;
+                import io.john.amiscaray.backend.framework.http.request.RequestMethod;
+                import io.john.amiscaray.backend.framework.http.response.Response;
                 import %4$s;
                 import %6$s;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;

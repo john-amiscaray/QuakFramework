@@ -10,13 +10,12 @@ module backend.framework.web {
     requires org.apache.commons.lang3;
     requires org.reflections;
     requires org.slf4j;
+    requires backend.framework.web.model;
 
     exports io.john.amiscaray.backend.framework.web.application;
     exports io.john.amiscaray.backend.framework.web.filter.annotation;
     exports io.john.amiscaray.backend.framework.web.filter.exception;
     exports io.john.amiscaray.backend.framework.web.handler;
-    exports io.john.amiscaray.backend.framework.web.handler.request;
-    exports io.john.amiscaray.backend.framework.web.handler.response;
     exports io.john.amiscaray.backend.framework.web.controller;
     exports io.john.amiscaray.backend.framework.web.controller.annotation;
     exports io.john.amiscaray.backend.framework.web.handler.annotation;
