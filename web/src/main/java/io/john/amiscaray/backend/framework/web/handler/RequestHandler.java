@@ -1,6 +1,6 @@
 package io.john.amiscaray.backend.framework.web.handler;
 
-import io.john.amiscaray.backend.framework.web.handler.request.Request;
+import io.john.amiscaray.backend.framework.http.request.Request;
 import io.john.amiscaray.backend.framework.web.handler.response.Response;
 
 @FunctionalInterface

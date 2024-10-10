@@ -1,4 +1,5 @@
-package io.john.amiscaray.backend.framework.web.handler.request;
+package io.john.amiscaray.backend.framework.http.request;
+
 
 import io.john.amiscaray.backend.framework.security.auth.Authentication;
 import io.john.amiscaray.backend.framework.security.auth.filter.AuthenticationFilter;

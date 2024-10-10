@@ -1,4 +1,4 @@
-package io.john.amiscaray.backend.framework.web.handler.request;
+package io.john.amiscaray.backend.framework.http.request;
 
 import java.util.HashMap;
 import java.util.Map;
