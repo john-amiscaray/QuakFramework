@@ -31,10 +31,10 @@ public class ControllerWriterTest {
                 package io.john.amiscaray.controllers;
                 
                 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-                import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
-                import io.john.amiscaray.backend.framework.web.handler.request.Request;
-                import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
-                import io.john.amiscaray.backend.framework.web.handler.response.Response;
+                import io.john.amiscaray.backend.framework.http.request.DynamicPathRequest;
+                import io.john.amiscaray.backend.framework.http.request.Request;
+                import io.john.amiscaray.backend.framework.http.request.RequestMethod;
+                import io.john.amiscaray.backend.framework.http.response.Response;
                 import io.john.amiscaray.stub.model.Student;
                 import io.john.amiscaray.stub.data.StudentTableEntry;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
@@ -170,10 +170,10 @@ public class ControllerWriterTest {
                 package io.john.amiscaray.controllers;
                 
                 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-                import io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest;
-                import io.john.amiscaray.backend.framework.web.handler.request.Request;
-                import io.john.amiscaray.backend.framework.web.handler.request.RequestMethod;
-                import io.john.amiscaray.backend.framework.web.handler.response.Response;
+                import io.john.amiscaray.backend.framework.http.request.DynamicPathRequest;
+                import io.john.amiscaray.backend.framework.http.request.Request;
+                import io.john.amiscaray.backend.framework.http.request.RequestMethod;
+                import io.john.amiscaray.backend.framework.http.response.Response;
                 import io.john.amiscaray.stub.model.Employee;
                 import io.john.amiscaray.stub.data.EmployeeTableEntry;
                 import io.john.amiscaray.backend.framework.data.DatabaseProxy;
