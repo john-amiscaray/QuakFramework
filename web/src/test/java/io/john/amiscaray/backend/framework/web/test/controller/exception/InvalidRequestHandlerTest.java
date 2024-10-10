@@ -22,7 +22,10 @@ public class InvalidRequestHandlerTest {
 
     @AfterAll
     public static void tearDown() throws Exception {
-        WebApplication.getInstance().stop();
+        var webApplication = WebApplication.getInstance();
+        if (webApplication.isHasStarted()) {
+            webApplication.stop();
+        }
     }
 
     @Test
