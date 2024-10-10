@@ -44,7 +44,7 @@ public class WebStarter {
         var result = new CompletableFuture<WebApplication>();
 
         application.on(Application.LifecycleState.CONTEXT_LOADED, app -> {
-            var reflections = new Reflections(main.getPackageName(), Scanners.TypesAnnotated);
+            var reflections = new Reflections(app.getClassScanPackage(), Scanners.TypesAnnotated);
             var controllers = reflections.getTypesAnnotatedWith(Controller.class);
             var ctx = ApplicationContext.getInstance();
             Map<RequestMapping, PathController<?, ?>> pathControllers = new HashMap<>();
