@@ -1,11 +1,13 @@
 package io.john.amiscaray.backend.framework.web.test.controller.exception;
 
+import io.john.amiscaray.backend.framework.web.application.WebApplication;
 import io.john.amiscaray.backend.framework.web.application.WebStarter;
 import io.john.amiscaray.backend.framework.web.controller.exception.InvalidRequestHandlerException;
 import io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.badreturn.TestControllerWithHandlerWithInvalidReturnType;
 import io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.nohandlers.TestControllerWithNoHandlers;
 import io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.noparams.TestControllerWithHandlerWithNoParams;
 import io.john.amiscaray.backend.framework.web.test.controller.exception.stub.controller.voidreturn.TestControllerWithHandlerWithVoidReturn;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +19,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 
 public class InvalidRequestHandlerTest {
+
+    @AfterAll
+    public static void tearDown() throws Exception {
+        WebApplication.getInstance().stop();
+    }
 
     @Test
     public void testControllerWithHandlerWithoutValidReturnTypeYieldsInvalidRequestHandlerException() throws ExecutionException, InterruptedException, TimeoutException {
