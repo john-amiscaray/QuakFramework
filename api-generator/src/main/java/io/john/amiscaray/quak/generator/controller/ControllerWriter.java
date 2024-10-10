@@ -141,7 +141,7 @@ public class ControllerWriter {
                     || method.getParameters().getFirst().isEmpty()
                     || !method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
             ) {
-                errors.add("be annotated with @APIQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
+                errors.add("be annotated with @APIQuery should have a single io.john.amiscaray.quak.http.request.DynamicPathRequest parameter");
             }
 
             if (!method.isStatic()) {
@@ -195,14 +195,14 @@ public class ControllerWriter {
             var errors = new ArrayList<String>();
 
             if (!method.getTypeAsString().equals("NativeQuery")) {
-                errors.add("be annotated with @APINativeQuery should return a io.john.amiscaray.backend.framework.data.query.NativeQuery");
+                errors.add("be annotated with @APINativeQuery should return a io.john.amiscaray.quak.data.query.NativeQuery");
             }
 
             if (method.getParameters().size() != 1
                     || method.getParameters().getFirst().isEmpty()
                     || !method.getParameters().getFirst().get().getTypeAsString().matches("DynamicPathRequest(<.*>)?")
             ) {
-                errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.backend.framework.web.handler.request.DynamicPathRequest parameter");
+                errors.add("be annotated with @APINativeQuery should have a single io.john.amiscaray.quak.http.request.DynamicPathRequest parameter");
             }
 
             if (!method.isStatic()) {
@@ -270,16 +270,16 @@ public class ControllerWriter {
         var sourceCode = String.format("""
                 package %1$s;
                 
-                import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-                import io.john.amiscaray.quak.http.request.http.DynamicPathRequest;
-                import io.john.amiscaray.quak.http.request.http.Request;
-                import io.john.amiscaray.quak.http.request.http.RequestMethod;
-                import io.john.amiscaray.quak.http.response.http.Response;
+                import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
+                import io.john.amiscaray.quak.http.request.DynamicPathRequest;
+                import io.john.amiscaray.quak.http.request.Request;
+                import io.john.amiscaray.quak.http.request.RequestMethod;
+                import io.john.amiscaray.quak.http.response.Response;
                 import %4$s;
                 import %6$s;
-                import io.john.amiscaray.backend.framework.data.DatabaseProxy;
-                import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
-                import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
+                import io.john.amiscaray.quak.data.DatabaseProxy;
+                import io.john.amiscaray.quak.web.controller.annotation.Controller;
+                import io.john.amiscaray.quak.web.handler.annotation.Handle;
                 
                 import java.util.HashMap;
                 import java.util.List;

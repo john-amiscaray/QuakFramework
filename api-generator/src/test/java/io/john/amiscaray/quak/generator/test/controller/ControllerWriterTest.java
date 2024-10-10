@@ -32,16 +32,16 @@ public class ControllerWriterTest {
                 """
                 package io.john.amiscaray.controllers;
                 
-                import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-                import io.john.amiscaray.quak.http.request.http.DynamicPathRequest;
-                import io.john.amiscaray.quak.http.request.http.Request;
-                import io.john.amiscaray.quak.http.request.http.RequestMethod;
-                import io.john.amiscaray.quak.http.response.http.Response;
+                import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
+                import io.john.amiscaray.quak.http.request.DynamicPathRequest;
+                import io.john.amiscaray.quak.http.request.Request;
+                import io.john.amiscaray.quak.http.request.RequestMethod;
+                import io.john.amiscaray.quak.http.response.Response;
                 import io.john.amiscaray.stub.model.Student;
                 import io.john.amiscaray.stub.data.StudentTableEntry;
-                import io.john.amiscaray.backend.framework.data.DatabaseProxy;
-                import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
-                import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
+                import io.john.amiscaray.quak.data.DatabaseProxy;
+                import io.john.amiscaray.quak.web.controller.annotation.Controller;
+                import io.john.amiscaray.quak.web.handler.annotation.Handle;
                 
                 import java.util.HashMap;
                 import java.util.List;
@@ -171,16 +171,16 @@ public class ControllerWriterTest {
                 """
                 package io.john.amiscaray.controllers;
                 
-                import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
-                import io.john.amiscaray.quak.http.request.http.DynamicPathRequest;
-                import io.john.amiscaray.quak.http.request.http.Request;
-                import io.john.amiscaray.quak.http.request.http.RequestMethod;
-                import io.john.amiscaray.quak.http.response.http.Response;
+                import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
+                import io.john.amiscaray.quak.http.request.DynamicPathRequest;
+                import io.john.amiscaray.quak.http.request.Request;
+                import io.john.amiscaray.quak.http.request.RequestMethod;
+                import io.john.amiscaray.quak.http.response.Response;
                 import io.john.amiscaray.stub.model.Employee;
                 import io.john.amiscaray.stub.data.EmployeeTableEntry;
-                import io.john.amiscaray.backend.framework.data.DatabaseProxy;
-                import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
-                import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
+                import io.john.amiscaray.quak.data.DatabaseProxy;
+                import io.john.amiscaray.quak.web.controller.annotation.Controller;
+                import io.john.amiscaray.quak.web.handler.annotation.Handle;
                 
                 import java.util.HashMap;
                 import java.util.List;

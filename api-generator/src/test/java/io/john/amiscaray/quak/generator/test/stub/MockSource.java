@@ -6,8 +6,8 @@ public class MockSource {
         return """
                 package io.john.amiscaray.stub.model;
                                 
-                import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
-                import io.john.amiscaray.backend.framework.generator.api.RestModel;
+                import io.john.amiscaray.quak.generator.api.EntityGenerator;
+                import io.john.amiscaray.quak.generator.api.RestModel;
                 import io.john.amiscaray.stub.data.StudentTableEntry;
                 import lombok.AllArgsConstructor;
                 import lombok.Getter;
@@ -40,7 +40,7 @@ public class MockSource {
         return """
                 package io.john.amiscaray.stub.data;
                                 
-                import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
+                import io.john.amiscaray.quak.generator.api.ModelGenerator;
                 import io.john.amiscaray.stub.model.Student;
                 import jakarta.persistence.Entity;
                 import jakarta.persistence.Id;
@@ -77,8 +77,8 @@ public class MockSource {
         return """
                 package io.john.amiscaray.stub.model;
                                 
-                import io.john.amiscaray.backend.framework.generator.api.EntityGenerator;
-                import io.john.amiscaray.backend.framework.generator.api.RestModel;
+                import io.john.amiscaray.quak.generator.api.EntityGenerator;
+                import io.john.amiscaray.quak.generator.api.RestModel;
                 import io.john.amiscaray.stub.data.EmployeeTableEntry;
                 import lombok.AllArgsConstructor;
                 import lombok.Getter;
@@ -110,11 +110,11 @@ public class MockSource {
         return """
                 package io.john.amiscaray.stub.data;
                                 
-                import io.john.amiscaray.backend.framework.data.query.DatabaseQuery;
-                import io.john.amiscaray.backend.framework.data.query.ValueIs;
-                import io.john.amiscaray.backend.framework.data.query.numeric.ValueGreaterThan;
-                import io.john.amiscaray.backend.framework.generator.api.APIQuery;
-                import io.john.amiscaray.backend.framework.generator.api.ModelGenerator;
+                import io.john.amiscaray.quak.data.query.DatabaseQuery;
+                import io.john.amiscaray.quak.data.query.ValueIs;
+                import io.john.amiscaray.quak.data.query.numeric.ValueGreaterThan;
+                import io.john.amiscaray.quak.generator.api.APIQuery;
+                import io.john.amiscaray.quak.generator.api.ModelGenerator;
                 import io.john.amiscaray.stub.model.Employee;
                 import jakarta.persistence.*;
                 import lombok.AllArgsConstructor;
@@ -186,13 +186,13 @@ public class MockSource {
 
     public static String dependencyProviderSourceCode() {
         return """
-                package io.john.amiscaray.backend.framework.data.di;
+                package io.john.amiscaray.quak.data.di;
                 
-                import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
-                import io.john.amiscaray.backend.framework.core.di.dependency.DependencyID;
-                import io.john.amiscaray.backend.framework.core.di.dependency.ProvidedDependency;
-                import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
-                import io.john.amiscaray.backend.framework.data.DatabaseProxy;
+                import io.john.amiscaray.quak.core.di.ApplicationContext;
+                import io.john.amiscaray.quak.core.di.dependency.DependencyID;
+                import io.john.amiscaray.quak.core.di.dependency.ProvidedDependency;
+                import io.john.amiscaray.quak.core.di.provider.DependencyProvider;
+                import io.john.amiscaray.quak.data.DatabaseProxy;
                                 
                 import java.util.List;
                                 

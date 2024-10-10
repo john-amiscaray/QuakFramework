@@ -54,7 +54,7 @@ public class ModuleInfoWriter {
 
     private String generateModuleInfoContent(List<String> modelPackages, List<String> ormPackages, List<String> diComponentPackages) {
         return String.format("""
-                exports %1$s.controllers to backend.framework.core, backend.framework.web;
+                exports %1$s.controllers to quak.framework.core, quak.framework.web;
                 
                 // Rules for RestModels
                 %2$s
@@ -63,11 +63,11 @@ public class ModuleInfoWriter {
                 // Rules for DI Components
                 %4$s
                 
-                requires backend.framework.core;
-                requires backend.framework.data;
-                requires backend.framework.generator;
-                requires backend.framework.web;
-                requires backend.framework.web.model;
+                requires quak.framework.core;
+                requires quak.framework.data;
+                requires quak.framework.generator.model;
+                requires quak.framework.web;
+                requires quak.framework.web.model;
                 requires jakarta.persistence;
                 requires static lombok;
                 requires org.reflections;
@@ -96,7 +96,7 @@ public class ModuleInfoWriter {
     private String generateRulesForPackagesWithDIComponents(List<String> packagesWithDIComponents) {
         var result = new StringBuilder();
         for (var diPackage : packagesWithDIComponents) {
-            result.append("opens ").append(diPackage).append(" to ").append("backend.framework.core;\n");
+            result.append("opens ").append(diPackage).append(" to ").append("quak.framework.core;\n");
         }
         return result.toString().trim();
     }

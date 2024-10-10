@@ -39,21 +39,21 @@ public class ModuleInfoWriterTest {
                 equalToCompressingWhiteSpace("""
                 module io.john.amiscaray {
                 
-                    exports io.john.amiscaray.controllers to backend.framework.core, backend.framework.web;
+                    exports io.john.amiscaray.controllers to quak.framework.core, quak.framework.web;
                     
                     // Rules for RestModels
                     opens io.john.amiscaray.stub.model to com.fasterxml.jackson.databind;
                     // Rules for Entities
                     opens io.john.amiscaray.stub.data to org.hibernate.orm.core;
                     // Rules for DI Components
-                    opens io.john.amiscaray.backend.framework.data.di to backend.framework.core;
-                    opens io.john.amiscaray.domain to backend.framework.core;
+                    opens io.john.amiscaray.domain to quak.framework.core;
+                    opens io.john.amiscaray.quak.data.di to quak.framework.core;
                     
-                    requires backend.framework.core;
-                    requires backend.framework.data;
-                    requires backend.framework.generator;
-                    requires backend.framework.web;
-                    requires backend.framework.web.model;
+                    requires quak.framework.core;
+                    requires quak.framework.data;
+                    requires quak.framework.generator.model;
+                    requires quak.framework.web;
+                    requires quak.framework.web.model;
                     requires jakarta.persistence;
                     requires static lombok;
                     requires org.reflections;
@@ -84,21 +84,21 @@ public class ModuleInfoWriterTest {
                         
                             requires org.slf4j;
                             // GENERATED SOURCES:
-                            exports io.john.amiscaray.controllers to backend.framework.core, backend.framework.web;
+                            exports io.john.amiscaray.controllers to quak.framework.core, quak.framework.web;
                     
                             // Rules for RestModels
                             opens io.john.amiscaray.stub.model to com.fasterxml.jackson.databind;
                             // Rules for Entities
                             opens io.john.amiscaray.stub.data to org.hibernate.orm.core;
                             // Rules for DI Components
-                            opens io.john.amiscaray.backend.framework.data.di to backend.framework.core;
-                            opens io.john.amiscaray.domain to backend.framework.core;
+                            opens io.john.amiscaray.domain to quak.framework.core;
+                            opens io.john.amiscaray.quak.data.di to quak.framework.core;
                             
-                            requires backend.framework.core;
-                            requires backend.framework.data;
-                            requires backend.framework.generator;
-                            requires backend.framework.web;
-                            requires backend.framework.web.model;
+                            requires quak.framework.core;
+                            requires quak.framework.data;
+                            requires quak.framework.generator.model;
+                            requires quak.framework.web;
+                            requires quak.framework.web.model;
                             requires jakarta.persistence;
                             requires static lombok;
                             requires org.reflections;
