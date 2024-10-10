@@ -1,3 +1,3 @@
-module backend.framework.generator {
+module quak.framework.generator.model {
     exports io.john.amiscaray.backend.framework.generator.api;
 }

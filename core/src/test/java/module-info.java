@@ -6,7 +6,7 @@ module backend.framework.core.test {
 
     requires org.junit.jupiter.api;
     requires org.hamcrest;
-    requires backend.framework.core;
+    requires quak.framework.core;
     requires static lombok;
 
     opens io.john.amiscaray.backend.framework.test.core to org.junit.platform.commons;

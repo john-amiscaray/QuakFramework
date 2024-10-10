@@ -4,17 +4,17 @@ import io.john.amiscaray.backend.framework.web.test.stub.WebConfigProvider;
 
 module backend.framework.web.test {
     requires static lombok;
-    requires backend.framework.web;
+    requires quak.framework.web;
     requires com.fasterxml.jackson.databind;
     requires org.junit.jupiter.api;
     requires org.apache.tomcat.embed.core;
     requires org.hamcrest;
     requires java.net.http;
-    requires backend.framework.core;
-    requires backend.framework.security;
+    requires quak.framework.core;
+    requires quak.framework.security;
     requires com.auth0.jwt;
     requires org.mockito;
-    requires backend.framework.web.model;
+    requires quak.framework.web.model;
 
     provides DependencyProvider with SimpleAuthenticatorProvider, WebConfigProvider;
 

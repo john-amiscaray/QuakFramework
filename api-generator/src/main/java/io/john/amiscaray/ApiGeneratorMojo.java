@@ -23,7 +23,7 @@ import java.util.HashMap;
 
 import static io.john.amiscaray.util.ParserUtils.getAnnotationMemberValue;
 
-@Mojo(name = "generate-class", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
+@Mojo(name = "generate-controllers", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class ApiGeneratorMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.sourceDirectory}", required = true)

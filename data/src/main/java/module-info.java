@@ -1,14 +1,14 @@
 import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 import io.john.amiscaray.backend.framework.data.di.DatabaseProxyStartupDependencyProvider;
 
-module backend.framework.data {
+module quak.framework.data {
     requires java.logging;
     requires jakarta.persistence;
     requires java.naming;
     requires java.sql;
     requires org.hibernate.orm.core;
     requires org.reflections;
-    requires backend.framework.core;
+    requires quak.framework.core;
     requires lombok;
 
     exports io.john.amiscaray.backend.framework.data;

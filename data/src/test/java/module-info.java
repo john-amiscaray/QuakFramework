@@ -1,6 +1,6 @@
 module backend.framework.data.test {
-    requires backend.framework.core;
-    requires backend.framework.data;
+    requires quak.framework.core;
+    requires quak.framework.data;
     requires com.h2database;
     requires jakarta.persistence;
     requires java.logging;

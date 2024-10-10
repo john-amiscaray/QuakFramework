@@ -1,6 +1,6 @@
 import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 
-module backend.framework.core {
+module quak.framework.core {
     exports io.john.amiscaray.backend.framework.core.properties;
     exports io.john.amiscaray.backend.framework.core;
     exports io.john.amiscaray.backend.framework.core.di.dependency;

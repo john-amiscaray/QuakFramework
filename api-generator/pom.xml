@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.john.amiscaray</groupId>
-        <artifactId>backend.framework</artifactId>
+        <artifactId>quak.framework</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>backend.framework.api-generator</artifactId>
+    <artifactId>quak.framework.generator</artifactId>
     <packaging>maven-plugin</packaging>
-    <name>api-generator</name>
+    <name>quak.framework.generator</name>
     <properties>
         <maven.version>3.6.0</maven.version>
     </properties>
@@ -38,7 +38,7 @@
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.generator</artifactId>
+            <artifactId>quak.framework.generator-model</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -49,7 +49,7 @@
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.data</artifactId>
+            <artifactId>quak.framework.data</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
@@ -60,7 +60,7 @@
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.web</artifactId>
+            <artifactId>quak.framework.web</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>

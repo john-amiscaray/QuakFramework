@@ -2,7 +2,7 @@ import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
 import io.john.amiscaray.backend.framework.security.di.AuthenticationFilterProvider;
 import io.john.amiscaray.backend.framework.security.di.CORSFilterProvider;
 
-module backend.framework.security {
+module quak.framework.security {
     exports io.john.amiscaray.backend.framework.security.auth.filter;
     exports io.john.amiscaray.backend.framework.security.auth;
     exports io.john.amiscaray.backend.framework.security.auth.credentials;
@@ -14,7 +14,7 @@ module backend.framework.security {
     exports io.john.amiscaray.backend.framework.security.di;
     exports io.john.amiscaray.backend.framework.security.cors.filter;
     requires static lombok;
-    requires backend.framework.core;
+    requires quak.framework.core;
     requires org.slf4j;
     requires org.apache.tomcat.embed.core;
     requires com.auth0.jwt;
