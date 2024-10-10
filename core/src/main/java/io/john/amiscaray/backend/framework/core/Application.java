@@ -54,6 +54,7 @@ public abstract class Application {
         preStop();
         finish();
         postStop();
+        hasStarted = false;
     }
 
     protected abstract void finish() throws Exception;
