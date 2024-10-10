@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>web-model</artifactId>
+            <artifactId>backend.framework.web-model</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>

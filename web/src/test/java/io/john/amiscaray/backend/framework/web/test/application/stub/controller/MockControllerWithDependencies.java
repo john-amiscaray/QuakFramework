@@ -2,9 +2,9 @@ package io.john.amiscaray.backend.framework.web.test.application.stub.controller
 
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.Instantiate;
 import io.john.amiscaray.backend.framework.core.di.provider.annotation.ProvidedWith;
+import io.john.amiscaray.backend.framework.http.response.Response;
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
-import io.john.amiscaray.backend.framework.web.handler.response.Response;
 import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationDetails;
 import io.john.amiscaray.backend.framework.web.test.application.stub.ApplicationUIDetails;
 import io.john.amiscaray.backend.framework.http.request.Request;

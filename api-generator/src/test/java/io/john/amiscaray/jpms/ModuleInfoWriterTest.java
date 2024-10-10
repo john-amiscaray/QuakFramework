@@ -52,6 +52,7 @@ public class ModuleInfoWriterTest {
                     requires backend.framework.data;
                     requires backend.framework.generator;
                     requires backend.framework.web;
+                    requires backend.framework.web.model;
                     requires jakarta.persistence;
                     requires static lombok;
                     requires org.reflections;
@@ -96,6 +97,7 @@ public class ModuleInfoWriterTest {
                             requires backend.framework.data;
                             requires backend.framework.generator;
                             requires backend.framework.web;
+                            requires backend.framework.web.model;
                             requires jakarta.persistence;
                             requires static lombok;
                             requires org.reflections;

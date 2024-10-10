@@ -14,7 +14,7 @@ module backend.framework.web.test {
     requires backend.framework.security;
     requires com.auth0.jwt;
     requires org.mockito;
-    requires web.model;
+    requires backend.framework.web.model;
 
     provides DependencyProvider with SimpleAuthenticatorProvider, WebConfigProvider;
 

@@ -2,12 +2,12 @@ package io.john.amiscaray.backend.framework.web.application;
 
 import io.john.amiscaray.backend.framework.core.Application;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
+import io.john.amiscaray.backend.framework.http.response.Response;
 import io.john.amiscaray.backend.framework.web.controller.DynamicPathController;
 import io.john.amiscaray.backend.framework.web.controller.PathController;
 import io.john.amiscaray.backend.framework.web.controller.annotation.Controller;
 import io.john.amiscaray.backend.framework.web.controller.exception.InvalidRequestHandlerException;
 import io.john.amiscaray.backend.framework.web.handler.annotation.Handle;
-import io.john.amiscaray.backend.framework.web.handler.response.Response;
 import io.john.amiscaray.backend.framework.http.request.Request;
 import io.john.amiscaray.backend.framework.http.request.RequestMapping;
 import org.reflections.Reflections;
