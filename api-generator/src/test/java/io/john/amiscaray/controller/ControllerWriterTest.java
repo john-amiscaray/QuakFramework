@@ -3,8 +3,6 @@ package io.john.amiscaray.controller;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.beans.IntrospectionException;
-
 import static io.john.amiscaray.assertions.TestSourceUtil.parsedClassOrInterfaceDeclarationOf;
 import static io.john.amiscaray.stub.MockSource.*;
 import static org.hamcrest.MatcherAssert.assertThat;
