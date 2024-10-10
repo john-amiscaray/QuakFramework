@@ -1,6 +1,6 @@
-import io.john.amiscaray.backend.framework.core.di.provider.DependencyProvider;
-import io.john.amiscaray.backend.framework.test.core.di.stub.MockProgramProvider;
-import io.john.amiscaray.backend.framework.test.core.di.stub.EmployeeStartupDependencyProvider;
+import io.john.amiscaray.quak.core.di.provider.DependencyProvider;
+import io.john.amiscaray.quak.core.test.di.stub.MockProgramProvider;
+import io.john.amiscaray.quak.core.test.di.stub.EmployeeStartupDependencyProvider;
 
 module backend.framework.core.test {
 
@@ -9,11 +9,11 @@ module backend.framework.core.test {
     requires quak.framework.core;
     requires static lombok;
 
-    opens io.john.amiscaray.backend.framework.test.core to org.junit.platform.commons;
-    opens io.john.amiscaray.backend.framework.test.core.di to org.junit.platform.commons;
-    exports io.john.amiscaray.backend.framework.test.core.di.stub;
-    exports io.john.amiscaray.backend.framework.test.core.di.stub.pojo;
-    opens io.john.amiscaray.backend.framework.test.core.di.stub to org.junit.platform.commons;
+    opens io.john.amiscaray.quak.core.test to org.junit.platform.commons;
+    opens io.john.amiscaray.quak.core.test.di to org.junit.platform.commons;
+    exports io.john.amiscaray.quak.core.test.di.stub;
+    exports io.john.amiscaray.quak.core.test.di.stub.pojo;
+    opens io.john.amiscaray.quak.core.test.di.stub to org.junit.platform.commons;
 
     provides DependencyProvider with EmployeeStartupDependencyProvider, MockProgramProvider;
 

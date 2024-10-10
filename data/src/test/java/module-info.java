@@ -9,6 +9,6 @@ module backend.framework.data.test {
     requires org.junit.jupiter.api;
     requires org.hibernate.orm.core;
 
-    opens io.john.amiscaray.backend.framework.data.test.stub to org.hibernate.orm.core;
-    opens io.john.amiscaray.backend.framework.data.test to org.junit.platform.commons;
+    opens io.john.amiscaray.quak.data.test.stub to org.hibernate.orm.core;
+    opens io.john.amiscaray.quak.data.test to org.junit.platform.commons;
 }
