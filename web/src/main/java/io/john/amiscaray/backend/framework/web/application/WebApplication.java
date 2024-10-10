@@ -60,6 +60,16 @@ public class WebApplication extends Application {
     }
 
     public void init(Configuration config) {
+        if (hasStarted) {
+            try {
+                finish();
+                initLifecycleListeners();
+                contextLoaded = false;
+                hasStarted = false;
+            } catch (LifecycleException e) {
+                LOG.error("Failed to stop currently running application:", e);
+            }
+        }
         main = config.main;
         classScanPackage = main.getPackageName();
         args = config.args;

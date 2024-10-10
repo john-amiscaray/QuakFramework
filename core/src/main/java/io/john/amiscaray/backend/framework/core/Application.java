@@ -3,6 +3,7 @@ package io.john.amiscaray.backend.framework.core;
 import io.john.amiscaray.backend.framework.core.properties.ApplicationProperties;
 import io.john.amiscaray.backend.framework.core.di.ApplicationContext;
 import io.john.amiscaray.backend.framework.core.di.exception.ContextInitializationException;
+import lombok.Getter;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -11,17 +12,25 @@ import java.util.function.Consumer;
 
 public abstract class Application {
 
+    @Getter
     protected boolean hasStarted;
+    @Getter
     protected boolean contextLoaded;
+    @Getter
     protected String classScanPackage;
     protected String[] args;
     protected Class<?> main;
-    protected Map<LifecycleState, List<Consumer<Application>>> lifecycleListeners = new HashMap<>();
+    protected Map<LifecycleState, List<Consumer<Application>>> lifecycleListeners;
 
     public Application(Class<?> main, String[] args) {
         this.args = args;
         this.main = main;
         classScanPackage = main.getPackageName();
+        initLifecycleListeners();
+    }
+
+    protected void initLifecycleListeners() {
+        lifecycleListeners = new HashMap<>();
         for(LifecycleState lifecycleState : LifecycleState.values()) {
             lifecycleListeners.put(lifecycleState, new ArrayList<>());
         }
