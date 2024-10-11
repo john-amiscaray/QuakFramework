@@ -3,6 +3,9 @@ package io.john.amiscaray.quak.core.properties;
 import java.util.Optional;
 import java.util.Properties;
 
+/**
+ * Acts as a wrapper for that application's {@link io.john.amiscaray.quak.core.properties.ApplicationProperty} instances. This reads the application.properties file and sets the values of each ApplicationProperty accordingly. This gets initialized on application startup.
+ */
 public class ApplicationProperties{
 
     private static ApplicationProperties applicationPropertiesInstance;

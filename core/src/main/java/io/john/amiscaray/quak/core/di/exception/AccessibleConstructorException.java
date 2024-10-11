@@ -1,5 +1,8 @@
 package io.john.amiscaray.quak.core.di.exception;
 
+/**
+ * Thrown when the application context could not instantiate a dependency because it can not access its constructor.
+ */
 public class AccessibleConstructorException extends RuntimeException{
 
     public AccessibleConstructorException(Class<?> provider) {

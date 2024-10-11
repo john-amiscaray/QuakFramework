@@ -2,6 +2,9 @@ package io.john.amiscaray.quak.core.di.exception;
 
 import java.util.Set;
 
+/**
+ * Thrown when the application context could not instantiate all the required dependencies.
+ */
 public class DependencyResolutionException extends RuntimeException{
 
     public DependencyResolutionException(Set<Class<?>> types) {

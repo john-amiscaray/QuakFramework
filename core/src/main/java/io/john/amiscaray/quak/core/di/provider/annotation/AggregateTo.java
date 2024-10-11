@@ -5,6 +5,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Used to aggregate dependencies into a list stored by the application context. The aggregateList argument is the name of the list to add the dependency to
+ */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.CONSTRUCTOR, ElementType.TYPE, ElementType.METHOD})
 public @interface AggregateTo {
