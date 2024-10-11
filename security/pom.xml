@@ -15,7 +15,7 @@
         <dependency>
             <groupId>io.john.amiscaray</groupId>
             <artifactId>quak.framework.core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
