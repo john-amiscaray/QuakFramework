@@ -1,0 +1,35 @@
+package io.john.amiscaray.quak.security.config;
+
+import io.john.amiscaray.quak.core.properties.ApplicationProperties;
+import io.john.amiscaray.quak.core.properties.ApplicationProperty;
+import io.john.amiscaray.quak.security.auth.principal.role.Role;
+import io.john.amiscaray.quak.security.di.AuthenticationStrategy;
+import lombok.Builder;
+import lombok.Singular;
+
+import java.util.List;
+import java.util.Map;
+
+public record SecurityConfig(AuthenticationStrategy authenticationStrategy,
+                             @Singular("securePathWithRole")
+                             Map<EndpointMapping, List<Role>> securedEndpointRoles,
+                             @Singular("securePathWithCorsConfig")
+                             Map<String, CORSConfig> pathCorsConfigMap,
+                             String jwtSecretKey,
+                             Long jwtSecretExpiryTime) {
+
+    private static ApplicationProperties APPLICATION_PROPERTIES = ApplicationProperties.getInstance();
+
+    @Builder
+    public SecurityConfig {
+
+    }
+
+    public SecurityConfig (AuthenticationStrategy strategy, Map<EndpointMapping, List<Role>> securedEndpointRoles) {
+        this(strategy, securedEndpointRoles,
+                Map.of("/*", CORSConfig.allowAll()),
+                APPLICATION_PROPERTIES.get(ApplicationProperty.JWT_SECRET_KEY),
+                Long.parseLong(APPLICATION_PROPERTIES.get(ApplicationProperty.JWT_EXPIRY_TIME)));
+    }
+
+}

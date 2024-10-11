@@ -5,43 +5,43 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.john.amiscaray</groupId>
-        <artifactId>backend.framework</artifactId>
+        <artifactId>quak.framework</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>aggregate-report</artifactId>
+    <artifactId>quak.framework.aggregate-report</artifactId>
     <packaging>pom</packaging>
 
     <dependencies>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.api-generator</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>quak.framework.generator</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>quak.framework.core</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.data</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>quak.framework.data</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.security</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>quak.framework.security</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.web</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>quak.framework.web</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>io.john.amiscaray</groupId>
-            <artifactId>backend.framework.web-model</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <artifactId>quak.framework.web-model</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

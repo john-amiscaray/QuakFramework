@@ -1,6 +1,6 @@
 module backend.framework.data.test {
-    requires backend.framework.core;
-    requires backend.framework.data;
+    requires quak.framework.core;
+    requires quak.framework.data;
     requires com.h2database;
     requires jakarta.persistence;
     requires java.logging;
@@ -9,6 +9,6 @@ module backend.framework.data.test {
     requires org.junit.jupiter.api;
     requires org.hibernate.orm.core;
 
-    opens io.john.amiscaray.backend.framework.data.test.stub to org.hibernate.orm.core;
-    opens io.john.amiscaray.backend.framework.data.test to org.junit.platform.commons;
+    opens io.john.amiscaray.quak.data.test.stub to org.hibernate.orm.core;
+    opens io.john.amiscaray.quak.data.test to org.junit.platform.commons;
 }
