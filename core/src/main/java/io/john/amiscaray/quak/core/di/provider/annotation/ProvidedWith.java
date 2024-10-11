@@ -12,6 +12,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.PARAMETER})
 public @interface ProvidedWith {
 
+    /**
+     * @return The name of the dependency to use.
+     */
     String dependencyName();
 
 }
