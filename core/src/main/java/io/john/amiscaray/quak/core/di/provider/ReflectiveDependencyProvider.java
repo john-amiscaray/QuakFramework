@@ -8,6 +8,10 @@ import java.lang.reflect.Executable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Used to reflectively provide an instance to the application context.
+ * @param <T> The type of the instance.
+ */
 public interface ReflectiveDependencyProvider<T> extends DependencyProvider<T> {
 
     Executable getExecutableReturningInstance();
