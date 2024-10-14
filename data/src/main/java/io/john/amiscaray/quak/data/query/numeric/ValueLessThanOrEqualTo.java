@@ -6,6 +6,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+/**
+ * A NumericQueryCriteria testing that the value of a field is less than or equal to a value
+ */
 public class ValueLessThanOrEqualTo extends NumericQueryCriteria{
 
     private final QueryCriteria lessThanOrEqualToConjunction;

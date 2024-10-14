@@ -8,6 +8,9 @@ import io.john.amiscaray.quak.data.DatabaseProxy;
 
 import java.util.List;
 
+/**
+ * Provides an instance of {@link io.john.amiscaray.quak.data.DatabaseProxy} to the application context on startup
+ */
 public class DatabaseProxyStartupDependencyProvider implements DependencyProvider<DatabaseProxy> {
 
     @Override

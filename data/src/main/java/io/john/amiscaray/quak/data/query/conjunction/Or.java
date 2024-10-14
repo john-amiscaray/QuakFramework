@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Used to OR two query criteria
+ */
 public class Or extends Conjunction {
 
     public Or(List<QueryCriteria> conditions) {

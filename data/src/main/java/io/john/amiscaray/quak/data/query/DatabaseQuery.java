@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * A set of criteria for a database query
+ * @param criteria The criteria for the entity being queried
+ */
 public record DatabaseQuery(List<QueryCriteria> criteria) {
 
     public static DatabaseQueryBuilder builder() {

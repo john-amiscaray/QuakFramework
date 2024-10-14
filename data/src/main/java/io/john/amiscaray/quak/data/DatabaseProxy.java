@@ -25,11 +25,18 @@ import java.util.function.Consumer;
 
 import static io.john.amiscaray.quak.core.properties.ApplicationProperty.*;
 
+/**
+ * A class used to perform database operations. Used to create hibernate sessions and perform CRUD operations.
+ */
 public class DatabaseProxy {
 
     private final SessionFactory dbSessionFactory;
     private Session currentSession;
 
+    /**
+     * Initialize the DatabaseProxy. Looks in the project packages for hibernate entities.
+     * @param classScanPackage The root package of the project to scan for entity classes from.
+     */
     public DatabaseProxy(String classScanPackage) {
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(Map.of(
@@ -53,21 +60,38 @@ public class DatabaseProxy {
         dbSessionFactory = metadata.buildSessionFactory();
     }
 
+    /**
+     * Begins a hibernate session
+     */
     public void beginSession() {
         currentSession = dbSessionFactory.openSession();
     }
 
+    /**
+     * Ends the hibernate session
+     */
     public void endSession() {
         currentSession.close();
         currentSession = null;
     }
 
+    /**
+     * Checks if an entity exists based on its ID.
+     * @param entityID The ID to test for.
+     * @param entityType The class representing the database entity.
+     * @return Whether there is an entity with the given ID.
+     * @param <T> matches the type of the entity.
+     */
     public <T> boolean existsById(Object entityID, Class<T> entityType) {
         checkSessionStarted();
         var optionalEntity = currentSession.byId(entityType).loadOptional(entityID);
         return optionalEntity.isPresent();
     }
 
+    /**
+     * Saves an entity to the database.
+     * @param entity The entity.
+     */
     public void persist(Object entity) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -75,6 +99,14 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    /**
+     * Performs a PUT operation on the database.
+     * @param entity The entity to update or save to the database.
+     * @param entityID The ID of the entity.
+     * @param entityType The class of the entity.
+     * @return Whether the operation was an update or a creation.
+     * @param <T> The type of the entity.
+     */
     public <T> boolean put(Object entity, Object entityID, Class<T> entityType) {
         var isUpdate = existsById(entityID, entityType);
 
@@ -86,6 +118,14 @@ public class DatabaseProxy {
         return isUpdate;
     }
 
+    /**
+     * Performs a PATCH operation on the database.
+     * @param entity The updated entity.
+     * @param entityID The ID of the entity to update.
+     * @param entityType The type of the entity.
+     * @return Whether the operation was successful.
+     * @param <T> The type of the entity.
+     */
     public <T> boolean patch(Object entity, Object entityID, Class<T> entityType) {
         var exists = existsById(entityID, entityType);
         if (!exists) {
@@ -100,11 +140,23 @@ public class DatabaseProxy {
         return true;
     }
 
+    /**
+     * Fetches an entity from the database by its ID.
+     * @param entityId The ID of the entity.
+     * @param entityType The type of the entity.
+     * @return The entity.
+     * @param <T> The type of the entity.
+     */
     public <T> T fetchById(Object entityId, Class<T> entityType) {
         checkSessionStarted();
         return currentSession.get(entityType, entityId);
     }
 
+    /**
+     * Deletes an entity from the database by its ID.
+     * @param entityId The ID of the entity.
+     * @param entityType The type of the entity.
+     */
     public void delete(Object entityId, Class<?> entityType) {
         checkSessionStarted();
         var entity = fetchById(entityId, entityType);
@@ -116,10 +168,23 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    /**
+     * Retrieves all entities of a given type from the database.
+     * @param entityType The type of the entity.
+     * @return A list of all the entities.
+     * @param <T> The type of the entity.
+     */
     public <T> List<T> queryAll(Class<T> entityType) {
         return queryAll(entityType, DatabaseQuery.builder().build());
     }
 
+    /**
+     * Retrieves all entities of a given type from the database which match a given query.
+     * @param entityType The type of the entity.
+     * @param databaseQuery The query to filter entities using.
+     * @return A list of all the entities.
+     * @param <T> The type of the entity.
+     */
     public <T> List<T> queryAll(Class<T> entityType, DatabaseQuery databaseQuery) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -138,6 +203,12 @@ public class DatabaseProxy {
         return result;
     }
 
+    /**
+     * Deletes all entities from the database matching a given query.
+     * @param deletionCriteria A database query for the deletion criteria.
+     * @param entityType The type of the entity.
+     * @param <T> The type of the entity.
+     */
     public <T> void deleteAll(DatabaseQuery deletionCriteria, Class<T> entityType) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -153,6 +224,14 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    /**
+     * Updates all entities from the database matching some update criteria.
+     * @param entityType The type of the entity.
+     * @param updateCriteria A database query for the update criteria.
+     * @param fieldUpdate The updates made to the field.
+     * @param <T> The type of the entity.
+     * @param <F> The type of the field being updated.
+     */
     public final <T, F> void updateAll(Class<T> entityType, DatabaseQuery updateCriteria, FieldUpdate<F> fieldUpdate) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -170,14 +249,38 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    /**
+     * Updates all entities of the same type.
+     * @param entityType The type of the entity.
+     * @param fieldUpdate The updates made to the field.
+     * @param <T> The type of the entity.
+     * @param <F> The type of the field.
+     */
     public final <T, F> void updateAll(Class<T> entityType, FieldUpdate<F> fieldUpdate) {
         updateAll(entityType, DatabaseQuery.builder().build(), fieldUpdate);
     }
 
+    /**
+     * Updates entities based on a given criteria to a new value.
+     * @param entityType The type of the entity.
+     * @param fieldToUpdate The field to update.
+     * @param updateCriteria A query for the update criteria.
+     * @param newValue The new value to set to the field.
+     * @param <T> The type of the entity.
+     * @param <V> The type of the field.
+     */
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
         updateAll(entityType, updateCriteria, FieldUpdate.builder(fieldToUpdate).apply(UpdateExpression.setTo(newValue)).build());
     }
 
+    /**
+     * Updates all entities of the same type with a new value.
+     * @param entityType The type of the entity.
+     * @param fieldToUpdate The field to update.
+     * @param newValue The new value of the field.
+     * @param <T> The type of the entity.
+     * @param <V> The type of the field.
+     */
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, V newValue) {
         updateAll(entityType, fieldToUpdate, DatabaseQuery.builder().build(), newValue);
     }
@@ -195,6 +298,11 @@ public class DatabaseProxy {
         update.set(fieldUpdate.fieldName(), currentExpression.as(fieldType));
     }
 
+    /**
+     * Creates a mutation query using an HQL string and runs it in a transaction.
+     * @param hql The HQL query.
+     * @param action A consumer of the created mutation query. Runs within the transaction.
+     */
     public void createMutationQueryThen(String hql, Consumer<MutationQuery> action) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
@@ -202,11 +310,25 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    /**
+     * Creates a selection query from an HQL string.
+     * @param hql The HQL string.
+     * @param entityType The type of the entity.
+     * @param action A consumer of the selection criteria.
+     * @param <R> The type of the result.
+     */
     public <R> void createSelectionQueryThen(String hql, Class<R> entityType, Consumer<SelectionQuery<R>> action) {
         checkSessionStarted();
         action.accept(currentSession.createSelectionQuery(hql, entityType));
     }
 
+    /**
+     * Creates a selection query from an HQL string and its parameters represented as an {@link io.john.amiscaray.quak.data.query.NativeQuery}.
+     * @param query The query.
+     * @param entityType The type of the entity.
+     * @return The selection query.
+     * @param <R> The type of the result.
+     */
     public <R> SelectionQuery<R> createSelectionQuery(NativeQuery query, Class<R> entityType) {
         checkSessionStarted();
         var selectionQuery = currentSession.createSelectionQuery(query.hql(), entityType);

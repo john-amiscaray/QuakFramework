@@ -4,6 +4,9 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+/**
+ * A NumericQueryCriteria testing that the value of a field is less than a value
+ */
 public class ValueLessThan extends NumericQueryCriteria{
 
     public ValueLessThan(String fieldName, Number value) {
