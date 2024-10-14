@@ -6,6 +6,9 @@ import io.john.amiscaray.quak.security.auth.filter.AuthenticationFilter;
 import io.john.amiscaray.quak.security.cors.filter.CORSFilter;
 import io.john.amiscaray.quak.security.config.SecurityConfig;
 
+/**
+ * The dependency IDs and names for security configs.
+ */
 public class SecurityDependencyIDs {
 
     public static final String SECURITY_CONFIG_DEPENDENCY_NAME = "applicationSecurityConfig";

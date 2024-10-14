@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 
 import java.util.Date;
 
+/**
+ * A simple {@link io.john.amiscaray.quak.security.auth.Authentication}.
+ */
 @AllArgsConstructor
 public class SimpleAuthentication implements Authentication{
 

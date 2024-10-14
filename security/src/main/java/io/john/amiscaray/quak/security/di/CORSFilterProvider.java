@@ -8,6 +8,9 @@ import io.john.amiscaray.quak.security.cors.filter.CORSFilter;
 
 import java.util.List;
 
+/**
+ * Provides the application with a CORS filter.
+ */
 public class CORSFilterProvider implements DependencyProvider<CORSFilter> {
 
     @Override
