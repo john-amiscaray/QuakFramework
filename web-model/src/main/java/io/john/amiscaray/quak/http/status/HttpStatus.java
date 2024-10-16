@@ -2,6 +2,9 @@ package io.john.amiscaray.quak.http.status;
 
 import lombok.Getter;
 
+/**
+ * An enum representing an HTTP status. Contains a status code and the description.
+ */
 @Getter
 public enum HttpStatus {
     // 1xx Informational
@@ -69,8 +72,13 @@ public enum HttpStatus {
         return code + " " + description;
     }
 
+    /**
+     * Returns a member of this enum matching the given status code.
+     * @param code The status code.
+     * @return The corresponding http status enum.
+     */
     public static HttpStatus fromCode(int code) {
-        for (HttpStatus status : HttpStatus.values()) {
+        for (HttpStatus status : HttpStatus.values()) { // TODO optimize this.
             if (status.code == code) {
                 return status;
             }

@@ -13,6 +13,9 @@ import java.util.List;
 
 import static io.john.amiscaray.quak.security.di.SecurityDependencyIDs.*;
 
+/**
+ * Provides the application with the appropriate authentication filter based on the selected authentication strategy.
+ */
 public class AuthenticationFilterProvider implements DependencyProvider<AuthenticationFilter> {
 
     @Override

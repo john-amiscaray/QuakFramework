@@ -10,6 +10,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.function.Consumer;
 
+/**
+ * Represents the base functionality of a quak application. This contains lifecycle hooks and methods to start or end the application.
+ */
 public abstract class Application {
 
     @Getter

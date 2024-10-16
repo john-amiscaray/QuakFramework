@@ -2,6 +2,9 @@ package io.john.amiscaray.quak.security.filter;
 
 import jakarta.servlet.Filter;
 
+/**
+ * A base class for filters used for security.
+ */
 public abstract class SecurityFilter implements Filter {
 
     protected boolean urlMatchesPathPattern(String url, String pattern) {

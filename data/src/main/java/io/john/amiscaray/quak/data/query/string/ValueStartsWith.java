@@ -4,7 +4,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
+/**
+ * A QueryCriteria testing that a string field starts with a prefix
+ */
 public class ValueStartsWith extends StringQueryCriteria{
+
     public ValueStartsWith(String fieldName, String value) {
         super(fieldName, value);
     }
@@ -13,4 +17,5 @@ public class ValueStartsWith extends StringQueryCriteria{
     public Predicate getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder) {
         return criteriaBuilder.like(queryRoot.get(fieldName), value + "%");
     }
+
 }

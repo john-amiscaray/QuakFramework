@@ -23,6 +23,9 @@ import java.util.HashMap;
 
 import static io.john.amiscaray.quak.generator.util.ParserUtils.getAnnotationMemberValue;
 
+/**
+ * Used to generate controllers based on classes annotated with {@link io.john.amiscaray.quak.generator.api.RestModel} and those annotated with {@link jakarta.persistence.Entity}
+ */
 @Mojo(name = "generate-controllers", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class ApiGeneratorMojo extends AbstractMojo {
 

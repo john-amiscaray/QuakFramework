@@ -4,6 +4,9 @@ import io.john.amiscaray.quak.data.query.QueryCriteria;
 
 import java.util.List;
 
+/**
+ * Used to join two or more query criteria
+ */
 public abstract class Conjunction implements QueryCriteria {
 
     protected final List<QueryCriteria> conditions;

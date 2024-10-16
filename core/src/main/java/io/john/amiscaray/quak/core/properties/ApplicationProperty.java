@@ -6,6 +6,9 @@ import lombok.Setter;
 import java.util.Optional;
 import java.util.Properties;
 
+/**
+ * Represents application properties specified in the application.properties file. This file goes in the application's resource folder.
+ */
 @Getter
 public enum ApplicationProperty {
     CONTEXT_PACKAGE("application.context.package", ""),

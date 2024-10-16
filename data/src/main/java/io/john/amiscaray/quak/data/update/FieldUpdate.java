@@ -4,6 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * A class representing a single database update operation.
+ * @param fieldName The name of the field to update.
+ * @param updates The changes made to the value of the field.
+ * @param <T> The entity class this applies to.
+ */
 public record FieldUpdate<T>(String fieldName, List<UpdateExpression<T>> updates) {
 
     public static <T> FieldUpdateBuilder<T> builder(String fieldName) {

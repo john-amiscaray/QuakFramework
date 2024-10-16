@@ -14,8 +14,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * Used to provide an instance to the application context from a method.
+ * @param <T> The type of the instance being provided.
+ */
 @AllArgsConstructor
-public class MethodDependencyProvider<T> implements ReflectiveDependencyProvider<T>{
+public final class MethodDependencyProvider<T> implements ReflectiveDependencyProvider<T>{
 
     private final Method methodReturningInstance;
 

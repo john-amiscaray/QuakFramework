@@ -20,6 +20,9 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+/**
+ * Stores all the project's dependencies as a map with {@link io.john.amiscaray.quak.core.di.dependency.DependencyID} as the key and the instance as the value. Also stores lists of grouped dependencies as "aggregate lists".
+ */
 public class ApplicationContext {
 
     private static ApplicationContext applicationContextInstance;
@@ -124,6 +127,11 @@ public class ApplicationContext {
         return "";
     }
 
+    /**
+     * Fetches instances of the given parameters. Used to call methods reflectively.
+     * @param parameters The parameters.
+     * @return The instances of the parameters to use.
+     */
     public Object[] fetchInstancesOfParameters(Parameter[] parameters) {
         return Arrays.stream(parameters)
                 .map(parameter -> {
@@ -147,6 +155,11 @@ public class ApplicationContext {
         return applicationContextInstance;
     }
 
+    /**
+     * Check if the application context contains an instance of the given class.
+     * @param clazz The class
+     * @return A boolean representing if the application context contains an instance of the given class.
+     */
     public boolean hasInstance(Class<?> clazz) {
         return instances.entrySet()
                 .stream()
@@ -156,6 +169,12 @@ public class ApplicationContext {
                 .isPresent();
     }
 
+    /**
+     * Gets an instance from the application context.
+     * @param clazz The class
+     * @return An instance of the class
+     * @param <T> A generic parameter matching the type of the instance
+     */
     public <T> T getInstance(Class<T> clazz) {
         if (!hasInstance(clazz)) {
             try {
@@ -177,14 +196,32 @@ public class ApplicationContext {
                 .orElseThrow();
     }
 
+    /**
+     * Checks if the application context contains an instance associated with the given dependency ID
+     * @param dependencyID The dependency ID
+     * @return A boolean representing if the application context contains an instance associated with the dependency ID
+     */
     public boolean hasInstance(DependencyID<?> dependencyID) {
         return instances.containsKey(dependencyID);
     }
 
+    /**
+     * Gets an instance from the application context.
+     * @param dependencyID The dependency ID of the instance to retrieve
+     * @return An instance of the class
+     * @param <T> A generic parameter matching the type of the instance
+     */
     public <T> T getInstance(DependencyID<T> dependencyID) {
         return (T) instances.get(dependencyID);
     }
 
+    /**
+     * Fetches a list of dependencies
+     * @param aggregateListName
+     * @param dependencyType
+     * @return
+     * @param <T>
+     */
     public <T> List<T> getAggregateDependencies(String aggregateListName, Class<T> dependencyType) {
         return aggregateDependencies.get(new DependencyID<>(aggregateListName, dependencyType));
     }

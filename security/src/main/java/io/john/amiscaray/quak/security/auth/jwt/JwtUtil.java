@@ -11,6 +11,9 @@ import io.john.amiscaray.quak.security.config.SecurityConfig;
 
 import java.util.Date;
 
+/**
+ * Used to manage and produce JWTs
+ */
 @ManagedType
 public class JwtUtil {
 
@@ -23,6 +26,11 @@ public class JwtUtil {
         expirationTime = securityConfig.jwtSecretExpiryTime();
     }
 
+    /**
+     * Generates a token from the user's {@link io.john.amiscaray.quak.security.auth.principal.Principal}.
+     * @param principal The user's principal.
+     * @return The JWT token as a String.
+     */
     public String generateToken(Principal principal) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
 
@@ -33,6 +41,11 @@ public class JwtUtil {
                 .sign(algorithm);
     }
 
+    /**
+     * Validates and decodes a given JWT.
+     * @param token The JWT as a String.
+     * @return The decoded JWT.
+     */
     public DecodedJWT validateTokenAndGetDecoded(String token) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         JWTVerifier verifier = JWT.require(algorithm)
@@ -40,10 +53,20 @@ public class JwtUtil {
         return verifier.verify(token);
     }
 
+    /**
+     * Extracts the subject of a JWT.
+     * @param token The JWT.
+     * @return The subject (the security ID of the user).
+     */
     public String extractSubject(String token) {
         return validateTokenAndGetDecoded(token).getSubject();
     }
 
+    /**
+     * Checks if a JWT is expired.
+     * @param token The JWT.
+     * @return Whether the token is expired.
+     */
     public boolean isTokenExpired(String token) {
         Date expiration = validateTokenAndGetDecoded(token).getExpiresAt();
         return expiration.before(new Date());

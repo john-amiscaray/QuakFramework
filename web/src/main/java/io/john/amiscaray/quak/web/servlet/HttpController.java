@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Handles all HTTP requests for a single path. Can handle any method for the given URL path.
+ */
 public class HttpController extends HttpServlet {
 
     @Setter

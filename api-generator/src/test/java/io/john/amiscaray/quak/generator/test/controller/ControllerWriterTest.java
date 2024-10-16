@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test;
 
 import static io.john.amiscaray.quak.generator.test.assertions.TestSourceUtil.parsedClassOrInterfaceDeclarationOf;
 import static io.john.amiscaray.quak.generator.test.stub.MockSource.*;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
 

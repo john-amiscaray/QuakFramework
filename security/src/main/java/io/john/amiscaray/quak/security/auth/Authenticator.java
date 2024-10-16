@@ -9,8 +9,17 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
+/**
+ * Used by the security framework to authenticate credentials.
+ */
 public interface Authenticator {
 
+    /**
+     * Authenticate the given credentials.
+     * @param credentials The credentials.
+     * @return The authentication.
+     * @throws InvalidCredentialsException if the credentials were invalid.
+     */
     default Authentication authenticate(Credentials credentials) throws InvalidCredentialsException {
         var principal = lookupPrincipal(credentials);
         if (principal.isEmpty()) {
@@ -23,6 +32,11 @@ public interface Authenticator {
         );
     }
 
+    /**
+     * @param securityID The securityID.
+     * @return An authentication for the user.
+     * @throws InvalidCredentialsException if there is no user with the given security ID.
+     */
     default Authentication authenticate(String securityID) throws InvalidCredentialsException {
         var principal = lookupPrincipal(securityID);
         if (principal.isEmpty()) {
@@ -35,10 +49,23 @@ public interface Authenticator {
         );
     }
 
+    /**
+     * Look up the user with the given security ID.
+     * @param securityID The security ID.
+     * @return The user's principal as an optional.
+     */
     Optional<Principal> lookupPrincipal(String securityID);
 
+    /**
+     * Look up the user with the given credentials.
+     * @param credentials The user's credentials.
+     * @return The user's principal as an optional.
+     */
     Optional<Principal> lookupPrincipal(Credentials credentials);
 
+    /**
+     * @return The duration an authentication is valid.
+     */
     default Duration getAuthenticationValidDuration() {
         return Duration.ofHours(12);
     }

@@ -18,13 +18,22 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * A filter used to verify the credentials given in the Authorization header.
+ */
 @AllArgsConstructor
 public abstract class AuthenticationFilter extends SecurityFilter {
 
     protected Authenticator authenticator;
     protected SecurityConfig securityConfig;
 
+    /**
+     * A request attribute for the verified JWT when using the JWT authentication strategy.
+     */
     public static final String VERIFIED_JWT_ATTRIBUTE = "jwt";
+    /**
+     * A request attribute for the verified {@link io.john.amiscaray.quak.security.auth.Authentication} produced by the filter.
+     */
     public static final String AUTHENTICATION_ATTRIBUTE = "authentication";
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpBasicAuthFilter.class);

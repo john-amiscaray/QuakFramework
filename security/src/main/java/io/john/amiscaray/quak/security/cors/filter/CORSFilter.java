@@ -11,6 +11,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * A filter used to apply CORS based on the application's {@link io.john.amiscaray.quak.security.config.SecurityConfig}.
+ */
 public class CORSFilter extends SecurityFilter {
 
     private SecurityConfig securityConfig;

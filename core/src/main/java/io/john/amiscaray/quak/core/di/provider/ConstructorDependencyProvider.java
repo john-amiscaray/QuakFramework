@@ -13,6 +13,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Used to provide an instance to the application context from a constructor.
+ * @param <T> The type of the instance.
+ */
 @AllArgsConstructor
 public class ConstructorDependencyProvider<T> implements ReflectiveDependencyProvider<T> {
 
