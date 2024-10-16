@@ -29,7 +29,7 @@
         <module>core</module>
         <module>data</module>
         <module>web</module>
-        <module>aggregate-report</module>
+        <module>aggregate-jacoco-reports</module>
         <module>generator</module>
         <module>api-generator</module>
         <module>security</module>
