@@ -31,6 +31,9 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Represents a web application. On startup, begins a tomcat server and registers the required servlets and filters.
+ */
 public class WebApplication extends Application {
     protected Tomcat server;
     protected Context servletContext;
@@ -39,6 +42,12 @@ public class WebApplication extends Application {
     private static final Logger LOG = LoggerFactory.getLogger(WebApplication.class);
     private static WebApplication instance = null;
 
+    /**
+     * The configuration of this web application.
+     * @param main The entry point class for the application (used for class scanning purposes).
+     * @param args The program args.
+     * @param pathControllers The path controllers to handle HTTP requests.
+     */
     public record Configuration(Class<?> main, String[] args, Map<RequestMapping, PathController<?, ?>> pathControllers) {
         @Builder
         public Configuration(Class<?> main, String[] args, @Singular("pathMapping") Map<RequestMapping, PathController<?, ?>> pathControllers) {
@@ -76,6 +85,10 @@ public class WebApplication extends Application {
         pathControllers.putAll(config.pathControllers);
     }
 
+    /**
+     * Begins the web application.
+     * @throws Exception Throws any exception.
+     */
     @Override
     public void startUp() throws Exception {
         if (LOG.isInfoEnabled()) {
@@ -102,6 +115,10 @@ public class WebApplication extends Application {
         server.getServer().await();
     }
 
+    /**
+     * Stops the web application.
+     * @throws LifecycleException If there was a problem ending the application.
+     */
     public void finish() throws LifecycleException {
         server.stop();
         server.destroy();

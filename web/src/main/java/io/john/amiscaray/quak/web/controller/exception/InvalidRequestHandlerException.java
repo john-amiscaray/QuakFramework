@@ -2,6 +2,9 @@ package io.john.amiscaray.quak.web.controller.exception;
 
 import java.lang.reflect.Method;
 
+/**
+ * Thrown when the {@link io.john.amiscaray.quak.web.application.WebStarter} finds an incorrectly defined handler method.
+ */
 public class InvalidRequestHandlerException extends RuntimeException {
 
     public InvalidRequestHandlerException(Class<?> controllerClass, Method handlerMethod) {

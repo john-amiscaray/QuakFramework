@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Groups related HTTP controllers into a single servlet. Quak framework will group controllers with common path prefixes.
+ */
 @AllArgsConstructor
 public class HttpControllerGroup extends HttpServlet {
 

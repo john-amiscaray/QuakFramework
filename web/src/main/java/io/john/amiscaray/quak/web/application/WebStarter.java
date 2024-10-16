@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Used to start a web application by scanning through the project classes an instantiating the provided controllers and filters.
+ */
 public class WebStarter {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebStarter.class);
@@ -34,6 +37,12 @@ public class WebStarter {
         return type.getTypeName();
     }
 
+    /**
+     * Begins a web application. Scans for classes annotated with {@link io.john.amiscaray.quak.web.controller.annotation.Controller} and creates instances of {@link io.john.amiscaray.quak.web.controller.PathController} based on them, so we can handle requests.
+     * @param main The main entry class of the program.
+     * @param args The program args.
+     * @return A completable future returning the web application. Completes after the context loads and the controllers have been parsed.
+     */
     public static CompletableFuture<WebApplication> beginWebApplication(Class<?> main, String[] args) {
         var application = WebApplication.getInstance();
         application.init(
