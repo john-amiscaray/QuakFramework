@@ -34,6 +34,14 @@ Quak Framework is split into different modules depending on the needs of your ap
 
 ## Application Lifecycle Hooks
 
+Quak represents an application using the `io.john.amiscaray.quak.core.Application` class. This class includes functionality for application lifecycle hooks. Different phases of the application lifecycle are represented using the `LifecycleState` enum defined in the `Application` class. Callbacks can be added for each of these lifecycle states using the `Application#on` method. The following are the application lifecycle states and their meanings:
+
+- `PRE_START` : Before the application starts.
+- `CONTEXT_LOADED` : After the application context loads (see the section below on dependency injection).
+- `POST_START` : After the application starts.
+- `PRE_STOP` : Before the application stops.
+- `POST_STOP` : After the application stops.
+
 ## Dependency Injection
 
 Quak framework has a robust API for dependency injection. Quak implements dependency injection using a combination of constructor-based dependency injection, annotation-based dependency providers, JPMS service loading, and a application singleton holding the dependencies.
