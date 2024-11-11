@@ -514,7 +514,7 @@ To get started with `quak.framework.security`, you first need to implement the `
 
 #### The Authenticator Interface
 
-The `Authenticator` interface has a default `authenticate` method. This calls an unimplemented `lookupPrincipal` method, checks its return value is not null, then returns a `io.john.amiscaray.quak.security.auth.SimpleAuthentication` object. Thus, all you need to do is implement the `lookupPrincipal` method. This will require you to map a user in your database to a user principal. To do this however, you need to define what a user principal is.
+The `Authenticator` interface has a default `authenticate` method. This calls an unimplemented `lookupPrincipal` method, checks its return value is not null, then returns a `io.john.amiscaray.quak.security.auth.SimpleAuthentication` object. Thus, all you need to do is implement the `lookupPrincipal` method. This will require you to map a user in your database to a user principal. To do this, however, you need to define what a user principal is.
 
 #### The Principal Interface
 
