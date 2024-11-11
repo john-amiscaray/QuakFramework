@@ -499,3 +499,7 @@ public class Main {
 }
 ```
 
+### WebConfig
+
+Lastly, `quak.web` provides a `WebConfig` class. This can be added to the application context for `quak.web` to read to configure your web application. Currently, the only config this contains is a `exceptionHttpStatusMapping` map. This map associates exceptions with different HTTP response codes so that if your handler throws an exception, a specific HTTP response code can be returned.
+
