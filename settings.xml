@@ -123,7 +123,11 @@ under the License.
       <username>${env.MAVEN_SNAPSHOT_USER}</username>
       <password>${env.MAVEN_SNAPSHOT_PASSWORD}</password>
     </server>
-
+    <server>
+      <id>github</id>
+      <username>${env.GITHUB_ACTOR}</username>
+      <password>${env.GH_TOKEN}</password>
+    </server>
     <!-- Another sample, using keys to authenticate.
     <server>
       <id>siteServer</id>

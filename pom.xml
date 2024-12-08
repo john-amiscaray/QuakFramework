@@ -150,9 +150,9 @@
     </build>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>nexus-snapshots</id>
-            <url>${env.MAVEN_SNAPSHOT_HOST}</url>
-        </snapshotRepository>
+        <repository>
+            <id>github</id>
+            <url>https://maven.pkg.github.com/john-amiscaray/QuakFramework</url>
+        </repository>
     </distributionManagement>
 </project>
