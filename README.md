@@ -1,5 +1,11 @@
 # Quak Framework
 
+<picture>
+  <source srcset="assets/quak_logo_dark.png" media="(prefers-color-scheme: dark)">
+  <source srcset="assets/quak_logo_light.png" media="(prefers-color-scheme: light)">
+  <img src="assets/quak_logo_light.png" alt="Quak logo">
+</picture>
+
 ## Table Of Contents
 
 - [Overview](#overview)
