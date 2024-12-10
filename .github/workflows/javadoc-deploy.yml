@@ -27,4 +27,4 @@ jobs:
           target-folder: docs
           project: maven
           custom-command: mvn javadoc:aggregate -pl !aggregate-jacoco-reports,!api-generator
-          javadocs-source-folder: target/reports/apidocs
+          javadoc-source-folder: target/reports/apidocs
