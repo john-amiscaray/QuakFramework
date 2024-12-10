@@ -30,6 +30,8 @@ Quak Framework is split into different modules depending on the needs of your ap
 | [quak.framework.generator](user-guide/quak_generator_api.md) | A maven plugin for web controller and module-info generation. Before compilation, scans the project for classes with annotations from the `quak.framework.generator-model` module. These annotations give information to allow this plugin to generate controllers. |
 | quak.framework.generator-model                               | Annotations for project classes and methods to give information for the quak.framework.generator maven plugin.                                                                                                                                                    |
 
+View the [javadocs](https://john-amiscaray.github.io/QuakFramework/) for more info.
+
 ## Installation
 
 > NOTE: Currently, Quak has only been released as a 1.0-SNAPSHOT version hosted via GitHub packages. When Quak has a full non-snapshot release, it will be hosted on maven central. Because Quak is only available on GitHub packages, you'll need extra setup beyond adding dependencies to your project's pom.xml.
