@@ -17,4 +17,4 @@ jobs:
           java-version: 21
           target-folder: docs
           project: maven
-          custom-command: mvn javadoc:javadoc
+          custom-command: mvn javadoc:javadoc -pl !aggregate-jacoco-reports,!api-generator
