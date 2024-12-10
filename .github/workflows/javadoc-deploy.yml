@@ -9,12 +9,21 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+      - name: Clean and Install
+        run: mvn clean install -DskipTests
       - name: Deploy JavaDoc 🚀
         uses: MathieuSoysal/Javadoc-publisher.yml@v2.3.0
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           javadoc-branch: master
-          java-version: 23
+          java-version: 21
           target-folder: docs
           project: maven
           custom-command: mvn javadoc:javadoc -pl !aggregate-jacoco-reports,!api-generator

@@ -1,8 +1,6 @@
 name: Run Test
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
 
 jobs:
@@ -12,10 +10,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-        env:
-          MAVEN_SNAPSHOT_HOST: ${{ secrets.MAVEN_SNAPSHOT_HOST }}
-          MAVEN_SNAPSHOT_USER: ${{ secrets.MAVEN_SNAPSHOT_USER }}
-          MAVEN_SNAPSHOT_PASSWORD: ${{ secrets.MAVEN_SNAPSHOT_PASSWORD }}
       - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
