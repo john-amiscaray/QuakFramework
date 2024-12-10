@@ -1,0 +1,1 @@
+moduleSearchIndex = [{"l":"quak.framework.core"},{"l":"quak.framework.data"},{"l":"quak.framework.generator.model"},{"l":"quak.framework.security"},{"l":"quak.framework.web"},{"l":"quak.framework.web.model"}];updateSearchResults();
