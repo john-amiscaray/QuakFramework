@@ -8,6 +8,7 @@ import io.john.amiscaray.quak.data.test.stub.Employee;
 import io.john.amiscaray.quak.data.test.helper.EmployeeTestDBConnector;
 import io.john.amiscaray.quak.data.update.FieldUpdate;
 import io.john.amiscaray.quak.core.properties.ApplicationProperties;
+import org.hibernate.HibernateException;
 import org.junit.jupiter.api.*;
 
 import java.io.FileNotFoundException;
@@ -135,6 +136,16 @@ public class DatabaseProxyTest {
                 new Employee(3L, "John", "Tech"),
                 new Employee(4L, "Annie", "Corporate")
         ), fetchedEmployees);
+    }
+
+    @Test
+    void testQueryEmployeeByNameBetweenNumericValuesThrowsException() {
+        assertThrows(HibernateException.class, () -> {
+            dbProxy.queryAll(Employee.class, DatabaseQuery
+                .builder()
+                .withCriteria(valueOfField("name", isBetween(2, 10)))
+                .build());
+        });
     }
 
     @Test

@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks an instance method that generates an instance of a {@link io.john.amiscaray.quak.generator.api.RestModel} from the current entity.
+ * Marks a static method that generates an instance of a {@link io.john.amiscaray.quak.generator.api.RestModel} from the current entity.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.SOURCE)

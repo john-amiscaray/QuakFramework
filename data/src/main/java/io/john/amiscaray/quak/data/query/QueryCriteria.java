@@ -84,7 +84,7 @@ public interface QueryCriteria {
     }
 
     /**
-     * Creates a query criteria provider testing that the value of a field is between a min and a max.
+     * Creates a query criteria provider testing that the value of a field is between a min and a max (inclusive).
      * @param min The min
      * @param max The max
      * @return A query criteria provider.
