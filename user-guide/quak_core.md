@@ -1,5 +1,7 @@
 # Quak Core
 
+The Quak Core module contains core functionalities for a quak application to function. This includes application lifecycle hooks, application configuration, and dependency injection.
+
 ## Application Lifecycle Hooks
 
 Quak represents an application using the `io.john.amiscaray.quak.core.Application` class. This class includes functionality for application lifecycle hooks. Different phases of the application lifecycle are represented using the `LifecycleState` enum defined in the `Application` class. Callbacks can be added for each of these lifecycle states using the `Application#on` method. The following are the application lifecycle states and their meanings:
