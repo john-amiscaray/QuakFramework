@@ -269,3 +269,65 @@ public class StudentDTOController {
 
 }
 ```
+
+## Module Info Generation
+
+When creating a Quak application that makes use of JPMS, there can be a lot of headaches involved with adding all the required declarations in your `module-info.java` file. For example, your rest models need to be opened to `com.fasterxml.jackson.databind` for serialization, your entities need to be opened to `org.hibernate.orm.core`, and all your dependency injection components need to be opened to `quak.framework.core`. This plugin's module-info generation seeks a solution to this problem. Using this functionality, you can define a `module-info.template` file in your resources folder with a module declaration:
+
+```java
+import io.john.amiscaray.quak.core.di.provider.DependencyProvider;
+import io.john.amiscaray.test.security.di.SimpleAuthenticatorProvider;
+import io.john.amiscaray.test.security.di.SecurityConfigProvider;
+
+module my.module {
+
+    requires org.slf4j;
+    requires quak.framework.security;
+
+    exports io.john.amiscaray.test.models to backend.framework.web;
+
+    provides DependencyProvider with SimpleAuthenticatorProvider;
+
+    requires com.fasterxml.jackson.databind;
+}
+```
+Then, when building your project with maven, the api generator plugin will generate the `module-info.java` file inserting additional declarations:
+
+```java
+import io.john.amiscaray.quak.core.di.provider.DependencyProvider;
+import io.john.amiscaray.test.security.di.SimpleAuthenticatorProvider;
+import io.john.amiscaray.test.security.di.SecurityConfigProvider;
+
+module my.module {
+
+    requires org.slf4j;
+    requires quak.framework.security;
+
+    exports io.john.amiscaray.test.models to backend.framework.web;
+
+    provides DependencyProvider with SimpleAuthenticatorProvider;
+
+    requires com.fasterxml.jackson.databind;
+
+    // GENERATED SOURCES:
+    exports io.john.amiscaray.test.controllers to quak.framework.core, quak.framework.web;
+    
+    // Rules for RestModels
+    opens io.john.amiscaray.test.models to com.fasterxml.jackson.databind;
+    // Rules for Entities
+    opens io.john.amiscaray.test.orm to org.hibernate.orm.core;
+    // Rules for DI Components
+    opens io.john.amiscaray.test.controllers.config to quak.framework.core;
+    opens io.john.amiscaray.test.di to quak.framework.core;
+    opens io.john.amiscaray.test.security.di to quak.framework.core;
+    
+    requires quak.framework.core;
+    requires quak.framework.data;
+    requires quak.framework.generator.model;
+    requires quak.framework.web;
+    requires quak.framework.web.model;
+    requires jakarta.persistence;
+    requires static lombok;
+    requires org.reflections;
+}
+```

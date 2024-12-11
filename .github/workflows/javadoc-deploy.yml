@@ -27,5 +27,5 @@ jobs:
           java-version: 21
           target-folder: docs
           project: maven
-          custom-command: mvn javadoc:aggregate -pl !aggregate-jacoco-reports,!api-generator
+          custom-command: mvn javadoc:aggregate -Ddoctitle="Quak Framework Latest Release Java Docs" -pl !aggregate-jacoco-reports,!api-generator
           javadoc-source-folder: target/reports/apidocs
