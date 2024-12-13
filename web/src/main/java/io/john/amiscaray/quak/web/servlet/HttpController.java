@@ -52,51 +52,51 @@ public class HttpController extends HttpServlet {
         if (LOG.isInfoEnabled()) {
             LOG.info("Servicing Request: {} {}", servletRequest.getMethod(), servletRequest.getRequestURI());
         }
-        var method = RequestMethod.valueOf(servletRequest.getMethod());
-        var controller = pathControllers.get(method);
-        var queryParams = servletRequest.getParameterMap()
-                .entrySet()
-                .stream()
-                .filter(paramEntry -> paramEntry.getValue().length > 0)
-                .map(paramEntry -> Map.entry(paramEntry.getKey(), paramEntry.getValue()[0]))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        if (controller == null || controller.requestHandler() == null) {
-            servletResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "This path does not support HTTP method " + method.name());
-            return;
-        }
-
-        var requestHeaders = extractHeaders(servletRequest);
-        var bodyRaw = readBody(servletRequest);
-        var requestAttributes = extractAttributes(servletRequest);
-        Request<?> request;
-        if (controller.requestBodyType().equals(String.class)) {
-            request = new DynamicPathRequest<>(
-                    requestHeaders,
-                    queryParams,
-                    method,
-                    pathParameters,
-                    bodyRaw,
-                    requestAttributes);
-        } else if (controller.requestBodyType().equals(Void.class)) {
-            request = new DynamicPathRequest<>(
-                    requestHeaders,
-                    queryParams,
-                    method,
-                    pathParameters,
-                    null,
-                    requestAttributes);
-        } else {
-            request = new DynamicPathRequest<>(
-                    requestHeaders,
-                    queryParams,
-                    method,
-                    pathParameters,
-                    MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw),
-                    requestAttributes);
-        }
-
         try {
+            var method = RequestMethod.valueOf(servletRequest.getMethod());
+            var controller = pathControllers.get(method);
+            var queryParams = servletRequest.getParameterMap()
+                    .entrySet()
+                    .stream()
+                    .filter(paramEntry -> paramEntry.getValue().length > 0)
+                    .map(paramEntry -> Map.entry(paramEntry.getKey(), paramEntry.getValue()[0]))
+                    .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            if (controller == null || controller.requestHandler() == null) {
+                servletResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "This path does not support HTTP method " + method.name());
+                return;
+            }
+
+            var requestHeaders = extractHeaders(servletRequest);
+            var bodyRaw = readBody(servletRequest);
+            var requestAttributes = extractAttributes(servletRequest);
+            Request<?> request;
+            if (controller.requestBodyType().equals(String.class)) {
+                request = new DynamicPathRequest<>(
+                        requestHeaders,
+                        queryParams,
+                        method,
+                        pathParameters,
+                        bodyRaw,
+                        requestAttributes);
+            } else if (controller.requestBodyType().equals(Void.class)) {
+                request = new DynamicPathRequest<>(
+                        requestHeaders,
+                        queryParams,
+                        method,
+                        pathParameters,
+                        null,
+                        requestAttributes);
+            } else {
+                request = new DynamicPathRequest<>(
+                        requestHeaders,
+                        queryParams,
+                        method,
+                        pathParameters,
+                        MAPPER.readerFor(controller.requestBodyType()).readValue(bodyRaw),
+                        requestAttributes);
+            }
+
             var response = controller.requestHandler().handleRequest((Request) request);
             servletResponse.setStatus(response.status());
             writeResponseHeaders(response.headers(), servletResponse);
@@ -130,6 +130,14 @@ public class HttpController extends HttpServlet {
             var exceptionToStatusCode = cfg.exceptionHttpStatusMapping();
             if (exceptionToStatusCode.containsKey(ex.getClass())) {
                 return new ExceptionAndItsStatusCode(ex, exceptionToStatusCode.get(ex.getClass()));
+            }
+            var superExceptionMapping = exceptionToStatusCode
+                    .keySet()
+                    .stream()
+                    .filter(type -> type.isAssignableFrom(ex.getClass()))
+                    .findFirst();
+            if (superExceptionMapping.isPresent()) {
+                return new ExceptionAndItsStatusCode(ex, exceptionToStatusCode.get(superExceptionMapping.get()));
             }
         }
 
