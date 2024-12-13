@@ -30,5 +30,7 @@ module quak.web.test {
     opens io.john.amiscaray.quak.web.test.controller.exception.stub.controller.stringparam;
     opens io.john.amiscaray.quak.web.test.controller.exception.stub.controller.voidreturn;
     opens io.john.amiscaray.quak.web.test.stub;
+    opens io.john.amiscaray.quak.web.test.servlet to org.junit.platform.commons;
+    opens io.john.amiscaray.quak.web.test.servlet.stub to com.fasterxml.jackson.databind;
     opens io.john.amiscaray.quak.web.test.util;
 }

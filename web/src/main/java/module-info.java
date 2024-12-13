@@ -22,4 +22,5 @@ module quak.framework.web {
     exports io.john.amiscaray.quak.web.cfg;
     exports io.john.amiscaray.quak.web.annotation;
     exports io.john.amiscaray.quak.web.controller.exception;
+    exports io.john.amiscaray.quak.web.servlet to quak.web.test;
 }
