@@ -36,6 +36,7 @@ io.john.amiscaray.quak.web.filter.annotation
 io.john.amiscaray.quak.web.filter.exception
 io.john.amiscaray.quak.web.handler
 io.john.amiscaray.quak.web.handler.annotation
+io.john.amiscaray.quak.web.servlet
 module:quak.framework.web.model
 io.john.amiscaray.quak.http.request
 io.john.amiscaray.quak.http.response
