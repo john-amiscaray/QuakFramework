@@ -6,8 +6,6 @@
   <img src="assets/logo/quak_logo_light.png" alt="Quak logo">
 </picture>
 
-> While this project is still in its 1.0-SNAPSHOT version, please feel free to give feedback on the current state of it [here](https://forms.gle/8hzAeV2Ae1p9ksYcA).
-
 ## Overview
 
 An intuitive Java backend framework to quickly develop REST APIs. Features:
@@ -17,6 +15,8 @@ An intuitive Java backend framework to quickly develop REST APIs. Features:
 - Code generation
 - HTTP Authentication and Authorization
 - Database operations
+
+> While this project is still in its 1.0-SNAPSHOT version, please feel free to give feedback on the current state of it [here](https://forms.gle/8hzAeV2Ae1p9ksYcA).
 
 ## Quak Modules Overview
 
