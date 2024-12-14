@@ -69,3 +69,7 @@ View the [javadocs](https://john-amiscaray.github.io/QuakFramework/) for more in
 If you are using a `settings.xml` file from your `~/.m2` folder, be sure to update your Maven settings in IntelliJ as follows:
 
 ![IntelliJ Maven Settings](assets/user-guide/mvn-settings.png)
+
+## Example Code
+
+For an example of how you might use Quak, check out [this repository](https://github.com/john-amiscaray/QuakExample).
