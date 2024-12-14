@@ -1,10 +1,12 @@
 # Quak Framework
 
 <picture>
-  <source srcset="assets/quak_logo_dark.png" media="(prefers-color-scheme: dark)">
-  <source srcset="assets/quak_logo_light.png" media="(prefers-color-scheme: light)">
-  <img src="assets/quak_logo_light.png" alt="Quak logo">
+  <source srcset="assets/logo/quak_logo_dark.png" media="(prefers-color-scheme: dark)">
+  <source srcset="assets/logo/quak_logo_light.png" media="(prefers-color-scheme: light)">
+  <img src="assets/logo/quak_logo_light.png" alt="Quak logo">
 </picture>
+
+> While this project is still in its 1.0-SNAPSHOT version, please feel free to give feedback on the current state of it [here](https://forms.gle/8hzAeV2Ae1p9ksYcA).
 
 ## Overview
 
@@ -36,8 +38,8 @@ View the [javadocs](https://john-amiscaray.github.io/QuakFramework/) for more in
 
 > NOTE: Currently, Quak has only been released as a 1.0-SNAPSHOT version hosted via GitHub packages. When Quak has a full non-snapshot release, it will be hosted on maven central. Because Quak is only available on GitHub packages, you'll need extra setup beyond adding dependencies to your project's pom.xml.
 
-1. Add the appropriate Quak modules as maven dependencies to your project. See the [project GitHub packages](https://github.com/john-amiscaray/QuakFramework/packages) for more details.
-2. In the project's `pom.xml`, add the following repositories:
+1. Add the appropriate Quak modules as maven dependencies in your project's `pom.xml`. See the [project GitHub packages](https://github.com/john-amiscaray/QuakFramework/packages) for more details.
+2. In your `pom.xml`, add the following repositories:
 ```xml
 <repositories>
     <repository>
@@ -53,7 +55,7 @@ View the [javadocs](https://john-amiscaray.github.io/QuakFramework/) for more in
     </pluginRepository>
 </pluginRepositories>
 ```
-3. In GitHub, generate a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with at least the `read:packages` permission enabled.
+3. In your GitHub developer settings, generate a classic [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) with at least the `read:packages` permission enabled.
 4. In your maven settings file (either in your `~/.m2/settings.xml` file or a `settings.xml` file in your project's root folder) add the following to authenticate with GitHub packages:
 ```xml
 <servers>
@@ -64,3 +66,6 @@ View the [javadocs](https://john-amiscaray.github.io/QuakFramework/) for more in
     </server>
 </servers>
 ```
+If you are using a `settings.xml` file from your `~/.m2` folder, be sure to update your Maven settings in IntelliJ as follows:
+
+![IntelliJ Maven Settings](assets/user-guide/mvn-settings.png)
