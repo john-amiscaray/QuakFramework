@@ -6,9 +6,12 @@
   <img src="assets/logo/quak_logo_light.png" alt="Quak logo">
 </picture>
 
+> While this project is still in its 1.0-SNAPSHOT version, please feel free to give feedback on the current state of it [here](https://forms.gle/8hzAeV2Ae1p9ksYcA).
+
 ## Overview
 
 An intuitive Java backend framework to quickly develop REST APIs. Features:
+
 - Dependency injection
 - Application lifecycle hooks
 - Annotation-based HTTP request handling
@@ -16,7 +19,166 @@ An intuitive Java backend framework to quickly develop REST APIs. Features:
 - HTTP Authentication and Authorization
 - Database operations
 
-> While this project is still in its 1.0-SNAPSHOT version, please feel free to give feedback on the current state of it [here](https://forms.gle/8hzAeV2Ae1p9ksYcA).
+Below are some simple code snippets to get you a quick look into some of the main features of Quak:
+
+### Simple Hello World Controller Application
+
+```java
+package io.john.amiscaray.test.controllers;
+
+import io.john.amiscaray.quak.http.request.Request;
+import io.john.amiscaray.quak.http.request.RequestMethod;
+import io.john.amiscaray.quak.http.response.Response;
+import io.john.amiscaray.quak.web.controller.annotation.Controller;
+import io.john.amiscaray.quak.web.handler.annotation.Handle;
+
+@Controller
+public class HelloWorldController {
+
+    @Handle(path="/greeting", method = RequestMethod.GET)
+    public Response<String> greet(Request<Void> request) {
+        return Response.of("Hello World!");
+    }
+
+}
+```
+
+```java
+package io.john.amiscaray.test;
+
+import io.john.amiscaray.quak.web.application.WebStarter;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+
+public class Main {
+    public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
+        var application = WebStarter.beginWebApplication(Main.class, args)
+                .get(10, TimeUnit.SECONDS);
+
+        application.await();
+    }
+}
+```
+
+### Data Querying
+
+```java
+package io.john.amiscaray.quak.data.test.stub;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.*;
+
+@Entity
+@Getter
+@NoArgsConstructor
+@ToString
+@EqualsAndHashCode
+@AllArgsConstructor
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+    private String name;
+    private String department;
+    private Long salary;
+
+    public Employee(Long id, String name, String department) {
+        this(name, department, 40000L);
+        this.id = id;
+    }
+
+    public Employee(String name, String department, Long salary) {
+        this.name = name;
+        this.department = department;
+        this.salary = salary;
+    }
+
+    public Employee(String name, String department) {
+        this(name, department, 40000L);
+    }
+}
+```
+
+```java
+package io.john.amiscaray.test.data;
+
+import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
+import io.john.amiscaray.quak.core.di.provider.annotation.ManagedType;
+import io.john.amiscaray.quak.data.DatabaseProxy;
+import io.john.amiscaray.quak.data.query.DatabaseQuery;
+import io.john.amiscaray.test.orm.Employee;
+
+import java.util.List;
+
+import static io.john.amiscaray.quak.data.query.QueryCriteria.*;
+
+@ManagedType
+public class EmployeeRepository {
+
+    private DatabaseProxy databaseProxy;
+
+    @Instantiate
+    public EmployeeRepository(DatabaseProxy databaseProxy) {
+        this.databaseProxy = databaseProxy;
+    }
+
+    public List<Employee> queryEmployeesWithIDsLessThanOrEqualTo2AndGreaterThanOrEqualTo4() {
+        return databaseProxy.queryAll(Employee.class, DatabaseQuery
+                .builder()
+                .withCriteria(valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))))
+                .build());
+    }
+}
+```
+
+### Configure CORS And JWT Auth
+
+```java
+package io.john.amiscaray.test.security.di;
+
+import io.john.amiscaray.quak.core.di.provider.annotation.Provide;
+import io.john.amiscaray.quak.core.di.provider.annotation.Provider;
+import io.john.amiscaray.quak.security.auth.principal.role.Role;
+import io.john.amiscaray.quak.security.config.CORSConfig;
+import io.john.amiscaray.quak.security.config.EndpointMapping;
+import io.john.amiscaray.quak.security.config.SecurityConfig;
+import io.john.amiscaray.quak.security.di.AuthenticationStrategy;
+import io.john.amiscaray.quak.security.di.SecurityDependencyIDs;
+
+import java.time.Duration;
+import java.util.List;
+
+@Provider
+public class SecurityConfigProvider2 {
+
+    @Provide(dependencyName = SecurityDependencyIDs.SECURITY_CONFIG_DEPENDENCY_NAME)
+    public SecurityConfig securityConfig() {
+        return SecurityConfig.builder()
+                .securePathWithCorsConfig(
+                        "/*",
+                        CORSConfig.builder()
+                                .allowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"))
+                                .allowOrigin("http://127.0.0.1:5500")
+                                .allowAllHeaders(true)
+                                .build()
+                )
+                .authenticationStrategy(AuthenticationStrategy.JWT)
+                .securePathWithRole(new EndpointMapping("/*", List.of(EndpointMapping.RequestMethodMatcher.ALL)), List.of(Role.any()))
+                .jwtSecretExpiryTime(Duration.ofHours(10).toMillis())
+                .jwtSecretKey(System.getenv("JWT_SECRET"))
+                .build();
+    }
+
+}
+```
+
+A full sample application can be found in [this repository](https://github.com/john-amiscaray/QuakExample).
 
 ## Quak Modules Overview
 
