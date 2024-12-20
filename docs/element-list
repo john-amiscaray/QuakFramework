@@ -5,6 +5,7 @@ io.john.amiscaray.quak.core.di.dependency
 io.john.amiscaray.quak.core.di.exception
 io.john.amiscaray.quak.core.di.provider
 io.john.amiscaray.quak.core.di.provider.annotation
+io.john.amiscaray.quak.core.exception
 io.john.amiscaray.quak.core.properties
 module:quak.framework.data
 io.john.amiscaray.quak.data
