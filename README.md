@@ -178,6 +178,8 @@ public class SecurityConfigProvider2 {
 }
 ```
 
+A full sample application can be found in [this repository](https://github.com/john-amiscaray/QuakExample).
+
 ## Quak Modules Overview
 
 Quak Framework is split into different modules depending on the needs of your application. The following is a table of each of the modules and their usage:
