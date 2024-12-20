@@ -16,7 +16,6 @@ public class ApplicationTest {
     @BeforeEach
     void setUp() {
         application = new DummyApplication(ApplicationTest.class, new String[0]);
-
         setUpListeners(application);
     }
 
