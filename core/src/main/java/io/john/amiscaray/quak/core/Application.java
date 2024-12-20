@@ -1,5 +1,6 @@
 package io.john.amiscaray.quak.core;
 
+import io.john.amiscaray.quak.core.exception.MissingApplicationPropertiesException;
 import io.john.amiscaray.quak.core.properties.ApplicationProperties;
 import io.john.amiscaray.quak.core.di.ApplicationContext;
 import io.john.amiscaray.quak.core.di.exception.ContextInitializationException;
@@ -97,6 +98,9 @@ public abstract class Application {
     }
 
     private void initProperties() {
+        if (main.getResource("/application.properties") == null) {
+            throw new MissingApplicationPropertiesException();
+        }
         try (var propertiesFileInputStream = main.getResourceAsStream("/application.properties")) {
             var applicationProperties = ApplicationProperties.getInstance();
             var propertiesFromFile = new Properties();
