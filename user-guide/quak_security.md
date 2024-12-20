@@ -29,3 +29,200 @@ To enforce authentication for URL paths, you can configure roles for accessing f
 ## Configuring CORS
 
 To configure CORS for your URL paths, you can use the `SecurityConfig`'s `pathCorsConfigMap` map. This map has URL paths as keys and `io.john.amiscaray.quak.security.config.CORSConfig` instances as values.
+
+## Example Setup
+
+### Authenticator
+
+```java
+package io.john.amiscaray.test.security;
+
+import io.john.amiscaray.quak.core.di.provider.annotation.ManagedType;
+import io.john.amiscaray.quak.security.auth.Authenticator;
+import io.john.amiscaray.quak.security.auth.credentials.Credentials;
+import io.john.amiscaray.quak.security.auth.principal.Principal;
+import io.john.amiscaray.quak.security.auth.principal.RoleAttachedPrincipal;
+import io.john.amiscaray.quak.security.auth.principal.role.Role;
+import io.john.amiscaray.quak.security.di.SecurityDependencyIDs;
+import io.john.amiscaray.test.security.roles.Roles;
+
+import java.time.Duration;
+import java.util.Optional;
+
+@ManagedType(dependencyName = SecurityDependencyIDs.AUTHENTICATOR_DEPENDENCY_NAME)
+public class SimpleAuthenticator implements Authenticator {
+
+    private static final RoleAttachedPrincipal JOHN = new RoleAttachedPrincipal() {
+        @Override
+        public Role[] getRoles() {
+            return new Role[] { Roles.user() };
+        }
+
+        @Override
+        public String getSecurityID() {
+            return "Johnny Boy";
+        }
+    };
+
+    private static final RoleAttachedPrincipal ELLI = new RoleAttachedPrincipal() {
+        @Override
+        public Role[] getRoles() {
+            return new Role[] { Roles.admin() };
+        }
+
+        @Override
+        public String getSecurityID() {
+            return "Elli";
+        }
+    };
+
+    @Override
+    public Optional<Principal> lookupPrincipal(String s) {
+        if (s.equals(JOHN.getSecurityID())) {
+            return Optional.of(JOHN);
+        } else if (s.equals(ELLI.getSecurityID())) {
+            return Optional.of(ELLI);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Principal> lookupPrincipal(Credentials credentials) {
+        if (credentials.getUsername().equals("John") && credentials.getPassword().equals("password")) {
+            return Optional.of(JOHN);
+        } else if (credentials.getUsername().equals("Elli") && credentials.getPassword().equals("password")) {
+            return Optional.of(ELLI);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Duration getAuthenticationValidDuration() {
+        return Duration.ofDays(30);
+    }
+
+}
+```
+
+### Roles
+
+```java
+package io.john.amiscaray.test.security.roles;
+
+import io.john.amiscaray.quak.security.auth.principal.role.Role;
+
+public class Roles {
+
+    public static Role user() {
+        return () -> "USER";
+    }
+
+    public static Role admin() {
+        return () -> "ADMIN";
+    }
+
+}
+```
+
+### Security Config
+
+```java
+package io.john.amiscaray.test.security.di;
+
+
+import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
+import io.john.amiscaray.quak.core.di.provider.annotation.Provide;
+import io.john.amiscaray.quak.core.di.provider.annotation.ProvidedWith;
+import io.john.amiscaray.quak.core.di.provider.annotation.Provider;
+import io.john.amiscaray.quak.security.config.CORSConfig;
+import io.john.amiscaray.quak.security.config.EndpointMapping;
+import io.john.amiscaray.quak.security.config.SecurityConfig;
+import io.john.amiscaray.quak.security.di.AuthenticationStrategy;
+import io.john.amiscaray.quak.security.di.SecurityDependencyIDs;
+import io.john.amiscaray.test.security.roles.Roles;
+
+import java.time.Duration;
+import java.util.List;
+
+@Provider
+public class SecurityConfigProvider {
+
+    private final String jwtSecret;
+
+    @Instantiate
+    public SecurityConfigProvider(@ProvidedWith(dependencyName = "jwt") String jwtSecret) {
+        this.jwtSecret = jwtSecret;
+    }
+
+    @Provide(dependencyName = SecurityDependencyIDs.SECURITY_CONFIG_DEPENDENCY_NAME)
+    public SecurityConfig securityConfig() {
+        return SecurityConfig.builder()
+                .securePathWithRole(new EndpointMapping("/studentdto/*", List.of(EndpointMapping.RequestMethodMatcher.ANY_MODIFYING)), List.of(Roles.admin()))
+                .securePathWithCorsConfig("/*", CORSConfig.builder()
+                        .allowOrigin("http://127.0.0.1:5500")
+                        .allowMethod("GET")
+                        .build())
+                .authenticationStrategy(AuthenticationStrategy.JWT)
+                .jwtSecretKey(jwtSecret)
+                .jwtSecretExpiryTime(Duration.ofHours(10).toMillis())
+                .build();
+    }
+
+}
+```
+
+### JWT Issuer Controller
+
+```java
+package io.john.amiscaray.test.controllers;
+
+import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
+import io.john.amiscaray.quak.http.request.Request;
+import io.john.amiscaray.quak.http.request.RequestMethod;
+import io.john.amiscaray.quak.http.response.Response;
+import io.john.amiscaray.quak.security.auth.Authenticator;
+import io.john.amiscaray.quak.security.auth.credentials.Credentials;
+import io.john.amiscaray.quak.security.auth.exception.InvalidCredentialsException;
+import io.john.amiscaray.quak.security.auth.jwt.JwtUtil;
+import io.john.amiscaray.quak.web.controller.annotation.Controller;
+import io.john.amiscaray.quak.web.handler.annotation.Handle;
+import io.john.amiscaray.test.models.LoginRequestBody;
+
+@Controller
+public class JWTIssuerController {
+
+    private JwtUtil jwtUtil;
+    private Authenticator authenticator;
+
+    @Instantiate
+    public JWTIssuerController(JwtUtil jwtUtil, Authenticator authenticator) {
+        this.jwtUtil = jwtUtil;
+        this.authenticator = authenticator;
+    }
+
+    @Handle(path="/login", method = RequestMethod.POST)
+    public Response<String> login(Request<LoginRequestBody> request) {
+        var requestBody = request.body();
+        var credentials = new Credentials() {
+            @Override
+            public String getUsername() {
+                return requestBody.username();
+            }
+
+            @Override
+            public String getPassword() {
+                return requestBody.password();
+            }
+        };
+
+        try {
+            var authentication = authenticator.authenticate(credentials);
+            var jwt = jwtUtil.generateToken(authentication.getIssuedTo());
+            return Response.of(jwt);
+        } catch (InvalidCredentialsException e) {
+            return new Response<>(401, "Invalid credentials");
+        }
+    }
+
+}
+```
