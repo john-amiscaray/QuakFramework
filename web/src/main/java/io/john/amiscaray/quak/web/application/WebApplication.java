@@ -184,6 +184,9 @@ public class WebApplication extends Application {
 
     private void addCORSFilter() {
         var corsFilter = applicationContext.getInstance(new DependencyID<>(SecurityDependencyIDs.CORS_FILTER_DEPENDENCY_NAME, CORSFilter.class));
+        if (corsFilter == null) {
+            return;
+        }
 
         var filterDef = new FilterDef();
         filterDef.setFilterName(SecurityDependencyIDs.CORS_FILTER_DEPENDENCY_NAME);
