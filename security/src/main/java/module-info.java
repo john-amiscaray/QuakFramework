@@ -1,6 +1,7 @@
 import io.john.amiscaray.quak.core.di.provider.DependencyProvider;
 import io.john.amiscaray.quak.security.di.AuthenticationFilterProvider;
 import io.john.amiscaray.quak.security.di.CORSFilterProvider;
+import io.john.amiscaray.quak.security.di.JWTUtilProvider;
 
 module quak.framework.security {
     exports io.john.amiscaray.quak.security.auth.filter;
@@ -19,5 +20,5 @@ module quak.framework.security {
     requires org.apache.tomcat.embed.core;
     requires com.auth0.jwt;
 
-    provides DependencyProvider with AuthenticationFilterProvider, CORSFilterProvider;
+    provides DependencyProvider with AuthenticationFilterProvider, CORSFilterProvider, JWTUtilProvider;
 }
