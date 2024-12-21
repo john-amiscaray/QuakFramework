@@ -17,4 +17,9 @@ public @interface ManagedType {
      */
     String dependencyName() default "";
 
+    /**
+     * @return The type to use for the dependency ID when stored in the application context
+     */
+    Class<?> dependencyType() default Void.class;
+
 }
