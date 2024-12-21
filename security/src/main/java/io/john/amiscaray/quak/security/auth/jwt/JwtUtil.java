@@ -5,7 +5,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.auth0.jwt.interfaces.JWTVerifier;
 import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
-import io.john.amiscaray.quak.core.di.provider.annotation.ManagedType;
 import io.john.amiscaray.quak.security.auth.principal.Principal;
 import io.john.amiscaray.quak.security.config.SecurityConfig;
 
@@ -14,7 +13,6 @@ import java.util.Date;
 /**
  * Used to manage and produce JWTs
  */
-@ManagedType
 public class JwtUtil {
 
     private final String secretKey;
