@@ -236,6 +236,13 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    /**
+     * Deletes all entities from the database matching a given query.
+     *
+     * @param <T>              The type of the entity.
+     * @param entityType       The type of the entity.
+     * @param criteria         Query criteria for the deletion.
+     */
     public <T> void deleteAllWhere(Class<T> entityType, QueryCriteria criteria) {
         deleteAll(entityType, new DatabaseQuery(List.of(criteria)));
     }
@@ -263,6 +270,18 @@ public class DatabaseProxy {
 
         currentSession.createMutationQuery(update).executeUpdate();
         transaction.commit();
+    }
+
+    /**
+     * Updates all entities from the database matching some update criteria.
+     * @param entityType The type of the entity.
+     * @param queryCriteria The query criteria to select rows to update.
+     * @param fieldUpdate The updates made to the field.
+     * @param <T> The type of the entity.
+     * @param <F> The type of the field being updated.
+     */
+    public final <T, F> void updateAllWhereAndApply(Class<T> entityType, QueryCriteria queryCriteria, FieldUpdate<F> fieldUpdate) {
+        updateAll(entityType, new DatabaseQuery(List.of(queryCriteria)), fieldUpdate);
     }
 
     /**

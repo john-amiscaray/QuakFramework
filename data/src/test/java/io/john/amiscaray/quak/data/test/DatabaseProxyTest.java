@@ -410,6 +410,24 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testUpdateEmployeesInCorporateDepartmentToDoubleSalaryUsingUpdateAllWhereAndApply() throws SQLException {
+        dbProxy.updateAllWhereAndApply(
+                Employee.class,
+                valueOfField("department", is("Corporate")),
+                FieldUpdate.<Number>builder("salary")
+                        .apply(multiply(2))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 80000L),
+                new Employee(5L, "Jeff", "Corporate", 80000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
     void testUpdateEmployeesInTechDepartmentToHalveSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 DatabaseQuery.builder()
@@ -423,6 +441,44 @@ public class DatabaseProxyTest {
                 new Employee(1L, "Billy", "Tech", 20000L),
                 new Employee(2L, "Elli", "Tech", 20000L),
                 new Employee(3L, "John", "Tech", 20000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeesInTechDepartmentToHalveSalaryAndAdd2000UsingUpdateAllWhereAndApply() throws SQLException {
+        dbProxy.updateAllWhereAndApply(
+                Employee.class,
+                valueOfField("department", is("Tech")),
+                FieldUpdate.<Number>builder("salary")
+                        .apply(divide(2))
+                        .apply(add(2000))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 22000L),
+                new Employee(2L, "Elli", "Tech", 22000L),
+                new Employee(3L, "John", "Tech", 22000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeesInTechDepartmentToAdd2000AndHalveSalaryUsingUpdateAllWhereAndApply() throws SQLException {
+        dbProxy.updateAllWhereAndApply(
+                Employee.class,
+                valueOfField("department", is("Tech")),
+                FieldUpdate.<Number>builder("salary")
+                        .apply(add(2000))
+                        .apply(divide(2))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 21000L),
+                new Employee(2L, "Elli", "Tech", 21000L),
+                new Employee(3L, "John", "Tech", 21000L),
                 new Employee(4L, "Annie", "Corporate", 40000L),
                 new Employee(5L, "Jeff", "Corporate", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
