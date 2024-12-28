@@ -204,6 +204,17 @@ public class DatabaseProxy {
     }
 
     /**
+     * Retrieves all entities of a given type from the database which match a given query.
+     * @param entityType The type of the entity.
+     * @param criteria The query to filter entities using.
+     * @return A list of all the entities.
+     * @param <T> The type of the entity.
+     */
+    public <T> List<T> queryAllWhere(Class<T> entityType, QueryCriteria criteria) {
+        return queryAll(entityType, new DatabaseQuery(List.of(criteria)));
+    }
+
+    /**
      * Deletes all entities from the database matching a given query.
      * @param deletionCriteria A database query for the deletion criteria.
      * @param entityType The type of the entity.

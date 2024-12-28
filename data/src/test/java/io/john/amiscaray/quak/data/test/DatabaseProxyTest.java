@@ -112,10 +112,21 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIdsBetween2And4() {
+    void testEmployeeCanBeQueriedByIDsBetween2And4() {
         var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(valueOfField("id", isBetween(2, 4)))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedByIDsBetween2And4UsingQueryCriteriaArg() {
+        var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", isBetween(2, 4)));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -130,6 +141,17 @@ public class DatabaseProxyTest {
                 .builder()
                 .withCriteria(valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryCriteriaArg() {
+        var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -157,6 +179,20 @@ public class DatabaseProxyTest {
                         isLessThanOrEqualTo(4)
                 )))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedUsingAllOfIDGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryCriteriaArg() {
+        var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", matchesAllOf(
+                        isGreaterThanOrEqualTo(2),
+                        isLessThanOrEqualTo(4)
+                )));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
