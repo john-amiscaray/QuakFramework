@@ -377,6 +377,22 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testUpdateEmployeeWithDepartmentTechToTechnologyUsingUpdateAllWhereAndSetTo() throws SQLException {
+        dbProxy.updateAllWhereAndSetTo(Employee.class,
+                "department",
+                    valueOfField("department", is("Tech")),
+                "Technology");
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Technology"),
+                new Employee(2L, "Elli", "Technology"),
+                new Employee(3L, "John", "Technology"),
+                new Employee(4L, "Annie", "Corporate"),
+                new Employee(5L, "Jeff", "Corporate")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
     void testUpdateEmployeeNamedJohnToJohnnyUsingPutMethod() throws SQLException {
         var isUpdate = dbProxy.put(new Employee(3L, "Johnny", "Tech"), 3L, Employee.class);
 
@@ -605,6 +621,22 @@ public class DatabaseProxyTest {
                         .withCriteria(valueOfField("id", isGreaterThan(2)))
                         .withCriteria(valueOfField("department", is("Corporate")))
                         .build(),
+                "Executive");
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Executive", 40000L),
+                new Employee(5L, "Jeff", "Executive", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateEmployeeWithIdGreaterThan2AndDepartmentIsCorporateToHaveDepartmentAsExecutiveUsingUpdateAllWhereAndSetTo() throws SQLException {
+        dbProxy.updateAllWhereAndSetTo(Employee.class,
+                "department",
+                        valueOfField("id", isGreaterThan(2)).and(valueOfField("department", is("Corporate"))),
                 "Executive");
 
         assertEquals(List.of(

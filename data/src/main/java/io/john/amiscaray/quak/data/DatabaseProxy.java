@@ -309,6 +309,19 @@ public class DatabaseProxy {
     }
 
     /**
+     * Updates entities based on a given criteria to a new value.
+     * @param entityType The type of the entity.
+     * @param fieldToUpdate The field to update.
+     * @param updateCriteria The query criteria to select fields for the update.
+     * @param newValue The new value to set to the field.
+     * @param <T> The type of the entity.
+     * @param <V> The type of the field.
+     */
+    public <T, V> void updateAllWhereAndSetTo(Class<T> entityType, String fieldToUpdate, QueryCriteria updateCriteria, V newValue) {
+        updateAll(entityType, fieldToUpdate, new DatabaseQuery(List.of(updateCriteria)), newValue);
+    }
+
+    /**
      * Updates all entities of the same type with a new value.
      * @param entityType The type of the entity.
      * @param fieldToUpdate The field to update.
