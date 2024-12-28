@@ -40,15 +40,12 @@ public class Test {
     }
 
     public List<Employee> fetchEmployeesNamedJohn() {
-        return dbProxy.queryAll(
-                Employee.class, DatabaseQuery.builder()
-                        .withCriteria(valueOfField("name", is("John")))
-                        .build());
+        return dbProxy.queryAllWhere(Employee.class, valueOfField("name", is("John")));
     }
     
 }
 ```
-In the example above, `DatabaseProxy#queryAll` method accepts the type of the database entity being querying along with an instance of `io.john.amiscaray.quak.data.query.DatabaseQuery`. `DatabaseQuery` is a record wrapping a list of `io.john.amiscaray.quak.data.query.QueryCriteria` implementations. It has a builder class associated with it used to add criteria to it using the `DatabaseQueryBuilder#withCriteria` method. Next, the `QueryCriteria` interface is used to define criteria for the query (basically the equivalent of conditions in the _WHERE_ clause in an SQL _SELECT_ statement). The interface contains various static utility methods to help you create implementations of this interface semantically. In the example above, the expression `valueOfField("name", is("John"))` returns a `io.john.amiscaray.quak.data.query.QueryCriteria`. This query criteria checks that the value of the name column is _"John"_. If you look at the second argument we passed to this function (the expression `is("John")`), that expression returns an implementation of `io.john.amiscaray.quak.data.query.QueryCriteria provider`. This interface has a single method which returns a `QueryCriteria` given the name of a field. Essentially, the `valueOf` method accepts the name of the field and a `QueryCriteriaProvider` to pass that field name to to create our `QueryCriteria`. `QueryCriteria` provides various other static methods for `QueryCriteriaProvider`s you can pass to this method. Below, you'll find more example queries you can make with this API:
+In the example above, `DatabaseProxy#queryAllWhere` method accepts the type of the database entity being querying along with an instance of `io.john.amiscaray.quak.data.query.QueryCriteria`. The `QueryCriteria` interface is used to define criteria for the query (basically the equivalent of conditions in the _WHERE_ clause in an SQL _SELECT_ statement). The interface contains various static utility methods to help you create implementations of this interface semantically. In the example above, the expression `valueOfField("name", is("John"))` returns a `io.john.amiscaray.quak.data.query.QueryCriteria`. This query criteria checks that the value of the _name_ column is _"John"_. If you look at the second argument we passed to this function (the expression `is("John")`), that expression returns an implementation of `io.john.amiscaray.quak.data.query.QueryCriteriaProvider`. This interface has a single method which returns a `QueryCriteria` given the name of a field. Essentially, the `valueOf` method accepts the name of the field and a `QueryCriteriaProvider` to pass that field name to create our `QueryCriteria`. `QueryCriteria` provides various other static methods for `QueryCriteriaProvider`s you can pass to this method. Below, you'll find more example queries you can make with this API:
 
 ```java
 import io.john.amiscaray.quak.core.di.provider.annotation.Instantiate;
@@ -69,34 +66,21 @@ public class Test {
     }
 
     public List<Employee> fetchEmployeesNamedJohn() {
-        return dbProxy.queryAll(
-                Employee.class, DatabaseQuery.builder()
-                        .withCriteria(valueOfField("name", is("John")))
-                        .build());
+        return dbProxy.queryAllWhere(Employee.class, valueOfField("name", is("John")));
     }
     
     public List<Employee> fetchEmployeesWithIDBetween2And10() {
-        return dbProxy.queryAll(
-                Employee.class, DatabaseQuery.builder()
-                        .withCriteria(valueOfField("id", isBetween(2, 10))) // inBetween is inclusive of the min and max
-                        .build());
+        return dbProxy.queryAllWhere(Employee.class, valueOfField("id", isBetween(2, 10))); // inBetween is inclusive of the min and max
     }
     
     public List<Employee> fetchEmployeesWithIDGreaterThanOrEqualTo2AndLessThanOrEqualTo4() {
-        return dbProxy.queryAll(Employee.class, DatabaseQuery
-                .builder()
-                .withCriteria(valueOfField("id", matchesAllOf(
+        return dbProxy.queryAllWhere(Employee.class, matchesAllOf(
                         isGreaterThanOrEqualTo(2),
-                        isLessThanOrEqualTo(4)
-                )))
-                .build());
+                        isLessThanOrEqualTo(4)));
     }
 
     public List<Employee> fetchEmployeesWithNameContainingN() {
-        return dbProxy.queryAll(
-                Employee.class, DatabaseQuery.builder()
-                        .withCriteria(valueOfField("name", contains("n")))
-                        .build());
+        return dbProxy.queryAllWhere(Employee.class, valueOfField("name", contains("n")));
     }
     
 }
@@ -130,11 +114,9 @@ public class Test {
     }
     
     public void updateEmployeesWithDepartmentTechToDepartmentTechnology() {
-        dbProxy.updateAll(Employee.class,
-                "department",
-                DatabaseQuery.builder()
-                        .withCriteria(valueOfField("department", is("Tech")))
-                        .build(),
+        dbProxy.updateAllWhereAndSetTo(Employee.class,
+                "department", 
+                valueOfField("department", is("Tech")),
                 "Technology");
     }
 
@@ -163,11 +145,9 @@ public class Test {
     }
     
     public void updateEmployeesWithDepartmentTechToDepartmentTechnology() {
-        dbProxy.updateAll(Employee.class,
+        dbProxy.updateAllWhereAndSetTo(Employee.class,
                 "department",
-                DatabaseQuery.builder()
-                        .withCriteria(valueOfField("department", is("Tech")))
-                        .build(),
+                valueOfField("department", is("Tech")),
                 "Technology");
     }
     
