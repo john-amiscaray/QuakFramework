@@ -313,9 +313,9 @@ public class DatabaseProxyTest {
 
     @Test
     void testDeleteEmployeeWithDepartmentCorporate() throws SQLException {
-        dbProxy.deleteAll(DatabaseQuery.builder()
+        dbProxy.deleteAll(Employee.class, DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Corporate")))
-                        .build(), Employee.class);
+                        .build());
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech"),
@@ -326,10 +326,10 @@ public class DatabaseProxyTest {
 
     @Test
     void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException {
-        dbProxy.deleteAll(DatabaseQuery.builder()
+        dbProxy.deleteAll(Employee.class, DatabaseQuery.builder()
                         .withCriteria(valueOfField("id", isLessThan(2))
                                 .or(valueOfField("id", isGreaterThan(3))))
-                .build(), Employee.class);
+                .build());
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),

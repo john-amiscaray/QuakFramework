@@ -216,11 +216,12 @@ public class DatabaseProxy {
 
     /**
      * Deletes all entities from the database matching a given query.
+     *
+     * @param <T>              The type of the entity.
+     * @param entityType       The type of the entity.
      * @param deletionCriteria A database query for the deletion criteria.
-     * @param entityType The type of the entity.
-     * @param <T> The type of the entity.
      */
-    public <T> void deleteAll(DatabaseQuery deletionCriteria, Class<T> entityType) {
+    public <T> void deleteAll(Class<T> entityType, DatabaseQuery deletionCriteria) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         CriteriaBuilder cb = currentSession.getCriteriaBuilder();
