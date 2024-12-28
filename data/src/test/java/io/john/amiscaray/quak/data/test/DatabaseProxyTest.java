@@ -125,7 +125,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIDsBetween2And4UsingQueryCriteriaArg() {
+    void testEmployeeCanBeQueriedByIDsBetween2And4UsingQueryAllWhere() {
         var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", isBetween(2, 4)));
 
         assertEquals(List.of(
@@ -150,7 +150,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryCriteriaArg() {
+    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryAllWhere() {
         var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))));
 
         assertEquals(List.of(
@@ -188,7 +188,7 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedUsingAllOfIDGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryCriteriaArg() {
+    void testEmployeeCanBeQueriedUsingAllOfIDGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryAllWhere() {
         var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", matchesAllOf(
                         isGreaterThanOrEqualTo(2),
                         isLessThanOrEqualTo(4)
@@ -325,11 +325,32 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testDeleteEmployeeWithDepartmentCorporateUsingDeleteAllWhere() throws SQLException {
+        dbProxy.deleteAllWhere(Employee.class, valueOfField("department", is("Corporate")));
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech"),
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
     void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException {
         dbProxy.deleteAll(Employee.class, DatabaseQuery.builder()
                         .withCriteria(valueOfField("id", isLessThan(2))
                                 .or(valueOfField("id", isGreaterThan(3))))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testDeleteEmployeeWithIdsLessThan2orGreaterThan3UsingDeleteAllWhere() throws SQLException {
+        dbProxy.deleteAllWhere(Employee.class, valueOfField("id", isLessThan(2)).or(valueOfField("id", isGreaterThan(3))));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),

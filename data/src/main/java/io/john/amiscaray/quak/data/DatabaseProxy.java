@@ -236,6 +236,10 @@ public class DatabaseProxy {
         transaction.commit();
     }
 
+    public <T> void deleteAllWhere(Class<T> entityType, QueryCriteria criteria) {
+        deleteAll(entityType, new DatabaseQuery(List.of(criteria)));
+    }
+
     /**
      * Updates all entities from the database matching some update criteria.
      * @param entityType The type of the entity.
