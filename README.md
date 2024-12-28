@@ -129,10 +129,7 @@ public class EmployeeRepository {
     }
 
     public List<Employee> queryEmployeesWithIDsLessThanOrEqualTo2AndGreaterThanOrEqualTo4() {
-        return databaseProxy.queryAll(Employee.class, DatabaseQuery
-                .builder()
-                .withCriteria(valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))))
-                .build());
+        return databaseProxy.queryAllWhere(Employee.class, valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))));
     }
 }
 ```
