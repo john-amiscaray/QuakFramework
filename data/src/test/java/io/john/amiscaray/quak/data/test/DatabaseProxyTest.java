@@ -112,10 +112,21 @@ public class DatabaseProxyTest {
     }
 
     @Test
-    void testEmployeeCanBeQueriedByIdsBetween2And4() {
+    void testEmployeeCanBeQueriedByIDsBetween2And4() {
         var fetchedEmployees = dbProxy.queryAll(Employee.class, DatabaseQuery.builder()
                 .withCriteria(valueOfField("id", isBetween(2, 4)))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedByIDsBetween2And4UsingQueryAllWhere() {
+        var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", isBetween(2, 4)));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -130,6 +141,17 @@ public class DatabaseProxyTest {
                 .builder()
                 .withCriteria(valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedByIdsGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryAllWhere() {
+        var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", isGreaterThanOrEqualTo(2)).and(valueOfField("id", isLessThanOrEqualTo(4))));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -157,6 +179,20 @@ public class DatabaseProxyTest {
                         isLessThanOrEqualTo(4)
                 )))
                 .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech"),
+                new Employee(4L, "Annie", "Corporate")
+        ), fetchedEmployees);
+    }
+
+    @Test
+    void testEmployeeCanBeQueriedUsingAllOfIDGreaterThanOrEqualTo2AndLessThanOrEqualTo4UsingQueryAllWhere() {
+        var fetchedEmployees = dbProxy.queryAllWhere(Employee.class, valueOfField("id", matchesAllOf(
+                        isGreaterThanOrEqualTo(2),
+                        isLessThanOrEqualTo(4)
+                )));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -277,9 +313,20 @@ public class DatabaseProxyTest {
 
     @Test
     void testDeleteEmployeeWithDepartmentCorporate() throws SQLException {
-        dbProxy.deleteAll(DatabaseQuery.builder()
+        dbProxy.deleteAll(Employee.class, DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Corporate")))
-                        .build(), Employee.class);
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech"),
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testDeleteEmployeeWithDepartmentCorporateUsingDeleteAllWhere() throws SQLException {
+        dbProxy.deleteAllWhere(Employee.class, valueOfField("department", is("Corporate")));
 
         assertEquals(List.of(
                 new Employee(1L, "Billy", "Tech"),
@@ -290,10 +337,20 @@ public class DatabaseProxyTest {
 
     @Test
     void testDeleteEmployeeWithIdsLessThan2orGreaterThan3() throws SQLException {
-        dbProxy.deleteAll(DatabaseQuery.builder()
+        dbProxy.deleteAll(Employee.class, DatabaseQuery.builder()
                         .withCriteria(valueOfField("id", isLessThan(2))
                                 .or(valueOfField("id", isGreaterThan(3))))
-                .build(), Employee.class);
+                .build());
+
+        assertEquals(List.of(
+                new Employee(2L, "Elli", "Tech"),
+                new Employee(3L, "John", "Tech")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testDeleteEmployeeWithIdsLessThan2orGreaterThan3UsingDeleteAllWhere() throws SQLException {
+        dbProxy.deleteAllWhere(Employee.class, valueOfField("id", isLessThan(2)).or(valueOfField("id", isGreaterThan(3))));
 
         assertEquals(List.of(
                 new Employee(2L, "Elli", "Tech"),
@@ -308,6 +365,22 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Tech")))
                         .build(),
+                "Technology");
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Technology"),
+                new Employee(2L, "Elli", "Technology"),
+                new Employee(3L, "John", "Technology"),
+                new Employee(4L, "Annie", "Corporate"),
+                new Employee(5L, "Jeff", "Corporate")
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeeWithDepartmentTechToTechnologyUsingUpdateAllWhereAndSetTo() throws SQLException {
+        dbProxy.updateAllWhereAndSetTo(Employee.class,
+                "department",
+                    valueOfField("department", is("Tech")),
                 "Technology");
 
         assertEquals(List.of(
@@ -353,6 +426,24 @@ public class DatabaseProxyTest {
     }
 
     @Test
+    void testUpdateEmployeesInCorporateDepartmentToDoubleSalaryUsingUpdateAllWhereAndApply() throws SQLException {
+        dbProxy.updateAllWhereAndApply(
+                Employee.class,
+                valueOfField("department", is("Corporate")),
+                FieldUpdate.<Number>builder("salary")
+                        .apply(multiply(2))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Corporate", 80000L),
+                new Employee(5L, "Jeff", "Corporate", 80000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
     void testUpdateEmployeesInTechDepartmentToHalveSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
                 DatabaseQuery.builder()
@@ -366,6 +457,44 @@ public class DatabaseProxyTest {
                 new Employee(1L, "Billy", "Tech", 20000L),
                 new Employee(2L, "Elli", "Tech", 20000L),
                 new Employee(3L, "John", "Tech", 20000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeesInTechDepartmentToHalveSalaryAndAdd2000UsingUpdateAllWhereAndApply() throws SQLException {
+        dbProxy.updateAllWhereAndApply(
+                Employee.class,
+                valueOfField("department", is("Tech")),
+                FieldUpdate.<Number>builder("salary")
+                        .apply(divide(2))
+                        .apply(add(2000))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 22000L),
+                new Employee(2L, "Elli", "Tech", 22000L),
+                new Employee(3L, "John", "Tech", 22000L),
+                new Employee(4L, "Annie", "Corporate", 40000L),
+                new Employee(5L, "Jeff", "Corporate", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    void testUpdateEmployeesInTechDepartmentToAdd2000AndHalveSalaryUsingUpdateAllWhereAndApply() throws SQLException {
+        dbProxy.updateAllWhereAndApply(
+                Employee.class,
+                valueOfField("department", is("Tech")),
+                FieldUpdate.<Number>builder("salary")
+                        .apply(add(2000))
+                        .apply(divide(2))
+                        .build());
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 21000L),
+                new Employee(2L, "Elli", "Tech", 21000L),
+                new Employee(3L, "John", "Tech", 21000L),
                 new Employee(4L, "Annie", "Corporate", 40000L),
                 new Employee(5L, "Jeff", "Corporate", 40000L)
         ), testDBConnector.queryEntries("SELECT * FROM employee"));
@@ -492,6 +621,22 @@ public class DatabaseProxyTest {
                         .withCriteria(valueOfField("id", isGreaterThan(2)))
                         .withCriteria(valueOfField("department", is("Corporate")))
                         .build(),
+                "Executive");
+
+        assertEquals(List.of(
+                new Employee(1L, "Billy", "Tech", 40000L),
+                new Employee(2L, "Elli", "Tech", 40000L),
+                new Employee(3L, "John", "Tech", 40000L),
+                new Employee(4L, "Annie", "Executive", 40000L),
+                new Employee(5L, "Jeff", "Executive", 40000L)
+        ), testDBConnector.queryEntries("SELECT * FROM employee"));
+    }
+
+    @Test
+    public void testUpdateEmployeeWithIdGreaterThan2AndDepartmentIsCorporateToHaveDepartmentAsExecutiveUsingUpdateAllWhereAndSetTo() throws SQLException {
+        dbProxy.updateAllWhereAndSetTo(Employee.class,
+                "department",
+                        valueOfField("id", isGreaterThan(2)).and(valueOfField("department", is("Corporate"))),
                 "Executive");
 
         assertEquals(List.of(

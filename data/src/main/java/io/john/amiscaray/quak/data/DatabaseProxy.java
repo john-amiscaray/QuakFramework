@@ -204,12 +204,24 @@ public class DatabaseProxy {
     }
 
     /**
-     * Deletes all entities from the database matching a given query.
-     * @param deletionCriteria A database query for the deletion criteria.
+     * Retrieves all entities of a given type from the database which match a given query.
      * @param entityType The type of the entity.
+     * @param criteria The query to filter entities using.
+     * @return A list of all the entities.
      * @param <T> The type of the entity.
      */
-    public <T> void deleteAll(DatabaseQuery deletionCriteria, Class<T> entityType) {
+    public <T> List<T> queryAllWhere(Class<T> entityType, QueryCriteria criteria) {
+        return queryAll(entityType, new DatabaseQuery(List.of(criteria)));
+    }
+
+    /**
+     * Deletes all entities from the database matching a given query.
+     *
+     * @param <T>              The type of the entity.
+     * @param entityType       The type of the entity.
+     * @param deletionCriteria A database query for the deletion criteria.
+     */
+    public <T> void deleteAll(Class<T> entityType, DatabaseQuery deletionCriteria) {
         checkSessionStarted();
         var transaction = currentSession.beginTransaction();
         CriteriaBuilder cb = currentSession.getCriteriaBuilder();
@@ -222,6 +234,17 @@ public class DatabaseProxy {
 
         currentSession.createMutationQuery(delete).executeUpdate();
         transaction.commit();
+    }
+
+    /**
+     * Deletes all entities from the database matching a given query.
+     *
+     * @param <T>              The type of the entity.
+     * @param entityType       The type of the entity.
+     * @param criteria         Query criteria for the deletion.
+     */
+    public <T> void deleteAllWhere(Class<T> entityType, QueryCriteria criteria) {
+        deleteAll(entityType, new DatabaseQuery(List.of(criteria)));
     }
 
     /**
@@ -250,6 +273,18 @@ public class DatabaseProxy {
     }
 
     /**
+     * Updates all entities from the database matching some update criteria.
+     * @param entityType The type of the entity.
+     * @param queryCriteria The query criteria to select rows to update.
+     * @param fieldUpdate The updates made to the field.
+     * @param <T> The type of the entity.
+     * @param <F> The type of the field being updated.
+     */
+    public final <T, F> void updateAllWhereAndApply(Class<T> entityType, QueryCriteria queryCriteria, FieldUpdate<F> fieldUpdate) {
+        updateAll(entityType, new DatabaseQuery(List.of(queryCriteria)), fieldUpdate);
+    }
+
+    /**
      * Updates all entities of the same type.
      * @param entityType The type of the entity.
      * @param fieldUpdate The updates made to the field.
@@ -271,6 +306,19 @@ public class DatabaseProxy {
      */
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
         updateAll(entityType, updateCriteria, FieldUpdate.builder(fieldToUpdate).apply(UpdateExpression.setTo(newValue)).build());
+    }
+
+    /**
+     * Updates entities based on a given criteria to a new value.
+     * @param entityType The type of the entity.
+     * @param fieldToUpdate The field to update.
+     * @param updateCriteria The query criteria to select fields for the update.
+     * @param newValue The new value to set to the field.
+     * @param <T> The type of the entity.
+     * @param <V> The type of the field.
+     */
+    public <T, V> void updateAllWhereAndSetTo(Class<T> entityType, String fieldToUpdate, QueryCriteria updateCriteria, V newValue) {
+        updateAll(entityType, fieldToUpdate, new DatabaseQuery(List.of(updateCriteria)), newValue);
     }
 
     /**
