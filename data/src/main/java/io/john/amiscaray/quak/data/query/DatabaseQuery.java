@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A set of criteria for a database query
- * @param criteria The criteria for the entity being queried
+ * A set of criteria for a database query.
+ * @param criteria The criteria for the entity being queried. See the {@link io.john.amiscaray.quak.data.query.QueryCriteria QueryCriteria class} for more info.
  */
 public record DatabaseQuery(List<QueryCriteria> criteria) {
 

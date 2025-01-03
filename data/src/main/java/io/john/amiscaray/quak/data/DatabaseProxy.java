@@ -298,7 +298,7 @@ public class DatabaseProxy {
     /**
      * Updates entities based on a given criteria to a new value.
      * @param entityType The type of the entity.
-     * @param fieldToUpdate The field to update.
+     * @param fieldToUpdate The name of the field to update.
      * @param updateCriteria A query for the update criteria.
      * @param newValue The new value to set to the field.
      * @param <T> The type of the entity.
@@ -311,7 +311,7 @@ public class DatabaseProxy {
     /**
      * Updates entities based on a given criteria to a new value.
      * @param entityType The type of the entity.
-     * @param fieldToUpdate The field to update.
+     * @param fieldToUpdate The name of the field to update.
      * @param updateCriteria The query criteria to select fields for the update.
      * @param newValue The new value to set to the field.
      * @param <T> The type of the entity.
@@ -324,7 +324,7 @@ public class DatabaseProxy {
     /**
      * Updates all entities of the same type with a new value.
      * @param entityType The type of the entity.
-     * @param fieldToUpdate The field to update.
+     * @param fieldToUpdate The name of the field to update.
      * @param newValue The new value of the field.
      * @param <T> The type of the entity.
      * @param <V> The type of the field.
@@ -347,7 +347,13 @@ public class DatabaseProxy {
     }
 
     /**
-     * Creates a mutation query using an HQL string and runs it in a transaction.
+     * Creates a mutation query using an HQL string and runs it in a transaction. Example:<br>
+     * <pre>
+     * {@code dbProxy.createMutationQueryThen(
+     *            "UPDATE Employee e SET e.department = :newDepartment",
+     *            query -> query.setParameter("newDepartment", "Tech").executeUpdate()
+     * );}
+     * </pre>
      * @param hql The HQL query.
      * @param action A consumer of the created mutation query. Runs within the transaction.
      */
@@ -359,7 +365,19 @@ public class DatabaseProxy {
     }
 
     /**
-     * Creates a selection query from an HQL string.
+     * Creates a selection query from an HQL string. Example:<br>
+     * <pre>
+     * {@code dbProxy.createSelectionQueryThen("FROM Employee WHERE department = 'Tech'", Employee.class, query -> {
+     *      assertEquals(
+     *          List.of(
+     *              new Employee(1L, "Billy", "Tech", 40000L),
+     *              new Employee(2L, "Elli", "Tech", 40000L),
+     *              new Employee(3L, "John", "Tech", 40000L)
+     *          ),
+     *          query.getResultList()
+     *      );
+     * });}
+     * </pre>
      * @param hql The HQL string.
      * @param entityType The type of the entity.
      * @param action A consumer of the selection criteria.

@@ -14,14 +14,24 @@ import jakarta.persistence.criteria.Root;
 import java.util.Arrays;
 
 /**
- * Used to provide criteria for database querying
+ * Used to provide criteria for database querying. Comes with static utility methods for easily creating these using semantic method chaining. Example:<br>
+ * <pre>{@code
+ * import static io.john.amiscaray.quak.data.query.QueryCriteria.*;
+ *
+ * public class Test {
+ *
+ *     public void test() {
+ *         QueryCriteria criteria = valueOfField("name", contains("oh"));
+ *     }
+ *
+ * }}</pre>
  */
 public interface QueryCriteria {
 
     /**
      * Creates a predicate using the given query root and criteria builder.
-     * @param queryRoot The query root
-     * @param criteriaBuilder The criteria builder
+     * @param queryRoot The query root.
+     * @param criteriaBuilder The criteria builder.
      * @return The predicate representing the criteria to query the database.
      */
     Predicate getTestPredicate(Root<?> queryRoot, CriteriaBuilder criteriaBuilder);
@@ -68,7 +78,7 @@ public interface QueryCriteria {
     /**
      * Creates a query criteria provider testing that the value of a field equals to the given value.
      * @param value The value.
-     * @return A query criteria provider
+     * @return A query criteria provider.
      */
     static QueryCriteriaProvider is(Object value) {
         return fieldName -> new ValueIs(fieldName, value);
@@ -85,8 +95,8 @@ public interface QueryCriteria {
 
     /**
      * Creates a query criteria provider testing that the value of a field is between a min and a max (inclusive).
-     * @param min The min
-     * @param max The max
+     * @param min The min.
+     * @param max The max.
      * @return A query criteria provider.
      */
     static QueryCriteriaProvider isBetween(Number min, Number max) {
