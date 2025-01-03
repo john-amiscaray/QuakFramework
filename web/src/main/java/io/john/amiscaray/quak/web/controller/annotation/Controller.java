@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface Controller {
     /**
-     * @return The parent path for each sub-path associated with the handler methods.
+     * @return The parent path for each sub-path associated with the handler methods. Defaults to an empty string meaning they are relative to the root of the API.
      */
     String contextPath() default "";
 }

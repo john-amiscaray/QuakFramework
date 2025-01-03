@@ -57,6 +57,9 @@ public class WebApplication extends Application {
         }
     }
 
+    /**
+     * @return The singleton instance of the web application.
+     */
     public static WebApplication getInstance() {
         if (instance == null) {
             instance = new WebApplication();
@@ -68,6 +71,10 @@ public class WebApplication extends Application {
         super(WebApplication.class, new String[]{});
     }
 
+    /**
+     * Inits the web application from a configuration.
+     * @param config The configuration used to start the web application.
+     */
     public void init(Configuration config) {
         if (hasStarted) {
             try {

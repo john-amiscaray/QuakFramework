@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Handles all HTTP requests for a single path. Can handle any method for the given URL path.
+ * Handles all HTTP requests for a single path. Can be configured to handle any HTTP method for that path.
  */
 public class HttpController extends HttpServlet {
 
@@ -37,6 +37,10 @@ public class HttpController extends HttpServlet {
 
     }
 
+    /**
+     * @param urlPattern The URL pattern this controller handles.
+     * @param pathControllers A map of HTTP methods to a corresponding handler.
+     */
     public HttpController(String urlPattern, Map<RequestMethod, PathController<?, ?>> pathControllers) {
         this.urlPattern = urlPattern;
         this.pathControllers = pathControllers;

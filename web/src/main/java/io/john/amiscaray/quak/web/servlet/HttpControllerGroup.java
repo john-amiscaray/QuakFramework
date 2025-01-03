@@ -17,6 +17,11 @@ public class HttpControllerGroup extends HttpServlet {
 
     private Map<String, HttpController> controllers;
 
+    /**
+     * Adds a controller to this group.
+     * @param urlPattern The parent path.
+     * @param controller The http controller to add.
+     */
     public void addController(String urlPattern, HttpController controller) {
         controllers.put(urlPattern, controller);
     }
