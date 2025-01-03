@@ -11,12 +11,12 @@ import io.john.amiscaray.quak.security.config.SecurityConfig;
 import java.util.Date;
 
 /**
- * Used to manage and produce JWTs
+ * Used to manage and produce JWTs.
  */
 public class JwtUtil {
 
     private final String secretKey;
-    private final long expirationTime; // 10 hours
+    private final long expirationTime;
 
     @Instantiate
     public JwtUtil(SecurityConfig securityConfig) {

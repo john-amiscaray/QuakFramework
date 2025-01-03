@@ -33,6 +33,7 @@ public interface Authenticator {
     }
 
     /**
+     * Tests that a given securityID exists.
      * @param securityID The securityID.
      * @return An authentication for the user.
      * @throws InvalidCredentialsException if there is no user with the given security ID.

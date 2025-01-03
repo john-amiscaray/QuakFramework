@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 /**
- * Applies HTTP Basic Authentication
+ * Applies HTTP Basic Authentication.
  */
 public class HttpBasicAuthFilter extends AuthenticationFilter {
 
