@@ -16,15 +16,15 @@ import java.util.Arrays;
 /**
  * Used to provide criteria for database querying. Comes with static utility methods for easily creating these using semantic method chaining. Example:<br>
  * <pre>{@code
- * import static io.john.amiscaray.quak.data.query.QueryCriteria.*;
+ *import static io.john.amiscaray.quak.data.query.QueryCriteria.*;
  *
- * public class Test {
+ *public class Test {
  *
- *     public void test() {
- *         QueryCriteria criteria = valueOfField("name", contains("oh"));
- *     }
+ *    public void test() {
+ *        QueryCriteria criteria = valueOfField("name", contains("oh"));
+ *    }
  *
- * }}</pre>
+ *}}</pre>
  */
 public interface QueryCriteria {
 

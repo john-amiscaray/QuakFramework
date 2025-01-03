@@ -5,14 +5,33 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * A class representing a single database update operation.
+ * A class representing a single database update operation. Often used with the static methods of {@link io.john.amiscaray.quak.data.update.UpdateExpression UpdateExpression} for semantic field updates:<br>
+ * <pre> {@code
+ *import static io.john.amiscaray.quak.data.update.UpdateExpression.*;
+ *
+ *public class Test {
+ *    public void test() {
+ *         dbProxy.updateAll(Employee.class,
+ *             FieldUpdate.<Number>forField("salary")
+ *                 .apply(multiply(1.5))
+ *                 .apply(add(2000))
+ *                 .build()
+ *          );
+ *    }
+ *}}</pre>
  * @param fieldName The name of the field to update.
  * @param updates The changes made to the value of the field.
  * @param <T> The entity class this applies to.
  */
 public record FieldUpdate<T>(String fieldName, List<UpdateExpression<T>> updates) {
 
-    public static <T> FieldUpdateBuilder<T> builder(String fieldName) {
+    /**
+     * Creates a builder for a field with a given name.
+     * @param fieldName The name of the field to update.
+     * @return A builder for a field update.
+     * @param <T> The type of the field being updated.
+     */
+    public static <T> FieldUpdateBuilder<T> forField(String fieldName) {
         return new FieldUpdateBuilder<>(fieldName);
     }
 

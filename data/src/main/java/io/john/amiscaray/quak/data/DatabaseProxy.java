@@ -305,7 +305,7 @@ public class DatabaseProxy {
      * @param <V> The type of the field.
      */
     public <T, V> void updateAll(Class<T> entityType, String fieldToUpdate, DatabaseQuery updateCriteria, V newValue) {
-        updateAll(entityType, updateCriteria, FieldUpdate.builder(fieldToUpdate).apply(UpdateExpression.setTo(newValue)).build());
+        updateAll(entityType, updateCriteria, FieldUpdate.forField(fieldToUpdate).apply(UpdateExpression.setTo(newValue)).build());
     }
 
     /**
@@ -349,10 +349,11 @@ public class DatabaseProxy {
     /**
      * Creates a mutation query using an HQL string and runs it in a transaction. Example:<br>
      * <pre>
-     * {@code dbProxy.createMutationQueryThen(
-     *            "UPDATE Employee e SET e.department = :newDepartment",
-     *            query -> query.setParameter("newDepartment", "Tech").executeUpdate()
-     * );}
+     * {@code
+     *dbProxy.createMutationQueryThen(
+     *           "UPDATE Employee e SET e.department = :newDepartment",
+     *           query -> query.setParameter("newDepartment", "Tech").executeUpdate()
+     *);}
      * </pre>
      * @param hql The HQL query.
      * @param action A consumer of the created mutation query. Runs within the transaction.
@@ -367,16 +368,17 @@ public class DatabaseProxy {
     /**
      * Creates a selection query from an HQL string. Example:<br>
      * <pre>
-     * {@code dbProxy.createSelectionQueryThen("FROM Employee WHERE department = 'Tech'", Employee.class, query -> {
-     *      assertEquals(
-     *          List.of(
-     *              new Employee(1L, "Billy", "Tech", 40000L),
-     *              new Employee(2L, "Elli", "Tech", 40000L),
-     *              new Employee(3L, "John", "Tech", 40000L)
-     *          ),
-     *          query.getResultList()
-     *      );
-     * });}
+     * {@code
+     *dbProxy.createSelectionQueryThen("FROM Employee WHERE department = 'Tech'", Employee.class, query -> {
+     *     assertEquals(
+     *         List.of(
+     *             new Employee(1L, "Billy", "Tech", 40000L),
+     *             new Employee(2L, "Elli", "Tech", 40000L),
+     *             new Employee(3L, "John", "Tech", 40000L)
+     *         ),
+     *         query.getResultList()
+     *     );
+     *});}
      * </pre>
      * @param hql The HQL string.
      * @param entityType The type of the entity.

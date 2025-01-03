@@ -412,7 +412,7 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Corporate")))
                         .build(),
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(multiply(2))
                         .build());
 
@@ -430,7 +430,7 @@ public class DatabaseProxyTest {
         dbProxy.updateAllWhereAndApply(
                 Employee.class,
                 valueOfField("department", is("Corporate")),
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(multiply(2))
                         .build());
 
@@ -449,7 +449,7 @@ public class DatabaseProxyTest {
                 DatabaseQuery.builder()
                         .withCriteria(valueOfField("department", is("Tech")))
                         .build(),
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(divide(2))
                         .build());
 
@@ -467,7 +467,7 @@ public class DatabaseProxyTest {
         dbProxy.updateAllWhereAndApply(
                 Employee.class,
                 valueOfField("department", is("Tech")),
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(divide(2))
                         .apply(add(2000))
                         .build());
@@ -486,7 +486,7 @@ public class DatabaseProxyTest {
         dbProxy.updateAllWhereAndApply(
                 Employee.class,
                 valueOfField("department", is("Tech")),
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(add(2000))
                         .apply(divide(2))
                         .build());
@@ -503,7 +503,7 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeesToIncreaseSalaryBy50PercentAndAdd2000() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(multiply(1.5))
                         .apply(add(2000))
                         .build()
@@ -521,7 +521,7 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeesToSubtract10000FromSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(subtract(10000))
                         .build()
         );
@@ -538,7 +538,7 @@ public class DatabaseProxyTest {
     @Test
     void testUpdateEmployeeSalaryDividingItBy9KeepsValueAsLong() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(divide(9))
                         .build()
         );
@@ -666,7 +666,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesRaisingSalaryToThePowerOf2() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Double>builder("salary")
+                FieldUpdate.<Double>forField("salary")
                         .apply(raiseToThePowerOf(2))
                         .build()
         );
@@ -683,7 +683,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesRaisingSalaryToThePowerOf2AndAdd5000() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Double>builder("salary")
+                FieldUpdate.<Double>forField("salary")
                         .apply(raiseToThePowerOf(2))
                         .apply(add(5000.0))
                         .build()
@@ -701,7 +701,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSetSalaryTo2ToThePowerOf15AndThenLogBase2() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Double>builder("salary")
+                FieldUpdate.<Double>forField("salary")
                         .apply(setTo(pow(2.0, 15.0)))
                         .apply(logBaseN(2.0))
                         .build()
@@ -719,7 +719,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSetSalaryToLnOfCurrentSalaryTimes200() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Double>builder("salary")
+                FieldUpdate.<Double>forField("salary")
                         .apply(multiply(200.0))
                         .apply(ln())
                         .build()
@@ -737,7 +737,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSetSalaryToSqrtOfCurrentSalary() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Double>builder("salary")
+                FieldUpdate.<Double>forField("salary")
                         .apply(sqrt())
                         .build()
         );
@@ -754,7 +754,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSetSalaryToMultiplyByNegative2AndAbsoluteValue() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<Number>builder("salary")
+                FieldUpdate.<Number>forField("salary")
                         .apply(multiply(-2L))
                         .apply(abs())
                         .build()
@@ -773,7 +773,7 @@ public class DatabaseProxyTest {
     public void testUpdateAllEmployeesSetSalaryToLogWithInvalidBase()  {
         assertThrows(IllegalArgumentException.class, () -> {
             dbProxy.updateAll(Employee.class,
-                    FieldUpdate.<Double>builder("salary")
+                    FieldUpdate.<Double>forField("salary")
                             .apply(logBaseN(-2.0))
                             .build()
             );
@@ -783,7 +783,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesAppendOneToDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(append(" One"))
                         .build()
         );
@@ -800,7 +800,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesPrependDeptOfToDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(prepend("Dept of "))
                         .build()
         );
@@ -817,7 +817,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(append("      "))
                         .apply(prepend("     "))
                         .apply(trim())
@@ -836,7 +836,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesAddTrailingWhitespaceAndTrimTrailingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(append("      "))
                         .apply(trimTrailing())
                         .build()
@@ -854,7 +854,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimTrailingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(append(" "))
                         .apply(prepend(" "))
                         .apply(trimTrailing())
@@ -873,7 +873,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesAddTrailingAndLeadingWhitespaceAndTrimLeadingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(append(" "))
                         .apply(prepend(" "))
                         .apply(trimLeading())
@@ -892,7 +892,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesAddLeadingWhitespaceAndTrimLeadingDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(prepend("      "))
                         .apply(trimLeading())
                         .build()
@@ -910,7 +910,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSubstringFirstLetterOfDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(subString(0, 1))
                         .build()
         );
@@ -927,7 +927,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSubstringFrom3rdPosWithLen3OfDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(subString(1, 3))
                         .build()
         );
@@ -944,7 +944,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSubstringFrom1ToEndOfDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(subString(1))
                         .build()
         );
@@ -961,7 +961,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSubstringFrom1To100OfDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(subString(0, 100))
                         .build()
         );
@@ -978,7 +978,7 @@ public class DatabaseProxyTest {
     @Test
     public void testUpdateAllEmployeesSubstringFrom100To100OfDepartment() throws SQLException {
         dbProxy.updateAll(Employee.class,
-                FieldUpdate.<String>builder("department")
+                FieldUpdate.<String>forField("department")
                         .apply(subString(100, 100))
                         .build()
         );

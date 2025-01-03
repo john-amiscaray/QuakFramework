@@ -8,13 +8,14 @@ import static java.lang.Math.log;
 
 /**
  * Represents an operation on a field of a database entity. Used by the database proxy to apply changes to fields of a table row.
+ * See the {@link io.john.amiscaray.quak.data.update.FieldUpdate FieldUpdate} class for more info.
  * @param <T> The database entity this update applies to.
  */
 @FunctionalInterface
 public interface UpdateExpression<T> {
 
     /**
-     * Applies an update the value of the current field represented by a JPA expression.
+     * Applies an update to the value of the current field represented by a JPA expression.
      * @param currentValue The JPA expression representing the current value of the field.
      * @param queryRoot The JPA query root.
      * @param cb The JPA criteria builder.
@@ -45,7 +46,7 @@ public interface UpdateExpression<T> {
     }
 
     /**
-     * Creates an update expression subtracting a number onto the current value of the field
+     * Creates an update expression subtracting a number onto the current value of the field.
      * @param number The number to add onto the current value.
      * @return The update expression.
      * @param <N> The type of the number.
@@ -131,7 +132,7 @@ public interface UpdateExpression<T> {
 
     /**
      * Creates an update expression appending a string to the current value.
-     * @param suffix The suffix to appending to the current value.
+     * @param suffix The suffix to append to the current value.
      * @return The update expression.
      */
     static UpdateExpression<String> append(String suffix) {
