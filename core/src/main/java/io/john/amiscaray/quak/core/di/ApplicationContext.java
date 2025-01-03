@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
- * Stores all the project's dependencies as a map with {@link io.john.amiscaray.quak.core.di.dependency.DependencyID} as the key and the instance as the value. Also stores lists of grouped dependencies as "aggregate lists".
+ * Stores all the project's dependencies as a map with {@link io.john.amiscaray.quak.core.di.dependency.DependencyID} as the key and the instance as the value. Also stores lists of grouped dependencies as "aggregate lists" (see the {@link io.john.amiscaray.quak.core.di.provider.annotation.AggregateTo AggregateTo} annotation for more details).
  */
 public class ApplicationContext {
 
