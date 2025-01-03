@@ -7,13 +7,13 @@ import io.john.amiscaray.quak.core.di.dependency.ProvidedDependency;
 import java.util.List;
 
 /**
- * Provides a dependency to the application context. This can be used with Java's service loader function so the core module will load in implementations of this interface to add dependencies to the application context.
+ * Provides a dependency to the application context. This can be used with Java's service loader functionality so the core module will load in implementations of this interface to add dependencies to the application context.
  * @param <T> The type of the dependency being provided.
  */
 public interface DependencyProvider<T> {
 
     /**
-     * @return An aggregate list to add this dependency to.
+     * @return An aggregate list to add this dependency to. See the {@link io.john.amiscaray.quak.core.di.provider.annotation.AggregateTo AggregateTo} annotation.
      */
     default String aggregateList() {
         return "";

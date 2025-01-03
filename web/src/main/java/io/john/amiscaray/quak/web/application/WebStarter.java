@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Used to start a web application by scanning through the project classes an instantiating the provided controllers and filters.
+ * Used to start a web application by scanning through the project classes and instantiating the provided controllers and filters.
  */
 public class WebStarter {
 

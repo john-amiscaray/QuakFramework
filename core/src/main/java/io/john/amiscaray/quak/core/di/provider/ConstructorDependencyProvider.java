@@ -4,7 +4,7 @@ import io.john.amiscaray.quak.core.di.ApplicationContext;
 import io.john.amiscaray.quak.core.di.dependency.DependencyID;
 import io.john.amiscaray.quak.core.di.dependency.ProvidedDependency;
 import io.john.amiscaray.quak.core.di.exception.DependencyInstantiationException;
-import io.john.amiscaray.quak.core.di.exception.InvalidDeclarationException;
+import io.john.amiscaray.quak.core.di.exception.InvalidManagedTypeDeclarationException;
 import io.john.amiscaray.quak.core.di.provider.annotation.AggregateTo;
 import io.john.amiscaray.quak.core.di.provider.annotation.ManagedType;
 import io.john.amiscaray.quak.core.di.provider.annotation.Provider;
@@ -42,7 +42,7 @@ public class ConstructorDependencyProvider<T> implements ReflectiveDependencyPro
             if (annotationDeclaration.dependencyType().isAssignableFrom(declaringClass)) {
                 declaredType = (Class<T>) annotationDeclaration.dependencyType();
             } else if (annotationDeclaration.dependencyType() != Void.class) {
-                throw new InvalidDeclarationException("Invalid dependency type: " + annotationDeclaration.dependencyType() + " for managed type of class: " + declaringClass);
+                throw new InvalidManagedTypeDeclarationException("Invalid dependency type: " + annotationDeclaration.dependencyType() + " for managed type of class: " + declaringClass);
             }
 
         } else if (declaringClass.isAnnotationPresent(Provider.class)) {

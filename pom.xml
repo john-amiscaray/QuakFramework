@@ -114,9 +114,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <compilerArgs>
-                        <argLine>--enable-preview</argLine>
-                    </compilerArgs>
                     <annotationProcessorPaths>
                         <annotationProcessorPath>
                             <groupId>org.projectlombok</groupId>
@@ -131,7 +128,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${maven-surefire-plugin.version}</version>
                 <configuration>
-                    <argLine>@{argLine} --enable-preview</argLine>
+                    <argLine>@{argLine}</argLine>
                 </configuration>
             </plugin>
             <plugin>

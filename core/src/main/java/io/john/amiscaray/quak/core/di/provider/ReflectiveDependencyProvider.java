@@ -14,6 +14,10 @@ import java.util.List;
  */
 public interface ReflectiveDependencyProvider<T> extends DependencyProvider<T> {
 
+    /**
+     * Retrieve the executable (method/constructor), corresponding to this instance, used to provide an instance to the application context.
+     * @return The executable.
+     */
     Executable getExecutableReturningInstance();
 
     @Override

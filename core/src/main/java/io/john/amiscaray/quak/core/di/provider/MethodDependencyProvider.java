@@ -15,7 +15,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Used to provide an instance to the application context from a method.
+ * Used to provide an instance to the application context from an annotated method.
  * @param <T> The type of the instance being provided.
  */
 @AllArgsConstructor

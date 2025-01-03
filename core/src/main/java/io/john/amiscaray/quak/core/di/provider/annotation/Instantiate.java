@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Instantiate the class using the annotated constructor and add it to the application context
+ * For a {@link io.john.amiscaray.quak.core.di.provider.annotation.ManagedType ManagedType} or controller, use the constructor annotated with this to instantiate it.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.CONSTRUCTOR)

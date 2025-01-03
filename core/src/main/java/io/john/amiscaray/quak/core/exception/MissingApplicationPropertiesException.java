@@ -1,5 +1,8 @@
 package io.john.amiscaray.quak.core.exception;
 
+/**
+ * Thrown if the application is missing an application.properties file.
+ */
 public class MissingApplicationPropertiesException extends RuntimeException {
 
     public MissingApplicationPropertiesException() {

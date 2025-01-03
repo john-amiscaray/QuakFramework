@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Maps an exception to an HTTP status code.
+ * Maps an exception to an HTTP status code. When this exception gets thrown during the execution of a controller, return a response with this status code and the exception message.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
