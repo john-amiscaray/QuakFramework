@@ -19,12 +19,25 @@ public record DynamicPathRequest<T>(Map<String, String> headers,
                                        Map<String, String> pathVariables,
                                        T body, Map<String, Object> attributes) implements Request<T>{
 
+    /**
+     * Create a DynamicPathRequest with empty headers, query params, and attributes.
+     * @param method The HTTP method.
+     * @param pathVariables The path variables as a map.
+     * @param body The request body.
+     */
     public DynamicPathRequest(RequestMethod method,
                               Map<String, String> pathVariables,
                               T body) {
         this(new HashMap<>(), new HashMap<>(), method, pathVariables, body, new HashMap<>());
     }
 
+    /**
+     * Create a DynamicPathRequest with empty query params, and attributes.
+     * @param headers The headers as a map.
+     * @param method The HTTP method.
+     * @param pathVariables The path variables as a map.
+     * @param body The request body.
+     */
     public DynamicPathRequest(Map<String, String> headers,
                               RequestMethod method,
                               Map<String, String> pathVariables,
@@ -32,6 +45,12 @@ public record DynamicPathRequest<T>(Map<String, String> headers,
         this(headers, new HashMap<>(), method, pathVariables, body, new HashMap<>());
     }
 
+    /**
+     * Create a DynamicPathRequest with empty headers and attributes.
+     * @param pathVariables The path variables as a map.
+     * @param queryParams The query params as a map.
+     * @param body The request body.
+     */
     public DynamicPathRequest(Map<String, String> pathVariables,
                               Map<String, String> queryParams,
                               T body) {
