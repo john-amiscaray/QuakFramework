@@ -27,6 +27,9 @@ public class ApplicationProperties{
         for (var applicationProperty : ApplicationProperty.class.getEnumConstants()) {
             var value = Optional.ofNullable(fileProperties.getProperty(applicationProperty.getName()))
                     .orElse(applicationProperty.getDefaultValue());
+            if (value.matches("\\$\\{.+}")) {
+                value = System.getenv(value.substring(2, value.length() - 1));
+            }
             applicationProperty.setValue(value);
         }
     }
