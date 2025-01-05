@@ -14,6 +14,11 @@ import java.util.List;
 public class JWTUtilProvider implements DependencyProvider<JwtUtil> {
 
     @Override
+    public boolean isDependencyOptional() {
+        return true;
+    }
+
+    @Override
     public DependencyID<JwtUtil> getDependencyID() {
         return SecurityDependencyIDs.JWT_UTIL_DEPENDENCY_ID;
     }
