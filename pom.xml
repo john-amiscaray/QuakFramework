@@ -6,11 +6,11 @@
 
     <groupId>io.john.amiscaray</groupId>
     <artifactId>quak.framework</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <version>${project.version}</version>
     <packaging>pom</packaging>
 
     <properties>
-        <project.version>1.0-SNAPSHOT</project.version>
+        <project.version>1.1-SNAPSHOT</project.version>
         <java.version>21</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
