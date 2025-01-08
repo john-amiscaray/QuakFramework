@@ -5,6 +5,8 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import com.googlecode.lanterna.terminal.Terminal;
+import io.john.amiscaray.quak.cli.cfg.ProjectConfig;
+import io.john.amiscaray.quak.cli.generator.ProjectGenerator;
 import io.john.amiscaray.quak.cli.templates.Template;
 
 import java.io.IOException;
@@ -43,7 +45,9 @@ public class Main {
                     Arrays.asList(Template.values()));
             terminal.putString(projectTemplate.toString());
             terminal.flush();
-            Thread.sleep(10000);
+            var projectGenerator = ProjectGenerator.getInstance();
+            projectGenerator.init(terminal);
+            projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate));
         } catch (IOException | InterruptedException ex) {
             throw new RuntimeException(ex);
         }
