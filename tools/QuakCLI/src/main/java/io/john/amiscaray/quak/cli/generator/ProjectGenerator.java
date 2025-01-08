@@ -32,12 +32,21 @@ public class ProjectGenerator {
         var sourcesDir = new File(rootFolder + "/src/main/java/" + packagePath);
         var resourcesDir = new File(rootFolder + "/src/main/resources");
         var testDir = new File(rootFolder + "/src/main/test/java/" + packagePath);
+
         resourcesDir.mkdirs();
         sourcesDir.mkdirs();
         testDir.mkdirs();
+
         var projectPom = new File(rootFolder, "pom.xml");
-        try (var fileWriter = new FileWriter(projectPom)) {
-            fileWriter.write(generateProjectPomSrc(projectConfig));
+        var projectMain = new File(sourcesDir, "Main.java");
+
+        writeToFile(projectPom, generateProjectPomSrc(projectConfig));
+        writeToFile(projectMain, generateProjectMainClassSrc(projectConfig));
+    }
+
+    private void writeToFile(File file, String src) throws IOException, InterruptedException {
+        try (var fileWriter = new FileWriter(file)) {
+            fileWriter.write(src);
         } catch (IOException ex) {
             terminal.setForegroundColor(TextColor.ANSI.RED_BRIGHT);
             terminal.putCharacter('\n');
@@ -159,6 +168,29 @@ public class ProjectGenerator {
                     </build>
                 </project>
                 """, projectConfig.groupID(), projectConfig.artifactID());
+    }
+
+    private String generateProjectMainClassSrc(ProjectConfig projectConfig) {
+        return String.format("""
+                package %1$s;
+                
+                import io.john.amiscaray.quak.web.application.WebStarter;
+                                
+                import java.util.concurrent.ExecutionException;
+                import java.util.concurrent.TimeUnit;
+                import java.util.concurrent.TimeoutException;
+                                
+                public class Main {
+                                
+                    public static void main(String[] args) throws ExecutionException, InterruptedException, TimeoutException {
+                        var application = WebStarter.beginWebApplication(Main.class, args)
+                                .get(10, TimeUnit.SECONDS);
+                                
+                        application.await();
+                    }
+                                
+                }
+                """, projectConfig.groupID());
     }
 
 }
