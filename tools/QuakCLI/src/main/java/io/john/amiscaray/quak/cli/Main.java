@@ -22,7 +22,6 @@ public class Main {
                 |__  _|___|__,|_,_|  |__|  |_| |__,|_|_|_|___|_____|___|_| |_,_|
                    |__|                                                        \s
                 ================================================================
-                
                 """;
         var defaultTerminalFactory = new DefaultTerminalFactory();
         try(var terminal = defaultTerminalFactory.createTerminal()) {
@@ -33,12 +32,12 @@ public class Main {
                 terminal.putCharacter('\n');
                 terminal.flush();
             }
+            putLines(terminal, 1);
             terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
             var artifactID = readText(terminal, "Enter an artifact ID: ");
-            terminal.putCharacter('\n');
-            terminal.flush();
+            putLines(terminal, 2);
             var groupID = readText(terminal, "Enter a group ID: ");
-            terminal.putCharacter('\n');
+            putLines(terminal, 2);
             terminal.flush();
             var projectTemplate = (Template) pickOption(terminal, "Select a template: ",
                     Arrays.asList(Template.values()));
@@ -91,9 +90,14 @@ public class Main {
         for (var option : options) {
             if (idx == selected) {
                 firstCheckPosition = terminal.getCursorPosition();
-                terminal.putString("● " + option);
+                terminal.setForegroundColor(TextColor.ANSI.CYAN_BRIGHT);
+                terminal.putString("●");
+                terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+                terminal.putString(" " + option);
             } else {
-                terminal.putString("○ " + option);
+                terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
+                terminal.putString("○");
+                terminal.putString(" " + option);
             }
             terminal.putCharacter('\n');
             idx++;
@@ -106,22 +110,34 @@ public class Main {
                 break;
             } else if (keyStroke.getKeyType() == KeyType.ArrowDown) {
                 terminal.setCursorPosition(firstCheckPosition.getColumn(), firstCheckPosition.getRow() + selected);
+                terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
                 terminal.putString("○");
                 selected = (selected + 1) % options.size();
                 terminal.setCursorPosition(firstCheckPosition.getColumn(), firstCheckPosition.getRow() + selected);
+                terminal.setForegroundColor(TextColor.ANSI.CYAN_BRIGHT);
                 terminal.putString("●");
                 terminal.flush();
             } else if (keyStroke.getKeyType() == KeyType.ArrowUp) {
                 terminal.setCursorPosition(firstCheckPosition.getColumn(), firstCheckPosition.getRow() + selected);
+                terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
                 terminal.putString("○");
                 selected = selected - 1 >= 0 ? selected - 1 : options.size() - 1;
                 terminal.setCursorPosition(firstCheckPosition.getColumn(), firstCheckPosition.getRow() + selected);
+                terminal.setForegroundColor(TextColor.ANSI.CYAN_BRIGHT);
                 terminal.putString("●");
                 terminal.flush();
             }
         }
+        terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
         terminal.setCursorPosition(endTerminalPosition);
         return options.get(selected);
+    }
+
+    private static void putLines(Terminal terminal, int lines) throws IOException {
+        for (int i = 0; i < lines; i++) {
+            terminal.putCharacter('\n');
+        }
+        terminal.flush();
     }
 
 }
