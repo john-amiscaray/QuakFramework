@@ -50,16 +50,19 @@ public class ProjectGenerator {
         writeToFile(new File(sourcesDir, "Main.java"), generateProjectMainClassSrc(projectConfig));
 
         var mavenSettings = new File(FileUtils.getUserDirectory() + "/.m2", "settings.xml");
+        var mavenSettingsWritten = true;
         if (!mavenSettings.exists()) {
             writeToFile(new File(FileUtils.getUserDirectory() + "/.m2", "settings.xml"), generateMavenSettings());
         } else {
-            addGithubServerToExistingMavenSettings(mavenSettings);
+            mavenSettingsWritten = addGithubServerToExistingMavenSettings(mavenSettings);
         }
-        terminal.setForegroundColor(TextColor.ANSI.YELLOW);
-        terminal.putCharacter('\n');
-        terminal.putString("WARNING: setting.xml written in ~/.m2/settings.xml. Ensure you put your github username and personal access token in the added 'github' server. This allows you to authenticate with Github packages.");
-        terminal.flush();
-        Thread.sleep(5000);
+        if (mavenSettingsWritten) {
+            terminal.setForegroundColor(TextColor.ANSI.YELLOW);
+            terminal.putCharacter('\n');
+            terminal.putString("WARNING: setting.xml written in ~/.m2/settings.xml. Ensure you put your github username and personal access token in the added 'github' server. This allows you to authenticate with Github packages.");
+            terminal.flush();
+            Thread.sleep(5000);
+        }
     }
 
     private void writeToFile(File file, String src) throws IOException, InterruptedException {
@@ -226,7 +229,16 @@ public class ProjectGenerator {
                 """;
     }
 
-    private void addGithubServerToExistingMavenSettings(File mavenSettings) throws IOException, SAXException, ParserConfigurationException, TransformerException, InterruptedException {
+    /**
+     * @param mavenSettings
+     * @return a boolean whether the file was written.
+     * @throws IOException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws TransformerException
+     * @throws InterruptedException
+     */
+    private boolean addGithubServerToExistingMavenSettings(File mavenSettings) throws IOException, SAXException, ParserConfigurationException, TransformerException, InterruptedException {
         var documentBuilderFactory = DocumentBuilderFactory.newInstance();
         var documentBuilder = documentBuilderFactory.newDocumentBuilder();
         var document = documentBuilder.parse(mavenSettings);
@@ -249,7 +261,7 @@ public class ProjectGenerator {
             }
         }
         if (containsGithubServer) {
-            return;
+            return false;
         }
         var newServer = document.createElement("server");
         var serverID = document.createElement("id");
@@ -278,6 +290,7 @@ public class ProjectGenerator {
         var source = new DOMSource(document);
         var result = new StreamResult(mavenSettings);
         transformer.transform(source, result);
+        return true;
     }
 
     private void generateAuthFramework(ProjectConfig projectConfig) {

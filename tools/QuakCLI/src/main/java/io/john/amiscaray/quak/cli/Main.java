@@ -157,8 +157,6 @@ public class Main {
         terminal.flush();
         var projectTemplate = (Template) pickOption(terminal, "Select a template: ",
                 Arrays.asList(Template.values()));
-        terminal.putString(projectTemplate.toString());
-        terminal.flush();
         var projectGenerator = ProjectGenerator.getInstance();
         projectGenerator.init(terminal);
         projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate));
