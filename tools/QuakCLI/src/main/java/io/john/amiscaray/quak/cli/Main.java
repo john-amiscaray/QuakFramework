@@ -18,43 +18,44 @@ import java.util.List;
 
 public class Main {
 
+    private static final String banner = """
+            ================================================================
+             _____         _      _____                                 _  \s
+            |     |_ _ ___| |_   |   __|___ ___ _____ ___ _ _ _ ___ ___| |_\s
+            |  |  | | | .'| '_|  |   __|  _| .'|     | -_| | | | . |  _| '_|
+            |__  _|___|__,|_,_|  |__|  |_| |__,|_|_|_|___|_____|___|_| |_,_|
+               |__|                                                        \s
+            ================================================================
+            """;
+    private static final List<String> commands = List.of("create");
+
     public static void main(String[] args) {
-        var banner = """
-                ================================================================
-                 _____         _      _____                                 _  \s
-                |     |_ _ ___| |_   |   __|___ ___ _____ ___ _ _ _ ___ ___| |_\s
-                |  |  | | | .'| '_|  |   __|  _| .'|     | -_| | | | . |  _| '_|
-                |__  _|___|__,|_,_|  |__|  |_| |__,|_|_|_|___|_____|___|_| |_,_|
-                   |__|                                                        \s
-                ================================================================
-                """;
         var defaultTerminalFactory = new DefaultTerminalFactory();
+        if (args.length == 0 || !commands.contains(args[0])) {
+            System.out.println("Usage: java -jar QuakCLI.jar <command>. Where command is one of: "
+                    + String.join(", ", commands.stream().map(command -> "'" + command + "'").toList()) + ".");
+            System.exit(-1);
+            return;
+        }
         try(var terminal = defaultTerminalFactory.createTerminal()) {
             terminal.setCursorVisible(false);
-            terminal.setForegroundColor(TextColor.ANSI.YELLOW_BRIGHT);
-            for(var line : banner.split("\n")) {
-                terminal.putString(line);
-                terminal.putCharacter('\n');
-                terminal.flush();
-            }
-            putLines(terminal, 1);
-            terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
-            var artifactID = readText(terminal, "Enter an artifact ID: ");
-            putLines(terminal, 2);
-            var groupID = readText(terminal, "Enter a group ID: ");
-            putLines(terminal, 2);
-            terminal.flush();
-            var projectTemplate = (Template) pickOption(terminal, "Select a template: ",
-                    Arrays.asList(Template.values()));
-            terminal.putString(projectTemplate.toString());
-            terminal.flush();
-            var projectGenerator = ProjectGenerator.getInstance();
-            projectGenerator.init(terminal);
-            projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate));
-        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException |
-                 TransformerException ex) {
+            showBanner(terminal);
+            var command = args[0];
+            Main.class.getDeclaredMethod(command, Terminal.class).invoke(null, terminal);
+        } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
+    }
+
+    private static void showBanner(Terminal terminal) throws IOException {
+        terminal.setForegroundColor(TextColor.ANSI.YELLOW_BRIGHT);
+        for(var line : banner.split("\n")) {
+            terminal.putString(line);
+            terminal.putCharacter('\n');
+            terminal.flush();
+        }
+        putLines(terminal, 1);
+        terminal.setForegroundColor(TextColor.ANSI.WHITE_BRIGHT);
     }
 
     private static String readText(Terminal terminal, String prompt) throws IOException {
@@ -146,6 +147,21 @@ public class Main {
             terminal.putCharacter('\n');
         }
         terminal.flush();
+    }
+
+    private static void create(Terminal terminal) throws IOException, ParserConfigurationException, InterruptedException, TransformerException, SAXException {
+        var artifactID = readText(terminal, "Enter an artifact ID: ");
+        putLines(terminal, 2);
+        var groupID = readText(terminal, "Enter a group ID: ");
+        putLines(terminal, 2);
+        terminal.flush();
+        var projectTemplate = (Template) pickOption(terminal, "Select a template: ",
+                Arrays.asList(Template.values()));
+        terminal.putString(projectTemplate.toString());
+        terminal.flush();
+        var projectGenerator = ProjectGenerator.getInstance();
+        projectGenerator.init(terminal);
+        projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate));
     }
 
 }
