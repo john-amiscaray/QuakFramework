@@ -234,41 +234,44 @@ public class ProjectGenerator {
         var documentBuilder = documentBuilderFactory.newDocumentBuilder();
         var document = documentBuilder.parse(mavenSettings);
         var serversTags = document.getDocumentElement().getElementsByTagName("servers");
+        var isNewServersTag = serversTags.getLength() == 0;
 
-        for (int i = 0; i < serversTags.getLength(); i++) {
-            var serversTag = serversTags.item(i);
-            var containsGithubServer = false;
-            for(var j = 0; j < serversTag.getChildNodes().getLength(); j++) {
-                var child = serversTag.getChildNodes().item(j);
-                if (child.getNodeName().equals("server")) {
-                    for(var k = 0; k < child.getChildNodes().getLength(); k++) {
-                        var serverProp = child.getChildNodes().item(k);
-                        if (serverProp.getNodeName().equals("id")) {
-                            if (serverProp.getTextContent().equals("github")) {
-                                containsGithubServer = true;
-                            }
+        var serversTag = isNewServersTag ? document.createElement("servers") : serversTags.item(0);
+        var containsGithubServer = false;
+        for(var j = 0; j < serversTag.getChildNodes().getLength(); j++) {
+            var child = serversTag.getChildNodes().item(j);
+            if (child.getNodeName().equals("server")) {
+                for(var k = 0; k < child.getChildNodes().getLength(); k++) {
+                    var serverProp = child.getChildNodes().item(k);
+                    if (serverProp.getNodeName().equals("id")) {
+                        if (serverProp.getTextContent().equals("github")) {
+                            containsGithubServer = true;
                         }
                     }
                 }
             }
-            if (containsGithubServer) {
-                continue;
-            }
-            var newServer = document.createElement("server");
-            var serverID = document.createElement("id");
-            serverID.setTextContent("github");
+        }
+        if (containsGithubServer) {
+            return;
+        }
+        var newServer = document.createElement("server");
+        var serverID = document.createElement("id");
+        serverID.setTextContent("github");
 
-            var username = document.createElement("username");
-            username.setTextContent("Your GitHub Username");
+        var username = document.createElement("username");
+        username.setTextContent("Your GitHub Username");
 
-            var password = document.createElement("password");
-            password.setTextContent("Your GitHub Personal Access Token");
+        var password = document.createElement("password");
+        password.setTextContent("Your GitHub Personal Access Token");
 
-            newServer.appendChild(serverID);
-            newServer.appendChild(username);
-            newServer.appendChild(password);
+        newServer.appendChild(serverID);
+        newServer.appendChild(username);
+        newServer.appendChild(password);
 
-            serversTag.appendChild(newServer);
+        serversTag.appendChild(newServer);
+
+        if (isNewServersTag) {
+            document.getDocumentElement().appendChild(serversTag);
         }
 
         var transformerFactory = TransformerFactory.newInstance();
@@ -278,6 +281,10 @@ public class ProjectGenerator {
         var source = new DOMSource(document);
         var result = new StreamResult(mavenSettings);
         transformer.transform(source, result);
+    }
+
+    private void generateAuthFramework(ProjectConfig projectConfig) {
+
     }
 
 }
