@@ -8,7 +8,10 @@ import com.googlecode.lanterna.terminal.Terminal;
 import io.john.amiscaray.quak.cli.cfg.ProjectConfig;
 import io.john.amiscaray.quak.cli.generator.ProjectGenerator;
 import io.john.amiscaray.quak.cli.templates.Template;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +51,8 @@ public class Main {
             var projectGenerator = ProjectGenerator.getInstance();
             projectGenerator.init(terminal);
             projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate));
-        } catch (IOException | InterruptedException ex) {
+        } catch (IOException | InterruptedException | ParserConfigurationException | SAXException |
+                 TransformerException ex) {
             throw new RuntimeException(ex);
         }
     }
