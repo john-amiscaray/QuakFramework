@@ -34,6 +34,7 @@
         <module>api-generator</module>
         <module>security</module>
         <module>web-model</module>
+        <module>tools/QuakCLI</module>
     </modules>
 
     <dependencies>
