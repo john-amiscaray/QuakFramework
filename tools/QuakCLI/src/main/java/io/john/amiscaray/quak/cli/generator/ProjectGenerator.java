@@ -38,8 +38,11 @@ public class ProjectGenerator {
         this.terminal = terminal;
     }
 
-    public void generateProject(ProjectConfig projectConfig) throws IOException, InterruptedException, ParserConfigurationException, SAXException, TransformerException {
-        var rootFolder = projectConfig.artifactID();
+    public void generateProject(ProjectConfig projectConfig, String workingDirectory) throws IOException, InterruptedException, ParserConfigurationException, SAXException, TransformerException {
+        if (workingDirectory.endsWith("/")) {
+            workingDirectory = workingDirectory.substring(0, workingDirectory.length() - 1);
+        }
+        var rootFolder = workingDirectory.isBlank() ? projectConfig.artifactID() : workingDirectory + "/" + projectConfig.artifactID();
         var packagePath = createPackagePath(projectConfig);
         var sourcesDir = new File(rootFolder + "/src/main/java/" + packagePath);
         var resourcesDir = new File(rootFolder + "/src/main/resources");

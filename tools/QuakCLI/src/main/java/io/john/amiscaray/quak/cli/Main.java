@@ -41,7 +41,7 @@ public class Main {
             terminal.setCursorVisible(false);
             showBanner(terminal);
             var command = args[0];
-            Main.class.getDeclaredMethod(command, Terminal.class).invoke(null, terminal);
+            Main.class.getDeclaredMethod(command, Terminal.class, String[].class).invoke(null, terminal, Arrays.copyOfRange(args, 1, args.length));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -149,7 +149,11 @@ public class Main {
         terminal.flush();
     }
 
-    private static void create(Terminal terminal) throws IOException, ParserConfigurationException, InterruptedException, TransformerException, SAXException {
+    private static void create(Terminal terminal, String[] args) throws IOException, ParserConfigurationException, InterruptedException, TransformerException, SAXException {
+        String workingDirectory = "";
+        if (args.length > 0) {
+            workingDirectory = args[0];
+        }
         var artifactID = readText(terminal, "Enter an artifact ID: ");
         putLines(terminal, 2);
         var groupID = readText(terminal, "Enter a group ID: ");
@@ -159,7 +163,7 @@ public class Main {
                 Arrays.asList(Template.values()));
         var projectGenerator = ProjectGenerator.getInstance();
         projectGenerator.init(terminal);
-        projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate));
+        projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate), workingDirectory);
     }
 
 }
