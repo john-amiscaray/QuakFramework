@@ -41,3 +41,4 @@ io.john.amiscaray.quak.web.servlet
 module:quak.framework.web.model
 io.john.amiscaray.quak.http.request
 io.john.amiscaray.quak.http.response
+io.john.amiscaray.quak.http.status
