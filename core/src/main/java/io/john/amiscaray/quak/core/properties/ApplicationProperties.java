@@ -29,7 +29,7 @@ public class ApplicationProperties{
 
         // Reset property values
         for(var property : ApplicationProperty.class.getEnumConstants()) {
-            property.setValue(null);
+            property.setValue(property.getDefaultValue());
         }
 
         fileProperties.forEach((key, value) -> {
