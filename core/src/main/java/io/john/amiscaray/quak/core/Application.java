@@ -73,7 +73,7 @@ public abstract class Application {
      * {@link Application#startUp() startup method}, and calls the <i>"post start"</i> listeners.
      * @throws Exception any exceptions from this method will be thrown.
      */
-    public final void start() throws Exception{
+    public void start() throws Exception{
         preStart();
         initProperties();
         initContext();
@@ -141,7 +141,7 @@ public abstract class Application {
         }
     }
 
-    private void initContext() {
+    protected void initContext() {
         var applicationContext = ApplicationContext.getInstance();
         try {
             applicationContext.init(classScanPackage);
@@ -150,7 +150,7 @@ public abstract class Application {
         }
     }
 
-    private void initProperties() {
+    protected void initProperties() {
         if (main.getResource("/application.properties") == null) {
             throw new MissingApplicationPropertiesException();
         }
@@ -173,27 +173,27 @@ public abstract class Application {
         lifecycleListeners.get(state).add(consumer);
     }
 
-    private void preStart() {
+    protected void preStart() {
         lifecycleListeners.get(LifecycleState.PRE_START)
                 .forEach(consumer -> consumer.accept(this));
     }
 
-    private void contextLoaded() {
+    protected void contextLoaded() {
         lifecycleListeners.get(LifecycleState.CONTEXT_LOADED)
                 .forEach(consumer -> consumer.accept(this));
     }
 
-    private void postStart() {
+    protected void postStart() {
         lifecycleListeners.get(LifecycleState.POST_START)
                 .forEach(consumer -> consumer.accept(this));
     }
 
-    private void preStop() {
+    protected void preStop() {
         lifecycleListeners.get(LifecycleState.PRE_STOP)
                 .forEach(consumer -> consumer.accept(this));
     }
 
-    private void postStop() {
+    protected void postStop() {
         lifecycleListeners.get(LifecycleState.POST_STOP)
                 .forEach(consumer -> consumer.accept(this));
         contextLoaded = false;
