@@ -93,6 +93,18 @@ public class WebApplication extends Application {
     }
 
     /**
+     *
+     */
+    public void start() throws Exception {
+        preStart();
+        initProperties();
+        initContext();
+        contextLoaded();
+        contextLoaded = true;
+        startUp();
+    }
+
+    /**
      * Begins the web application.
      * @throws Exception Throws any exception.
      */
@@ -119,6 +131,7 @@ public class WebApplication extends Application {
         server.start();
         server.getService().addConnector(connector1);
         hasStarted = true;
+        postStart();
         server.getServer().await();
     }
 
