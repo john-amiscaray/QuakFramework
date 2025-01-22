@@ -16,6 +16,8 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+      - name: Add Env Variable
+        run: echo "{}}}}}{$=HELLO_WORLD" >> $GITHUB_ENV
       - name: Test with maven
         run: mvn test
       - name: Upload coverage to Codecov
@@ -30,7 +32,3 @@ jobs:
           name: codecov-umbrella
           path_to_write_report: ./coverage/codecov_report.txt
           verbose: true
-#      - name: Maven Deploy
-#        run: mvn -s settings.xml clean deploy -Dmaven.resolver.transport=wagon -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true
-#        env:
-#          SNAPSHOT_REPOSITORY_HOST: ${{ secrets.MAVEN_SNAPSHOT_HOST }}

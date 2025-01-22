@@ -8,6 +8,7 @@ module backend.framework.core.test {
     requires org.hamcrest;
     requires quak.framework.core;
     requires static lombok;
+    requires org.mockito;
 
     opens io.john.amiscaray.quak.core.test to org.junit.platform.commons;
     opens io.john.amiscaray.quak.core.test.di to org.junit.platform.commons;
