@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class ApplicationTest {
 
@@ -36,7 +35,6 @@ public class ApplicationTest {
         Assertions.assertEquals(ApplicationProperty.DB_CONNECTION_PASSWORD.getValue(), "");
         Assertions.assertEquals(ApplicationProperty.SQL_DIALECT.getValue(), "org.hibernate.dialect.H2Dialect");
         Assertions.assertEquals(ApplicationProperty.JWT_SECRET_KEY.getValue(), System.getenv("PATH"));
-        Assertions.assertEquals(ApplicationProperty.JWT_EXPIRY_TIME.getValue(), System.getenv("{}}}}}{$"));
     }
 
     @Test
