@@ -123,11 +123,11 @@ under the License.
       <username>${env.MAVEN_SNAPSHOT_USER}</username>
       <password>${env.MAVEN_SNAPSHOT_PASSWORD}</password>
     </server>
-    <server>
-      <id>github</id>
-      <username>${env.GITHUB_ACTOR}</username>
-      <password>${env.GH_TOKEN}</password>
-    </server>
+<!--    <server>-->
+<!--      <id>github</id>-->
+<!--      <username>${env.GITHUB_ACTOR}</username>-->
+<!--      <password>${env.GH_TOKEN}</password>-->
+<!--    </server>-->
     <!-- Another sample, using keys to authenticate.
     <server>
       <id>siteServer</id>
@@ -192,6 +192,13 @@ under the License.
    |
    |-->
   <profiles>
+    <profile>
+      <id>deploy-to-test-snapshot-repo</id>
+      <properties>
+        <server.id>nexus-snapshots</server.id>
+        <server.url>${env.MAVEN_SNAPSHOT_HOST}</server.url>
+      </properties>
+    </profile>
     <!-- profile
      | Specifies a set of introductions to the build process, to be activated using one or more of the
      | mechanisms described above. For inheritance purposes, and to activate profiles via <activatedProfiles/>
