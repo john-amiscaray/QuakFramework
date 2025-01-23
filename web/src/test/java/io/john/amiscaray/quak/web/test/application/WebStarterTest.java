@@ -2,6 +2,7 @@ package io.john.amiscaray.quak.web.test.application;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.john.amiscaray.quak.core.Application;
 import io.john.amiscaray.quak.core.di.ApplicationContext;
 import io.john.amiscaray.quak.web.application.WebApplication;
 import io.john.amiscaray.quak.web.application.WebStarter;
@@ -24,6 +25,7 @@ import java.net.http.HttpResponse;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 
 import static io.john.amiscaray.quak.web.test.stub.MockAccount.*;
 import static io.john.amiscaray.quak.web.test.stub.MockUserInfo.dummyUser;
@@ -31,6 +33,7 @@ import static io.john.amiscaray.quak.web.test.stub.MockUserInfo.dummyUsers;
 import static io.john.amiscaray.quak.web.test.util.TestConnectionUtil.ROOT_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.*;
 
 public class WebStarterTest {
 
@@ -349,6 +352,23 @@ public class WebStarterTest {
                     assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, status);
                     assertNotEquals(UnmappedException.MESSAGE, httpResponse.body());
                 });
+    }
+
+    @Test
+    public void shouldAddCallbackToWebApplicationWhenCallingTheOnMethod() {
+        try (var mockedApplication = mockStatic(WebApplication.class)) {
+            var mockWebApplication = mock(WebApplication.class);
+            mockedApplication.when(WebApplication::getInstance)
+                    .thenReturn(mockWebApplication);
+            Consumer<Application> callback = app -> {
+                System.out.println("Hello World");
+            };
+
+            WebStarter.on(Application.LifecycleState.POST_START, callback);
+
+            verify(mockWebApplication, times(1))
+                    .on(Application.LifecycleState.POST_START, callback);
+        }
     }
 
 }
