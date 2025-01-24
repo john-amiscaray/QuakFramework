@@ -3,42 +3,73 @@ package io.john.amiscaray.quak.generator.jpms;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import io.john.amiscaray.quak.generator.model.VisitedSourcesState;
 import lombok.AllArgsConstructor;
+import org.apache.maven.plugin.logging.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 public class ModuleInfoWriter {
 
     private VisitedSourcesState finalVisitedSourcesState;
     private String rootPackage;
+    private String targetControllerPackage;
     private String moduleInfoTemplate;
-
-    public ModuleInfoWriter(VisitedSourcesState finalVisitedSourcesState, String rootPackage) {
-        this.finalVisitedSourcesState = finalVisitedSourcesState;
-        this.rootPackage = rootPackage;
-    }
+    private Log logger;
 
     public String writeModuleInfo() {
-        if (finalVisitedSourcesState.visitedRestModelClasses().isEmpty() && finalVisitedSourcesState.visitedEntityClasses().isEmpty()) {
-            return null;
-        }
+        var packageNameToPackageInfo = new HashMap<String, ParsedPackageInfo>();
 
-        var modelPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedRestModelClasses());
+        var restModelPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedRestModelClasses());
+        for (var restModelPackage : restModelPackages) {
+            if (packageNameToPackageInfo.containsKey(restModelPackage)) {
+                packageNameToPackageInfo.get(restModelPackage)
+                        .setContainsRestModelClasses(true);
+            } else {
+                packageNameToPackageInfo.put(
+                        restModelPackage,
+                        new ParsedPackageInfo(restModelPackage, false, true, false));
+            }
+        }
         var ormPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedEntityClasses());
+        for (var ormPackage : ormPackages) {
+            if (packageNameToPackageInfo.containsKey(ormPackage)) {
+                packageNameToPackageInfo.get(ormPackage)
+                        .setContainsORMClasses(true);
+            } else {
+                packageNameToPackageInfo.put(
+                        ormPackage,
+                        new ParsedPackageInfo(ormPackage, true, false, false)
+                );
+            }
+        }
         var diComponentPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedDIComponents());
+        for (var diComponentPackage : diComponentPackages) {
+            if (packageNameToPackageInfo.containsKey(diComponentPackage)) {
+                packageNameToPackageInfo.get(diComponentPackage)
+                        .setContainsDIClasses(true);
+            } else {
+                packageNameToPackageInfo.put(
+                        diComponentPackage,
+                        new ParsedPackageInfo(diComponentPackage, false, false, true)
+                );
+            }
+        }
 
         if (moduleInfoTemplate == null) {
             return String.format("""
             module %1$s {
             %2$s
             }
-            """, rootPackage, generateModuleInfoContent(modelPackages, ormPackages, diComponentPackages));
+            """, rootPackage, generateModuleInfoContent(packageNameToPackageInfo));
         } else {
             // remove the closing curly bracket and add some space to add the generated code
             moduleInfoTemplate = moduleInfoTemplate.stripTrailing();
             moduleInfoTemplate = moduleInfoTemplate.substring(0, moduleInfoTemplate.length() - 1) + "\n    // GENERATED SOURCES:\n";
 
-            return moduleInfoTemplate + generateModuleInfoContent(modelPackages, ormPackages, diComponentPackages) + "}";
+            return moduleInfoTemplate + generateModuleInfoContent(packageNameToPackageInfo) + "}";
         }
     }
 
@@ -52,16 +83,11 @@ public class ModuleInfoWriter {
                 .toList();
     }
 
-    private String generateModuleInfoContent(List<String> modelPackages, List<String> ormPackages, List<String> diComponentPackages) {
+    private String generateModuleInfoContent(Map<String, ParsedPackageInfo> packageNameToPackageInfo) {
         return String.format("""
-                exports %1$s.controllers to quak.framework.core, quak.framework.web;
+                exports %1$s to quak.framework.core, quak.framework.web;
                 
-                // Rules for RestModels
                 %2$s
-                // Rules for Entities
-                %3$s
-                // Rules for DI Components
-                %4$s
                 
                 requires quak.framework.core;
                 requires quak.framework.data;
@@ -71,10 +97,32 @@ public class ModuleInfoWriter {
                 requires jakarta.persistence;
                 requires static lombok;
                 requires org.reflections;
-                """, rootPackage, generateRulesForModelPackages(modelPackages),
-                        generateRulesForORMPackages(ormPackages),
-                        generateRulesForPackagesWithDIComponents(diComponentPackages))
-                .indent(4);
+                """, targetControllerPackage,
+                generateRulesForPackages(packageNameToPackageInfo)).indent(4);
+    }
+
+    private String generateRulesForPackages(Map<String, ParsedPackageInfo> packageNameToPackageInfo) {
+        var resultingRules = new StringBuilder();
+        for (var packageInfo : packageNameToPackageInfo.values()) {
+            resultingRules.append(generateRulesForPackage(packageInfo));
+            resultingRules.append("\n");
+        }
+        return resultingRules.toString().stripTrailing();
+    }
+
+    private String generateRulesForPackage(ParsedPackageInfo packageInfo) {
+        var resultingRule = new StringBuilder("opens ").append(packageInfo.getPackageName()).append(" to ");
+        var openedTo = new ArrayList<String>();
+        if (packageInfo.isContainsDIClasses()) {
+            openedTo.add("quak.framework.core");
+        }
+        if (packageInfo.isContainsRestModelClasses()) {
+            openedTo.add("com.fasterxml.jackson.databind");
+        }
+        if (packageInfo.isContainsORMClasses()) {
+            openedTo.add("org.hibernate.orm.core");
+        }
+        return resultingRule.append(String.join(", ", openedTo)).append(";").toString();
     }
 
     private String generateRulesForModelPackages(List<String> modelPackages) {

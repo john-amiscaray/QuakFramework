@@ -216,11 +216,11 @@ public class ApplicationContext {
     }
 
     /**
-     * Fetches a list of dependencies
-     * @param aggregateListName
-     * @param dependencyType
-     * @return
-     * @param <T>
+     * Fetches a list of dependencies aggregated into a named list.
+     * @param aggregateListName The name of the list of dependencies.
+     * @param dependencyType The type of the dependencies.
+     * @return The list of the dependencies.
+     * @param <T> The type of the dependencies.
      */
     public <T> List<T> getAggregateDependencies(String aggregateListName, Class<T> dependencyType) {
         return aggregateDependencies.get(new DependencyID<>(aggregateListName, dependencyType));

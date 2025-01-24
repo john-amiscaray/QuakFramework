@@ -12,6 +12,7 @@ module backend.framework.core.test {
 
     opens io.john.amiscaray.quak.core.test to org.junit.platform.commons;
     opens io.john.amiscaray.quak.core.test.di to org.junit.platform.commons;
+    opens io.john.amiscaray.quak.core.test.properties to org.junit.platform.commons;
     exports io.john.amiscaray.quak.core.test.di.stub;
     exports io.john.amiscaray.quak.core.test.di.stub.pojo;
     opens io.john.amiscaray.quak.core.test.di.stub to org.junit.platform.commons;

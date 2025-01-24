@@ -24,9 +24,10 @@ import java.util.HashMap;
 import static io.john.amiscaray.quak.generator.util.ParserUtils.getAnnotationMemberValue;
 
 /**
- * Used to generate controllers based on classes annotated with {@link io.john.amiscaray.quak.generator.api.RestModel} and those annotated with {@link jakarta.persistence.Entity}
+ * Used to generate controllers based on classes annotated with {@link io.john.amiscaray.quak.generator.api.RestModel} and those annotated with {@link jakarta.persistence.Entity}.
+ * Also generates a module-info.java file needed for dependency injection.
  */
-@Mojo(name = "generate-controllers", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
+@Mojo(name = "generate-sources", requiresDependencyResolution = ResolutionScope.RUNTIME, defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class ApiGeneratorMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.sourceDirectory}", required = true)
@@ -36,7 +37,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
     private File generatedClassesDirectory;
 
     @Parameter(required = true)
-    private String targetPackage;
+    private String targetControllerPackage;
 
     @Parameter(required = true)
     private String rootPackage;
@@ -54,8 +55,13 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
     @Override
     public void execute() {
+        if (!generatedClassesDirectory.exists()) {
+            getLog().warn("Cannot find target folder. Creating it.");
+            generatedClassesDirectory.mkdirs();
+        }
+
         if (!sourceDirectory.exists()) {
-            getLog().warn("Source directory does not exist: " + sourceDirectory.getAbsolutePath());
+            getLog().error("Cannot generate sources. Source directory does not exist: " + sourceDirectory.getAbsolutePath());
             return;
         }
 
@@ -73,9 +79,12 @@ public class ApiGeneratorMojo extends AbstractMojo {
     }
 
     private void generateModuleInfo() {
-        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, moduleInfoTemplateSource);
+        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, targetControllerPackage, moduleInfoTemplateSource, getLog());
         try {
-            writeGeneratedModuleInfo(moduleInfoWriter.writeModuleInfo());
+            var generatedModuleInfoContents = moduleInfoWriter.writeModuleInfo();
+            if (generatedModuleInfoContents != null) {
+                writeGeneratedModuleInfo(generatedModuleInfoContents);
+            }
         } catch (IOException e) {
             getLog().error("Could not write module-info.java: ", e);
         }
@@ -83,6 +92,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
 
     private void writeGeneratedModuleInfo(String moduleInfoSource) throws IOException {
         var newGeneratedJavaSource = new File(generatedClassesDirectory, "module-info.java");
+
         try (var fileWriter = new FileWriter(newGeneratedJavaSource)) {
             fileWriter.write(moduleInfoSource);
         }
@@ -108,7 +118,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
         }
 
         for (var restModelToEntityClassEntry : restModelClassToEntityClass.entrySet()) {
-            var generatedSource = controllerWriter.writeNewController(targetPackage, restModelToEntityClassEntry.getKey(), restModelToEntityClassEntry.getValue());
+            var generatedSource = controllerWriter.writeNewController(targetControllerPackage, restModelToEntityClassEntry.getKey(), restModelToEntityClassEntry.getValue());
             try {
                 writeGeneratedController(generatedSource);
             } catch (IOException e) {
@@ -118,7 +128,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
     }
 
     private void writeGeneratedController(GeneratedClass generatedClass) throws IOException {
-        var packageSubFolders = targetPackage.replace(".", "/");
+        var packageSubFolders = targetControllerPackage.replace(".", "/");
         var outDirectory = new File(generatedClassesDirectory, "/" + packageSubFolders);
         if (!outDirectory.exists()) {
             outDirectory.mkdirs();

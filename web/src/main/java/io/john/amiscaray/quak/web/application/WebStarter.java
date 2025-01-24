@@ -22,6 +22,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 /**
  * Used to start a web application by scanning through the project classes and instantiating the provided controllers and filters.
@@ -35,6 +36,15 @@ public class WebStarter {
             return parameterizedType.getRawType().getTypeName();
         }
         return type.getTypeName();
+    }
+
+    /**
+     * Adds a callback function to the web application. NOTE: This should be called <strong>before</strong> calling {@link io.john.amiscaray.quak.web.application.WebStarter#beginWebApplication WebStarter#beginWebApplication} for the callbacks to properly work.
+     * @param lifecycleState A specific state of the application when the callback should be called.
+     * @param callback A callback called when the lifecycleState has occurred.
+     */
+    public static void on(Application.LifecycleState lifecycleState, Consumer<Application> callback) {
+        WebApplication.getInstance().on(lifecycleState, callback);
     }
 
     /**
