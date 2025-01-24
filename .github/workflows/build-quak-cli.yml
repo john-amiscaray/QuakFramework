@@ -1,0 +1,60 @@
+name: Build Quak CLI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Maven
+        run: sudo apt-get update && sudo apt-get install -y maven
+
+      # Set up Java environment
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      # Build the Maven project
+      - name: Build Maven package
+        run: mvn -f tools/QuakCLI/pom.xml clean package
+
+      # Move the JAR to the desired location
+      - name: Move JAR file
+        run: |
+          mkdir -p dist
+          mv tools/QuakCLI/target/*.jar dist/
+
+      # Create a Bash executable script
+      - name: Create Bash script
+        run: |
+          echo "#!/bin/bash" > dist/run-jar.sh
+          echo "java -jar \$(dirname \"\$0\")/$(ls dist/*.jar) \"\$@\"" >> dist/run-jar.sh
+          chmod +x dist/run-jar.sh
+
+      # Create a Windows Batch script
+      - name: Create Windows Batch script
+        run: |
+          echo @echo off > dist/run-jar.bat
+          echo set SCRIPT_DIR=%%~dp0 >> dist/run-jar.bat
+          echo java -jar %%SCRIPT_DIR%%\\$(ls dist/*.jar) %%* >> dist/run-jar.bat
+
+      # Optional: Add the JAR and scripts to the repository (requires permissions)
+      - name: Commit and push JAR and scripts
+        if: github.ref == 'refs/heads/master'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/*
+          git commit -m "Add built JAR file and cross-platform executable scripts [skip ci]"
+          git push
