@@ -38,16 +38,16 @@ jobs:
       # Create a Bash executable script
       - name: Create Bash script
         run: |
-          echo "#!/bin/bash" > distribution/run-jar.sh
-          echo "java -jar \$(dirname \"\$0\")/$(ls distribution/*.jar) \"\$@\"" >> distribution/run-jar.sh
-          chmod +x distribution/run-jar.sh
+          echo "#!/bin/bash" > distribution/quak-cli.sh
+          echo "java -jar \$(dirname \"\$0\")/$(ls distribution/*.jar) \"\$@\"" >> distribution/quak-cli.sh
+          chmod +x distribution/quak-cli.sh
 
       # Create a Windows Batch script
       - name: Create Windows Batch script
         run: |
-          echo @echo off > distribution/run-jar.bat
-          echo set SCRIPT_DIR=%%~dp0 >> distribution/run-jar.bat
-          echo java -jar %%SCRIPT_DIR%%\\$(ls distribution/*.jar) %%* >> distribution/run-jar.bat
+          echo @echo off > distribution/quak-cli.bat
+          echo set SCRIPT_DIR=%%~dp0 >> distribution/quak-cli.bat
+          echo java -jar %%SCRIPT_DIR%%\\$(ls distribution/*.jar) %%* >> distribution/quak-cli.bat
 
       # Optional: Add the JAR and scripts to the repository (requires permissions)
       - name: Commit and push JAR and scripts
