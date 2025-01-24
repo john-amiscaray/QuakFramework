@@ -6,6 +6,8 @@ import io.john.amiscaray.quak.cli.cfg.ProjectConfig;
 import io.john.amiscaray.quak.cli.templates.Template;
 import org.apache.commons.io.FileUtils;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -669,7 +671,20 @@ public class ProjectGenerator {
         transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
         var source = new DOMSource(document);
         var result = new StreamResult(altered);
+        removeWhitespaceNodes(document.getDocumentElement());
         transformer.transform(source, result);
+    }
+
+    private static void removeWhitespaceNodes(Node node) {
+        var children = node.getChildNodes();
+        for (int i = children.getLength() - 1; i >= 0; i--) {
+            var child = children.item(i);
+            if (child.getNodeType() == Node.TEXT_NODE && child.getTextContent().trim().isEmpty()) {
+                node.removeChild(child);
+            } else if (child.getNodeType() == Node.ELEMENT_NODE) {
+                removeWhitespaceNodes(child);
+            }
+        }
     }
 
 }
