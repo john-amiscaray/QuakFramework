@@ -11,7 +11,6 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
-import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
@@ -187,12 +186,12 @@ public class ProjectGenerator {
                                 <executions>
                                     <execution>
                                         <goals>
-                                            <goal>generate-controllers</goal>
+                                            <goal>generate-sources</goal>
                                         </goals>
                                         <phase>process-sources</phase>
                                         <configuration>
                                             <rootPackage>%1$s</rootPackage>
-                                            <targetPackage>%1$s.%2$s</targetPackage>
+                                            <targetControllerPackage>%1$s.controllers</targetControllerPackage>
                                         </configuration>
                                     </execution>
                                 </executions>
