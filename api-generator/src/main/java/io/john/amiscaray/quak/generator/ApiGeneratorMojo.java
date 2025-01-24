@@ -79,9 +79,12 @@ public class ApiGeneratorMojo extends AbstractMojo {
     }
 
     private void generateModuleInfo() {
-        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, targetControllerPackage, moduleInfoTemplateSource);
+        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, targetControllerPackage, moduleInfoTemplateSource, getLog());
         try {
-            writeGeneratedModuleInfo(moduleInfoWriter.writeModuleInfo());
+            var generatedModuleInfoContents = moduleInfoWriter.writeModuleInfo();
+            if (generatedModuleInfoContents != null) {
+                writeGeneratedModuleInfo(generatedModuleInfoContents);
+            }
         } catch (IOException e) {
             getLog().error("Could not write module-info.java: ", e);
         }
