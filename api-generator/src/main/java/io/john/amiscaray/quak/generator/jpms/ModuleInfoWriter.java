@@ -3,6 +3,7 @@ package io.john.amiscaray.quak.generator.jpms;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import io.john.amiscaray.quak.generator.model.VisitedSourcesState;
 import lombok.AllArgsConstructor;
+import org.apache.maven.plugin.logging.Log;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,12 +17,9 @@ public class ModuleInfoWriter {
     private String rootPackage;
     private String targetControllerPackage;
     private String moduleInfoTemplate;
+    private Log logger;
 
     public String writeModuleInfo() {
-        if (finalVisitedSourcesState.visitedRestModelClasses().isEmpty() && finalVisitedSourcesState.visitedEntityClasses().isEmpty()) {
-            return null;
-        }
-
         var packageNameToPackageInfo = new HashMap<String, ParsedPackageInfo>();
 
         var restModelPackages = extractPackagesFromClasses(finalVisitedSourcesState.visitedRestModelClasses());

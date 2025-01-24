@@ -2,6 +2,7 @@ package io.john.amiscaray.quak.generator.test.jpms;
 
 import io.john.amiscaray.quak.generator.jpms.ModuleInfoWriter;
 import io.john.amiscaray.quak.generator.model.VisitedSourcesState;
+import org.apache.maven.plugin.logging.Log;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import static io.john.amiscaray.quak.generator.test.assertions.TestSourceUtil.pa
 import static io.john.amiscaray.quak.generator.test.stub.MockSource.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalToCompressingWhiteSpace;
+import static org.mockito.Mockito.mock;
 
 public class ModuleInfoWriterTest {
 
@@ -33,8 +35,8 @@ public class ModuleInfoWriterTest {
                 mockFinalVisitedSourcesStatue(),
                 "io.john.amiscaray",
                 "io.john.amiscaray.controllers",
-                null
-
+                null,
+                mock(Log.class)
         );
 
         assertThat(
@@ -68,8 +70,8 @@ public class ModuleInfoWriterTest {
                 mockFinalVisitedSourcesStatue(),
                 "io.john.amiscaray",
                 "io.john.amiscaray",
-                null
-
+                null,
+                mock(Log.class)
         );
 
         assertThat(
@@ -109,7 +111,8 @@ public class ModuleInfoWriterTest {
                             requires org.slf4j;
                         
                         }
-                        """
+                        """,
+                mock(Log.class)
         );
 
         assertThat(
