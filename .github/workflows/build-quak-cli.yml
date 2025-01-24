@@ -40,7 +40,7 @@ jobs:
         run: |
           cd distribution
           echo "#!/bin/bash" > ./quak-cli.sh
-          echo "java -jar /$(ls *.jar) \"\$@\"" >> ./quak-cli.sh
+          echo "java -jar ./$(ls *.jar) \"\$@\"" >> ./quak-cli.sh
           chmod +x ./quak-cli.sh
 
       # Create a Windows Batch script
