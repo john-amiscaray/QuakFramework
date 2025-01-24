@@ -29,6 +29,10 @@ public class ModuleInfoWriterTest {
         ));
     }
 
+    public VisitedSourcesState mockEmptyVisitedSourcesState() {
+        return new VisitedSourcesState(new HashMap<>(), List.of(), List.of(), List.of());
+    }
+
     @Test
     public void testWritesModuleInfoForStudentAndEmployeeStubs() {
         var moduleInfoWriter = new ModuleInfoWriter(
@@ -142,6 +146,75 @@ public class ModuleInfoWriterTest {
                         """)
         );
 
+    }
+
+    @Test
+    public void testWritesModuleInfoWhenNoDIClassesRestModelsOrEntitiesFoundAndNoTemplate() {
+        var moduleInfoWriter = new ModuleInfoWriter(
+                mockEmptyVisitedSourcesState(),
+                "io.john.amiscaray",
+                "io.john.amiscaray.http",
+                null,
+                mock(Log.class)
+        );
+
+        assertThat(
+                moduleInfoWriter.writeModuleInfo(),
+                equalToCompressingWhiteSpace("""
+                        module io.john.amiscaray {
+                        
+                             exports io.john.amiscaray.http to quak.framework.core, quak.framework.web;
+
+                             requires quak.framework.core;
+                             requires quak.framework.data;
+                             requires quak.framework.generator.model;
+                             requires quak.framework.web;
+                             requires quak.framework.web.model;
+                             requires jakarta.persistence;
+                             requires static lombok;
+                             requires org.reflections;
+                        }
+                        """)
+        );
+    }
+
+    @Test
+    public void testWritesModuleInfoWhenNoDIClassesRestModelsOrEntitiesFoundWithTemplate() {
+        var moduleInfoWriter = new ModuleInfoWriter(
+                mockEmptyVisitedSourcesState(),
+                "io.john.amiscaray",
+                "io.john.amiscaray.http",
+                """
+                        module my.module {
+                        
+                            requires org.slf4j;
+                        
+                        }
+                        """,
+                mock(Log.class)
+        );
+
+        assertThat(
+                moduleInfoWriter.writeModuleInfo(),
+                equalToCompressingWhiteSpace("""
+                        module my.module {
+                                                
+                             requires org.slf4j;
+                         
+                             // GENERATED SOURCES:
+                             exports io.john.amiscaray.http to quak.framework.core, quak.framework.web;
+
+                             requires quak.framework.core;
+                             requires quak.framework.data;
+                             requires quak.framework.generator.model;
+                             requires quak.framework.web;
+                             requires quak.framework.web.model;
+                             requires jakarta.persistence;
+                             requires static lombok;
+                             requires org.reflections;
+                        }
+                        """)
+        );
     }
 
 }
