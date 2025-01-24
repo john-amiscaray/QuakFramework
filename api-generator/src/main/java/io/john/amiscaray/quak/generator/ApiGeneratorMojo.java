@@ -37,7 +37,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
     private File generatedClassesDirectory;
 
     @Parameter(required = true)
-    private String targetPackage;
+    private String targetControllerPackage;
 
     @Parameter(required = true)
     private String rootPackage;
@@ -79,7 +79,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
     }
 
     private void generateModuleInfo() {
-        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, moduleInfoTemplateSource);
+        var moduleInfoWriter = new ModuleInfoWriter(visitedSourcesState, rootPackage, targetControllerPackage, moduleInfoTemplateSource);
         try {
             writeGeneratedModuleInfo(moduleInfoWriter.writeModuleInfo());
         } catch (IOException e) {
@@ -115,7 +115,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
         }
 
         for (var restModelToEntityClassEntry : restModelClassToEntityClass.entrySet()) {
-            var generatedSource = controllerWriter.writeNewController(targetPackage, restModelToEntityClassEntry.getKey(), restModelToEntityClassEntry.getValue());
+            var generatedSource = controllerWriter.writeNewController(targetControllerPackage, restModelToEntityClassEntry.getKey(), restModelToEntityClassEntry.getValue());
             try {
                 writeGeneratedController(generatedSource);
             } catch (IOException e) {
@@ -125,7 +125,7 @@ public class ApiGeneratorMojo extends AbstractMojo {
     }
 
     private void writeGeneratedController(GeneratedClass generatedClass) throws IOException {
-        var packageSubFolders = targetPackage.replace(".", "/");
+        var packageSubFolders = targetControllerPackage.replace(".", "/");
         var outDirectory = new File(generatedClassesDirectory, "/" + packageSubFolders);
         if (!outDirectory.exists()) {
             outDirectory.mkdirs();
