@@ -32,22 +32,22 @@ jobs:
       # Move the JAR to the desired location
       - name: Move JAR file
         run: |
-          mkdir -p dist
-          mv tools/QuakCLI/target/*.jar dist/
+          mkdir -p distribution
+          mv tools/QuakCLI/target/*.jar distribution/
 
       # Create a Bash executable script
       - name: Create Bash script
         run: |
-          echo "#!/bin/bash" > dist/run-jar.sh
-          echo "java -jar \$(dirname \"\$0\")/$(ls dist/*.jar) \"\$@\"" >> dist/run-jar.sh
-          chmod +x dist/run-jar.sh
+          echo "#!/bin/bash" > distribution/run-jar.sh
+          echo "java -jar \$(dirname \"\$0\")/$(ls distribution/*.jar) \"\$@\"" >> distribution/run-jar.sh
+          chmod +x distribution/run-jar.sh
 
       # Create a Windows Batch script
       - name: Create Windows Batch script
         run: |
-          echo @echo off > dist/run-jar.bat
-          echo set SCRIPT_DIR=%%~dp0 >> dist/run-jar.bat
-          echo java -jar %%SCRIPT_DIR%%\\$(ls dist/*.jar) %%* >> dist/run-jar.bat
+          echo @echo off > distribution/run-jar.bat
+          echo set SCRIPT_DIR=%%~dp0 >> distribution/run-jar.bat
+          echo java -jar %%SCRIPT_DIR%%\\$(ls distribution/*.jar) %%* >> distribution/run-jar.bat
 
       # Optional: Add the JAR and scripts to the repository (requires permissions)
       - name: Commit and push JAR and scripts
@@ -55,6 +55,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add dist/*
+          git add distribution/*
           git commit -m "Add built JAR file and cross-platform executable scripts [skip ci]"
           git push
