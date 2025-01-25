@@ -33,14 +33,14 @@ jobs:
       - name: Move JAR file
         run: |
           mkdir -p distribution
-          mv tools/QuakCLI/target/*.jar distribution/
+          mv tools/QuakCLI/target/QuakCLI*.jar distribution/
 
       # Create a Bash executable script
       - name: Create Bash script
         run: |
           cd distribution
           echo "#!/bin/bash" > ./quak-cli.sh
-          echo "java -jar ./$(ls *.jar) \"\$@\"" >> ./quak-cli.sh
+          echo "java -jar ./$(ls QuakCLI*.jar) \"\$@\"" >> ./quak-cli.sh
           chmod +x ./quak-cli.sh
 
       # Create a Windows Batch script
@@ -49,7 +49,7 @@ jobs:
           cd distribution
           echo "@echo off" > ./quak-cli.bat
           echo "set SCRIPT_DIR=%~dp0" >> ./quak-cli.bat
-          echo "java -jar %SCRIPT_DIR%\\$(ls *.jar) %*" >> ./quak-cli.bat
+          echo "java -jar %SCRIPT_DIR%\\$(ls QuakCLI*.jar) %*" >> ./quak-cli.bat
 
       # Optional: Add the JAR and scripts to the repository (requires permissions)
       - name: Commit and push JAR and scripts

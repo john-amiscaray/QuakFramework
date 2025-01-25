@@ -31,13 +31,14 @@ public class Main {
 
     public static void main(String[] args) {
         var defaultTerminalFactory = new DefaultTerminalFactory();
+        var isWindows = System.getProperty("os.name").toLowerCase().contains("win");
         if (args.length == 0 || !commands.contains(args[0])) {
             System.out.println("Usage: java -jar QuakCLI.jar <command>. Where command is one of: "
                     + String.join(", ", commands.stream().map(command -> "'" + command + "'").toList()) + ".");
             System.exit(-1);
             return;
         }
-        try(var terminal = defaultTerminalFactory.createTerminal()) {
+        try(var terminal = isWindows ? defaultTerminalFactory.createTerminalEmulator() : defaultTerminalFactory.createTerminal()) {
             terminal.setCursorVisible(false);
             showBanner(terminal);
             var command = args[0];
