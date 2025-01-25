@@ -48,8 +48,8 @@ jobs:
         run: |
           cd distribution
           echo @echo off > ./quak-cli.bat
-          echo set SCRIPT_DIR=%%~dp0 >> ./quak-cli.bat
-          echo java -jar %%SCRIPT_DIR%%\\$(ls ./*.jar) %%* >> ./quak-cli.bat
+          echo set SCRIPT_DIR=%~dp0 >> ./quak-cli.bat
+          echo java -jar %SCRIPT_DIR%\$(ls ./*.jar) %* >> ./quak-cli.bat
 
       # Optional: Add the JAR and scripts to the repository (requires permissions)
       - name: Commit and push JAR and scripts
