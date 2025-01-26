@@ -197,7 +197,7 @@ View the [javadocs](https://john-amiscaray.github.io/QuakFramework/) for more in
 
 > NOTE: Currently, Quak has only been released as a 1.0-SNAPSHOT version hosted via GitHub packages. When Quak has a full non-snapshot release, it will be hosted on maven central. Because Quak is only available on GitHub packages, you'll need extra setup beyond adding dependencies to your project's pom.xml.
 
-You can use the Quak CLI to set up most of the project for you (except for step three below where you need to insert your GitHub username and personal access token manually). Otherwise, follow the steps below:
+You can use the [Quak CLI](https://github.com/john-amiscaray/QuakFramework/wiki/The-Quak-CLI) to set up most of the project for you (except for step three below where you need to insert your GitHub username and personal access token manually). Otherwise, follow the steps below:
 
 1. Add the appropriate Quak modules as maven dependencies in your project's `pom.xml`. See the [project GitHub packages](https://github.com/john-amiscaray/QuakFramework/packages) for more details.
 2. In your `pom.xml`, add the following repositories:
