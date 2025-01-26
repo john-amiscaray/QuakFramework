@@ -15,8 +15,9 @@ import javax.xml.transform.TransformerException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-public class Main {
+public class QuakCLIMain {
 
     private static final String banner = """
             ================================================================
@@ -27,14 +28,17 @@ public class Main {
                |__|                                                        \s
             ================================================================
             """;
-    private static final List<String> commands = List.of("create");
+    private static final Map<String, String> commandDescriptions = Map.of(
+            "create", "Used to create a new Quak Application. Accepts a single optional argument for the directory to put your application's root folder. If the directory is not specified, the project will be located in the directory where you ran the command. Example: './quak-cli.bat create C:/Projects/'",
+            "help", "Used to give help information about possible commands. Accepts a single optional argument for the name of a command you need help with. If this isn't specified then it will list all available commands."
+    );
 
     public static void main(String[] args) {
         var defaultTerminalFactory = new DefaultTerminalFactory();
         var isWindows = System.getProperty("os.name").toLowerCase().contains("win");
-        if (args.length == 0 || !commands.contains(args[0])) {
+        if (args.length == 0 || !commandDescriptions.containsKey(args[0])) {
             System.out.println("Usage: java -jar QuakCLI.jar <command>. Where command is one of: "
-                    + String.join(", ", commands.stream().map(command -> "'" + command + "'").toList()) + ".");
+                    + listCommands());
             System.exit(-1);
             return;
         }
@@ -42,7 +46,7 @@ public class Main {
             terminal.setCursorVisible(false);
             showBanner(terminal);
             var command = args[0];
-            Main.class.getDeclaredMethod(command, Terminal.class, String[].class).invoke(null, terminal, Arrays.copyOfRange(args, 1, args.length));
+            QuakCLIMain.class.getDeclaredMethod(command, Terminal.class, String[].class).invoke(null, terminal, Arrays.copyOfRange(args, 1, args.length));
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
@@ -165,6 +169,33 @@ public class Main {
         var projectGenerator = ProjectGenerator.getInstance();
         projectGenerator.init(terminal);
         projectGenerator.generateProject(new ProjectConfig(artifactID, groupID, projectTemplate), workingDirectory);
+    }
+
+    private static void help(Terminal terminal, String[] args) throws IOException, InterruptedException {
+        if (args.length > 0) {
+            var command = args[0];
+            if (!commandDescriptions.containsKey(command)) {
+                terminal.putString("Command not found. You can ask for help about the following commands: " + listCommands());
+            } else {
+                terminal.putString(commandDescriptions.get(command));
+            }
+        } else {
+            terminal.putString("Using this tool you can use the following commands: " + listCommands() + " Try 'quak-cli help <command> for help about a specific command.'");
+        }
+        terminal.flush();
+        putLines(terminal, 2);
+        terminal.putString("Press Any Key to Exit...");
+        terminal.flush();
+        while (true) {
+            var keyStroke = terminal.readInput();
+            if (keyStroke != null) {
+                break;
+            }
+        }
+    }
+
+    private static String listCommands() {
+        return String.join(", ", commandDescriptions.keySet().stream().map(command -> "'" + command + "'").toList()) + ".";
     }
 
 }
