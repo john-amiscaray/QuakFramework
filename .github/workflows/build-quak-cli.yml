@@ -15,9 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Maven
-        run: sudo apt-get update && sudo apt-get install -y maven
-
       # Set up Java environment
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -51,6 +48,10 @@ jobs:
           echo "set SCRIPT_DIR=%~dp0" >> ./quak-cli.bat
           echo "java -jar %SCRIPT_DIR%\\$(ls QuakCLI*.jar) %*" >> ./quak-cli.bat
 
+      - name: Zip Executables
+        run: |
+          cd distribution
+          zip -r QuakCLI.zip *
       # Optional: Add the JAR and scripts to the repository (requires permissions)
       - name: Commit and push JAR and scripts
         if: github.ref == 'refs/heads/master'
