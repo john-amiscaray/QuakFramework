@@ -69,7 +69,7 @@ public class ApplicationProperties{
      * @return The value of the property as a string.
      */
     public String get(ApplicationProperty property) {
-        return property.getOrElseDefault(fileProperties);
+        return property.getOrElseDefault();
     }
 
     /**
@@ -90,7 +90,7 @@ public class ApplicationProperties{
      * @return The value of the property as a string.
      */
     public String getOrElse(ApplicationProperty property, String defaultValue) {
-        return property.getOrElse(fileProperties, defaultValue);
+        return property.getOrElse(defaultValue);
     }
 
 }

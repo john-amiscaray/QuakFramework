@@ -74,11 +74,12 @@ public enum ApplicationProperty {
         this.defaultValue = defaultValue;
     }
 
-    String getOrElse(Properties properties, String defaultValue) {
-        return Optional.ofNullable(properties.getProperty(name)).orElse(defaultValue);
+    String getOrElse(String defaultValue) {
+        return Optional.ofNullable(value).orElse(defaultValue);
     }
 
-    String getOrElseDefault(Properties properties) {
-        return Optional.of(properties.getProperty(name)).orElse(defaultValue);
+    String getOrElseDefault() {
+        return Optional.ofNullable(value).orElse(defaultValue);
     }
+
 }
