@@ -34,15 +34,15 @@ public enum ApplicationProperty {
     /**
      * The SQL dialect to use. Defaults to org.hibernate.dialect.MySQLDialect.
      */
-    SQL_DIALECT("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"),
+    SQL_DIALECT("hibernate.dialect", ""),
     /**
      * The SQL driver class to use. Defaults to com.mysql.cj.jdbc.Driver.
      */
-    DB_DRIVER_CLASS("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver"),
+    DB_DRIVER_CLASS("hibernate.connection.driver_class", ""),
     /**
      * The database connection URL. Defaults to jdbc:mysql://localhost:3306/test.
      */
-    DB_CONNECTION_URL("hibernate.connection.url", "jdbc:mysql://localhost:3306/test"),
+    DB_CONNECTION_URL("hibernate.connection.url", ""),
     /**
      * The hibernate database username. Defaults to <i>"root"</i>.
      */
@@ -74,11 +74,11 @@ public enum ApplicationProperty {
         this.defaultValue = defaultValue;
     }
 
-    String getOrElse(String defaultValue) {
+    public String getOrElse(String defaultValue) {
         return Optional.ofNullable(value).orElse(defaultValue);
     }
 
-    String getOrElseDefault() {
+    public String getOrElseDefault() {
         return Optional.ofNullable(value).orElse(defaultValue);
     }
 
