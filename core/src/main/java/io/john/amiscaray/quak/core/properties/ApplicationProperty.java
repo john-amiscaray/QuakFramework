@@ -32,15 +32,15 @@ public enum ApplicationProperty {
      */
     SERVER_DIRECTORY("server.directory", "server"),
     /**
-     * The SQL dialect to use. Defaults to org.hibernate.dialect.MySQLDialect.
+     * The SQL dialect to use. If not set, Quak will try to autofill it based on the connection url.
      */
     SQL_DIALECT("hibernate.dialect", ""),
     /**
-     * The SQL driver class to use. Defaults to com.mysql.cj.jdbc.Driver.
+     * The SQL driver class to use. If not set, Quak will try to autofill it based on the connection url.
      */
     DB_DRIVER_CLASS("hibernate.connection.driver_class", ""),
     /**
-     * The database connection URL. Defaults to jdbc:mysql://localhost:3306/test.
+     * The database connection URL. Defaults to an empty string.
      */
     DB_CONNECTION_URL("hibernate.connection.url", ""),
     /**
