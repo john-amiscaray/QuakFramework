@@ -38,10 +38,24 @@ public class DatabaseProxy {
      * @param classScanPackage The root package of the project to scan for entity classes from.
      */
     public DatabaseProxy(String classScanPackage) {
+        var sqlDialect = SQL_DIALECT.getOrElseDefault();
+        var dbDriverClass = DB_DRIVER_CLASS.getOrElseDefault();
+
+        if (DB_CONNECTION_URL.getValue().startsWith("jdbc:mysql")) {
+            sqlDialect = sqlDialect.isEmpty() ? "org.hibernate.dialect.MySQLDialect" : sqlDialect;
+            dbDriverClass = dbDriverClass.isEmpty() ? "com.mysql.cj.jdbc.Driver" : dbDriverClass;
+        } else if (DB_CONNECTION_URL.getValue().startsWith("jdbc:oracle")) {
+            sqlDialect = sqlDialect.isEmpty() ? "org.hibernate.dialect.OracleDialect" : sqlDialect;
+            dbDriverClass = dbDriverClass.isEmpty() ? "oracle.jdbc.OracleDriver" : dbDriverClass;
+        } else if (DB_CONNECTION_URL.getValue().startsWith("jdbc:postgresql")) {
+            sqlDialect = sqlDialect.isEmpty() ? "org.hibernate.dialect.PostgreSQLDialect" : sqlDialect;
+            dbDriverClass = dbDriverClass.isEmpty() ? "org.postgresql.Driver" : dbDriverClass;
+        }
+
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(Map.of(
-                        SQL_DIALECT.getName(), SQL_DIALECT.getValue(),
-                        DB_DRIVER_CLASS.getName(), DB_DRIVER_CLASS.getValue(),
+                        SQL_DIALECT.getName(), sqlDialect,
+                        DB_DRIVER_CLASS.getName(), dbDriverClass,
                         DB_CONNECTION_URL.getName(), DB_CONNECTION_URL.getValue(),
                         DB_CONNECTION_USERNAME.getName(), DB_CONNECTION_USERNAME.getValue(),
                         DB_CONNECTION_PASSWORD.getName(), DB_CONNECTION_PASSWORD.getValue(),

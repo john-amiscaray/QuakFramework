@@ -32,17 +32,17 @@ public enum ApplicationProperty {
      */
     SERVER_DIRECTORY("server.directory", "server"),
     /**
-     * The SQL dialect to use. Defaults to org.hibernate.dialect.MySQLDialect.
+     * The SQL dialect to use. If not set, Quak will try to autofill it based on the connection url.
      */
-    SQL_DIALECT("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"),
+    SQL_DIALECT("hibernate.dialect", ""),
     /**
-     * The SQL driver class to use. Defaults to com.mysql.cj.jdbc.Driver.
+     * The SQL driver class to use. If not set, Quak will try to autofill it based on the connection url.
      */
-    DB_DRIVER_CLASS("hibernate.connection.driver_class", "com.mysql.cj.jdbc.Driver"),
+    DB_DRIVER_CLASS("hibernate.connection.driver_class", ""),
     /**
-     * The database connection URL. Defaults to jdbc:mysql://localhost:3306/test.
+     * The database connection URL. Defaults to an empty string.
      */
-    DB_CONNECTION_URL("hibernate.connection.url", "jdbc:mysql://localhost:3306/test"),
+    DB_CONNECTION_URL("hibernate.connection.url", ""),
     /**
      * The hibernate database username. Defaults to <i>"root"</i>.
      */
@@ -74,11 +74,11 @@ public enum ApplicationProperty {
         this.defaultValue = defaultValue;
     }
 
-    String getOrElse(String defaultValue) {
+    public String getOrElse(String defaultValue) {
         return Optional.ofNullable(value).orElse(defaultValue);
     }
 
-    String getOrElseDefault() {
+    public String getOrElseDefault() {
         return Optional.ofNullable(value).orElse(defaultValue);
     }
 
